@@ -1,6 +1,6 @@
-# UniverseGuard2 <img width=256px height=256px src="logo.png" style="align:right"/>
+# UniverseGuard2 
 
-Universe Guard provides a simple command interface to protect some areas in your Minecraft Server world.
+Universe Guard provides a simple command interface to protect some areas in your Minecraft Server world. <img width=256px height=256px src="logo.png" style="align:right"/>
 
 # How it works
 Universe Guard is really easy to use. It all starts with a single command, /rg, wich gives you the Region Selector.
