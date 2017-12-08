@@ -177,6 +177,14 @@ public class RegionUtils {
 	}
 
 	/**
+	 * Check if there are old regions to convert
+	 */
+	public static boolean shouldConvertOldRegions()
+	{
+		return getOldRegionFolder().exists() || getOldGlobalRegionFolder().exists();
+	}
+	
+	/**
 	 * Convert the old region format to the new one (from UniverseGuard to UniverseGuard2)
 	 */
 	public static void convertOldRegions()

@@ -65,7 +65,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.0";
+	public static final String VERSION = "2.1";
 	/**
 	 * Plugin Description
 	 */
@@ -151,9 +151,11 @@ public class UniverseGuard {
 		// Update regions to the latest RegionVersion
 		this.updateRegions();
 		// Convert the old region format to the new one (from UniverseGuard to UniverseGuard2)
-		LogUtils.print(RegionText.CONFIGURATION_CONVERTING_OLD_REGIONS.getValue());
-		RegionUtils.convertOldRegions();
-		LogUtils.print(RegionText.CONFIGURATION_OLD_REGIONS_CONVERTED.getValue());
+		if(RegionUtils.shouldConvertOldRegions()) {
+			LogUtils.print(RegionText.CONFIGURATION_CONVERTING_OLD_REGIONS.getValue());
+			RegionUtils.convertOldRegions();
+			LogUtils.print(RegionText.CONFIGURATION_OLD_REGIONS_CONVERTED.getValue());	
+		}
 		LogUtils.print(RegionText.CONFIGURATION_REGIONS_UPDATED.getValue());
 	}
 

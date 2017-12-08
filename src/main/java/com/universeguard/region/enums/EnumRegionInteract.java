@@ -21,7 +21,11 @@ public enum EnumRegionInteract {
 	HOPPER("hopper", true),
 	LEVER("lever", true),
 	BUTTON("button", true),
-	FURNACE("furnace", true);
+	FURNACE("furnace", true),
+	DOOR("door", true),
+	FENCE_GATE("fencegate", true),
+	TRAPDOOR("trapdoor", true),
+	SIGN("sign", true);
 	
 	private String NAME;
 	private boolean VALUE;
