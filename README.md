@@ -1,5 +1,5 @@
 # UniverseGuard2
-<div style="text-align:right"><img width=256px height=256px src="logo.png" /></div>
+<div style="text-align:center"><img width=256px height=256px src="logo.png" /></div>
 
 Universe Guard provides a simple command interface to protect some areas in your Minecraft Server world.
 
