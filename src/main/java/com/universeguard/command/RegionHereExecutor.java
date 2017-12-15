@@ -18,47 +18,29 @@ import org.spongepowered.api.text.format.TextColors;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.FlagUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
  * 
- * Command Handler for /rg flaginfo
+ * Command Handler for /rg info
  * @author Jimi
  *
  */
-public class RegionFlagInfoExecutor implements CommandExecutor {
+public class RegionHereExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (src instanceof Player) {
 			Player player = (Player) src;
-			if (args.hasAny("flag") && args.hasAny("name")) {
-				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null) {
-					EnumRegionFlag flag = FlagUtils.getFlag(args.<String>getOne("flag").get());
-					if(flag != null) {
-						if(region.getFlag(EnumRegionFlag.HIDE_FLAGS))
-							MessageUtils.sendMessage(player, RegionText.FLAG_HIDDEN.getValue(), TextColors.RED);
-						else {
-							boolean value = region.getFlag(flag);
-							MessageUtils.sendMessage(player, String.valueOf(value), value ? TextColors.GREEN : TextColors.RED);	
-						}
-					} else
-						MessageUtils.sendErrorMessage(player, RegionText.REGION_FLAG_NOT_VALID.getValue());
-				} else
-					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
-			} else {
-				MessageUtils.sendErrorMessage(player, getCommandUsage());
-			}
+			Region region = RegionUtils.getRegion(player.getLocation());
+			if(region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION))
+				MessageUtils.sendMessage(player, RegionText.REGION.getValue() + ": " + region.getName(), RegionUtils.isMember(region, player) ? TextColors.GOLD : TextColors.GREEN);
+			else
+				MessageUtils.sendErrorMessage(player, RegionText.NO_REGION_HERE.getValue());
 		}
 
 		return CommandResult.empty();
-	}
-
-	private String getCommandUsage() {
-		return "/rg info <name>";
 	}
 
 }

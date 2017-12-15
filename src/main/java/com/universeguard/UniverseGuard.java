@@ -55,6 +55,10 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 @Plugin(id = UniverseGuard.ID, name = UniverseGuard.NAME, version = UniverseGuard.VERSION, description = UniverseGuard.DESCRIPTION, authors = UniverseGuard.AUTHOR)
 public class UniverseGuard {
 	/**
+	 * Plugin Version
+	 */
+	public static final String VERSION = "2.2";
+	/**
 	 * Plugin ID
 	 */
 	public static final String ID = "universeguard";
@@ -62,10 +66,6 @@ public class UniverseGuard {
 	 * Plugin Name
 	 */
 	public static final String NAME = "Universe Guard 2";
-	/**
-	 * Plugin Version
-	 */
-	public static final String VERSION = "2.1";
 	/**
 	 * Plugin Description
 	 */
@@ -227,6 +227,7 @@ public class UniverseGuard {
 		CommandSpec regionSpawn = CommandUtils.buildCommandSpec("Teleports to a region spawn location", new RegionSpawnExecutor(), GenericArguments.remainingJoinedStrings(Text.of("name")));
 		CommandSpec regionList = CommandUtils.buildCommandSpec("Show the list of all regions", new RegionListExecutor());
 		CommandSpec regionGamemode = CommandUtils.buildCommandSpec("Set the gamemode of a region", new RegionGamemodeExecutor(), RegionPermission.ALL.getValue(), GenericArguments.string(Text.of("gamemode")));
+		CommandSpec regionHere = CommandUtils.buildCommandSpec("Tells wich region you are currently in", new RegionHereExecutor());
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -290,6 +291,7 @@ public class UniverseGuard {
 				.child(regionCommand, "command")
 				.child(regionExpand, "expand")
 				.child(regionFlagInfo, "flaginfo")
+				.child(regionHere, "here")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

@@ -19,9 +19,12 @@ import org.spongepowered.api.event.filter.cause.First;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionInteract;
+import com.universeguard.region.enums.RegionEventType;
+import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.FlagUtils;
 import com.universeguard.utils.MessageUtils;
+import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -83,14 +86,16 @@ public class FlagInteractListener {
 		Region region = RegionUtils.getRegion(player.getLocation());
 		if(region != null) {
 			boolean cancel = false;
-			if(interact != null)
-				cancel = !region.getInteract(interact);
-			if(region.isLocal())
-				cancel = cancel && !RegionUtils.hasPermission(player, region);
-			if(cancel) {
-				event.setCancelled(true);
-				if(player != null)
-					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+			if(interact != null) {
+				if(region.isLocal())
+					cancel = !region.getInteract(interact) && !RegionUtils.hasPermission(player, region);
+				else
+					cancel = !region.getInteract(interact) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
+				if(cancel) {
+					event.setCancelled(true);
+					if(player != null)
+						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+				}
 			}
 		}
 		

@@ -45,6 +45,7 @@ public enum EnumRegionFlag {
 	HIDE_LOCATIONS("hidelocation", false),
 	HIDE_FLAGS("hideflags", false),
 	HIDE_MEMBERS("hidemembers", false),
+	HIDE_REGION("hideregion", false),
 	SEND_CHAT("sendchat", true);
 	
 	private String NAME;

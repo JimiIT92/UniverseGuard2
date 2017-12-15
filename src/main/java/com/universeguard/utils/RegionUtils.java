@@ -798,6 +798,7 @@ public class RegionUtils {
 			printHelpFor(player, "priority [priority]", RegionText.REGION_HELP_PRIORITY);
 			printHelpFor(player, "command [command]", RegionText.REGION_HELP_COMMAND);
 			printHelpFor(player, "expand [direction] (blocks)", RegionText.REGION_HELP_EXPAND);
+			printHelpFor(player, "here", RegionText.REGION_HELP_HERE);
 			printHelpFor(player, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 			break;
 		}
@@ -873,6 +874,7 @@ public class RegionUtils {
 		case 9:
 			printFlagHelpFor(player, EnumRegionFlag.ITEM_PICKUP, RegionText.REGION_FLAG_HELP_ITEM_PICKUP);
 			printFlagHelpFor(player, EnumRegionFlag.OTHER_LIQUIDS_FLOW, RegionText.REGION_FLAG_HELP_OTHER_LIQUIDS_FLOW);
+			printFlagHelpFor(player, EnumRegionFlag.HIDE_REGION, RegionText.REGION_FLAG_HELP_HIDE_REGION);
 			break;
 		}
 	}

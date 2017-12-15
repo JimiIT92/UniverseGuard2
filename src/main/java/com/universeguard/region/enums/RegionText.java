@@ -14,6 +14,7 @@ package com.universeguard.region.enums;
  */
 public enum RegionText {
 	REGION("Region"),
+	NO_REGION_HERE("There's no Region here!"),
 	LOADING("Loading..."),
 	LOADED("Loaded!"),
 	LOADING_CONFIGURATION("Loading Configuration"),
@@ -87,6 +88,7 @@ public enum RegionText {
 	PRIORITY("Priority"),
 	EDITING("Editing region"),
 	MEMBERS("Members"),
+	FLAG_HIDDEN("You can't view this flag"),
 	REGION_INFO("Displaying info for region"),
 	REGION_HELP_RG("Get the region selector item"),
 	REGION_HELP_SAVE("Save the current editing region"),
@@ -106,6 +108,7 @@ public enum RegionText {
 	REGION_HELP_PRIORITY("Set the priority of the current editing region"),
 	REGION_HELP_COMMAND("Allow or disallow a command (and all it's sub-commands) in the current editing region"),
 	REGION_HELP_EXPAND("Expand the selected area for creating a region in the selected direction until the world limit or by the number of specified blocks"),
+	REGION_HELP_HERE("Tells wich region you are currently in"),
 	REGION_HELP_HELP("Shows this help or the flags help"),
 	REGION_FLAG_HELP_PLACE("Sets if non-members can place blocks in the region"),
 	REGION_FLAG_HELP_DESTROY("Sets if non-members can break blocks in the region"),
@@ -137,7 +140,8 @@ public enum RegionText {
 	REGION_FLAG_HELP_SEND_CHAT("Sets if players can send chat messages while in the region"),
 	REGION_FLAG_HELP_HIDE_LOCATIONS("Sets if region locations will not be displayed using the /rg info command"),
 	REGION_FLAG_HELP_HIDE_MEMBERS("Sets if region members will not be displayed using the /rg info command"),
-	REGION_FLAG_HELP_HIDE_FLAGS("Sets if region flags will not be displayed using the /rg info command"),
+	REGION_FLAG_HELP_HIDE_FLAGS("Sets if region flags will not be displayed using the /rg info or the /rg flaginfo command"),
+	REGION_FLAG_HELP_HIDE_REGION("Sets if region will be displayed using the /rg here command"),
 	REGION_FLAG_HELP_ENDERMAN_GRIEF("Sets if enderman can place/break blocks in the region"),
 	REGION_FLAG_HELP_ENDER_DRAGON_BLOCK_DAMAGE("Sets if Ender Dragon can break blocks in the region"),
 	REGION_FLAG_HELP_INTERACT("Allow/disallow block interaction in the region"),
