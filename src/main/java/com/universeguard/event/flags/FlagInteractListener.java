@@ -19,7 +19,6 @@ import org.spongepowered.api.event.filter.cause.First;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.RegionEventType;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.FlagUtils;

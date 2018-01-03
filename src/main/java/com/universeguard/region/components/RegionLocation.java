@@ -83,10 +83,11 @@ public class RegionLocation {
 	}
 	
 	public World getServerWorld() {
-		return Sponge.getServer().getWorld(world).get();
+		return Sponge.getServer().getWorld(world).isPresent() ? Sponge.getServer().getWorld(world).get() : null;
 	}
 	
 	public Location<World> getLocation() {
-		return new Location<World>(this.getServerWorld(), this.toVector());
+		World world = this.getServerWorld();
+		return world != null ? new Location<World>(world, this.toVector()) : null;
 	}
 }

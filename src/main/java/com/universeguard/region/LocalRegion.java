@@ -8,6 +8,7 @@
 package com.universeguard.region;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -17,6 +18,7 @@ import com.universeguard.region.components.RegionLocation;
 import com.universeguard.region.components.RegionMember;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionType;
+import com.universeguard.utils.RegionUtils;
 
 /**
  * Local Region Class
@@ -175,8 +177,25 @@ public class LocalRegion extends Region {
 	 * @param player The player
 	 * @param role The role
 	 */
+	public void addMemberByUUID(UUID player, RegionRole role) {
+		this.addMember(RegionUtils.getPlayer(player), role);
+	}
+	
+	/**
+	 * Add a Player with the specified Role to the Region
+	 * @param player The player
+	 * @param role The role
+	 */
 	public void addMember(Player player, RegionRole role) {
 		this.MEMBERS.add(new RegionMember(player, role));
+	}
+
+	/**
+	 * Remove a member from the Region
+	 * @param player The player
+	 */
+	public void removeMemberByUUID(UUID player) {
+		this.removeMember(RegionUtils.getPlayer(player));
 	}
 	
 	/**

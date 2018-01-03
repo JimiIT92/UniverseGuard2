@@ -7,6 +7,7 @@
  */
 package com.universeguard.utils;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.CatalogType;
@@ -35,6 +36,26 @@ public class FlagUtils {
 			if(configNode.getNode("flags", flag.getName()).isVirtual())
 				configNode.getNode("flags", flag.getName()).setValue(flag.getValue());
 		}
+		for(EnumRegionInteract interact : EnumRegionInteract.values()) {
+			if(configNode.getNode("interacts", interact.getName()).isVirtual())
+				configNode.getNode("interacts", interact.getName()).setValue(interact.getValue());
+		}
+		for(EnumRegionVehicle vehicle : EnumRegionVehicle.values()) {
+			if(configNode.getNode("vehicleplace", vehicle.getName()).isVirtual())
+				configNode.getNode("vehicleplace", vehicle.getName()).setValue(vehicle.getPlace());
+		}
+		for(EnumRegionVehicle vehicle : EnumRegionVehicle.values()) {
+			if(configNode.getNode("vehicledestroy", vehicle.getName()).isVirtual())
+				configNode.getNode("vehicledestroy", vehicle.getName()).setValue(vehicle.getDestroy());
+		}
+		for(EnumRegionExplosion explosion : EnumRegionExplosion.values()) {
+			if(configNode.getNode("explosiondamage", explosion.getName()).isVirtual())
+				configNode.getNode("explosiondamage", explosion.getName()).setValue(explosion.getDamage());
+		}
+		for(EnumRegionExplosion explosion : EnumRegionExplosion.values()) {
+			if(configNode.getNode("explosiondestroy", explosion.getName()).isVirtual())
+				configNode.getNode("explosiondestroy", explosion.getName()).setValue(explosion.getDestroy());
+		}
 		if(configNode.getNode("timers", "hunger").isVirtual())
 			configNode.getNode("timers", "hunger").setValue(UniverseGuard.HUNGER_TIMER).setComment("The update frequency (in seconds) of the hunger flag timer");
 		if(configNode.getNode("timers", "gamemode").isVirtual())
@@ -48,6 +69,17 @@ public class FlagUtils {
 	public static void getValues(CommentedConfigurationNode configNode) {
 		for(EnumRegionFlag flag : EnumRegionFlag.values()) {
 			flag.setValue(configNode.getNode("flags", flag.getName()).getBoolean());
+		}
+		for(EnumRegionInteract interact : EnumRegionInteract.values()) {
+			interact.setValue(configNode.getNode("interacts", interact.getName()).getBoolean());
+		}
+		for(EnumRegionVehicle vehicle : EnumRegionVehicle.values()) {
+			vehicle.setPlace(configNode.getNode("vehicleplace", vehicle.getName()).getBoolean());
+			vehicle.setDestroy(configNode.getNode("vehicledestroy", vehicle.getName()).getBoolean());
+		}
+		for(EnumRegionExplosion explosion : EnumRegionExplosion.values()) {
+			explosion.setDamage(configNode.getNode("explosiondamage", explosion.getName()).getBoolean());
+			explosion.setDestroy(configNode.getNode("explosiondestroy", explosion.getName()).getBoolean());
 		}
 		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "hunger").getInt();
 		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "gamemode").getInt();
@@ -252,5 +284,16 @@ public class FlagUtils {
 					return id;
 		}
 		return null;
+	}
+	
+	/**
+	 * Get the mob id from name
+	 * @param name The name of the mob
+	 * @return The mob id for a mob with that name if exists, null otherwise
+	 */
+	public static List<String> getAllMobIds() {
+		return Sponge.getRegistry().getAllOf(EntityType.class).stream()
+			    .map(CatalogType::getId)
+			    .collect(Collectors.toList());
 	}
 }

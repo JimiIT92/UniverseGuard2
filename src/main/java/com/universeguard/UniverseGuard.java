@@ -57,7 +57,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.2";
+	public static final String VERSION = "2.3";
 	/**
 	 * Plugin ID
 	 */
@@ -338,6 +338,10 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagMobDropListener());
 		EventUtils.registerEvent(new FlagCommandListener());
 		EventUtils.registerEvent(new FlagSendChatListener());
+		EventUtils.registerEvent(new FlagIceMeltListener());
+		EventUtils.registerEvent(new FlagVinesGrowthListener());
+		EventUtils.registerEvent(new FlagExitListener());
+		EventUtils.registerEvent(new FlagEnterListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())

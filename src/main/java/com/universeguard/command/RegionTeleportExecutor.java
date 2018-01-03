@@ -40,7 +40,8 @@ public class RegionTeleportExecutor implements CommandExecutor {
 				if (region != null) {
 					if(region.isLocal())
 					{
-						if(region.getFlag(EnumRegionFlag.CAN_TP))
+						Region current = RegionUtils.getRegion(player.getLocation());
+						if(current != null && current.getFlag(EnumRegionFlag.EXIT) && region.getFlag(EnumRegionFlag.CAN_TP) && region.getFlag(EnumRegionFlag.ENTER))
 							player.setLocation(((LocalRegion)region).getTeleportLocation().getLocation());
 						else if(!PermissionUtils.hasPermission(player, RegionPermission.REGION))
 							MessageUtils.sendErrorMessage(player, RegionText.REGION_NO_TP.getValue());

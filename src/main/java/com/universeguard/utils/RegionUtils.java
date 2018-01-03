@@ -17,11 +17,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -459,7 +461,6 @@ public class RegionUtils {
 						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
 			}
 			player.sendMessage(Text.of(explosionsDamage.toArray()));
-			player.sendMessage(Text.of(interacts.toArray()));
 			MessageUtils.sendMessage(player, RegionText.EXPLOSIONS_DESTROY.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
@@ -527,7 +528,22 @@ public class RegionUtils {
 
 		}
 	}
+	
+	/**
+	 * Get a player from it's UUID
+	 */
+	public static Player getPlayer(UUID uuid) {
+	    Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(uuid);
 
+	    if (onlinePlayer.isPresent()) {
+	        return onlinePlayer.get();
+	    }
+
+	    Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+
+	    return userStorage.isPresent() ? userStorage.get().get(uuid).get().getPlayer().get() : null;
+	}
+	
 	/**
 	 * Get the member of a Region
 	 * @param region The Region
@@ -542,6 +558,16 @@ public class RegionUtils {
 		return null;
 	}
 
+	/**
+	 * Check if a player is a member of a Region
+	 * @param region The Region
+	 * @param player The player
+	 * @return true if the player is a member of that Region, false otherwise
+	 */
+	public static boolean isMemberByUUID(Region region, UUID player) {
+		return isMember(region, getPlayer(player));
+	}
+	
 	/**
 	 * Check if a player is a member of a Region
 	 * @param region The Region
@@ -608,7 +634,7 @@ public class RegionUtils {
 	 * @param page The page to display
 	 */
 	public static void printFlagHelpHeader(Player player, int page) {
-		MessageUtils.sendMessage(player, RegionText.FLAG_HELP.getValue() + "(" + String.valueOf(page) + "/9)",
+		MessageUtils.sendMessage(player, RegionText.FLAG_HELP.getValue() + "(" + String.valueOf(page) + "/10)",
 				TextColors.GOLD);
 	}
 
@@ -652,18 +678,20 @@ public class RegionUtils {
 	public static boolean isInRegion(LocalRegion region, Location<World> location) {
 		Location<World> pos1 = region.getFirstPoint().getLocation();
 		Location<World> pos2 = region.getSecondPoint().getLocation();
+		if(pos1 != null && pos2 != null) {
+			int x1 = Math.min(pos1.getBlockX(), pos2.getBlockX());
+			int y1 = Math.min(pos1.getBlockY(), pos2.getBlockY());
+			int z1 = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
+			int x2 = Math.max(pos1.getBlockX(), pos2.getBlockX());
+			int y2 = Math.max(pos1.getBlockY(), pos2.getBlockY());
+			int z2 = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
 
-		int x1 = Math.min(pos1.getBlockX(), pos2.getBlockX());
-		int y1 = Math.min(pos1.getBlockY(), pos2.getBlockY());
-		int z1 = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-		int x2 = Math.max(pos1.getBlockX(), pos2.getBlockX());
-		int y2 = Math.max(pos1.getBlockY(), pos2.getBlockY());
-		int z2 = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-
-		return region.getWorld().equals(region.getWorld())
-				&& region.getFirstPoint().getDimension().equalsIgnoreCase(location.getExtent().getDimension().getType().getId())
-				&& ((location.getBlockX() >= x1 && location.getBlockX() <= x2) && (location.getBlockY() >= y1 && location.getBlockY() <= y2)
-						&& (location.getBlockZ() >= z1 && location.getBlockZ() <= z2));
+			return region.getWorld().equals(region.getWorld())
+					&& region.getFirstPoint().getDimension().equalsIgnoreCase(location.getExtent().getDimension().getType().getId())
+					&& ((location.getBlockX() >= x1 && location.getBlockX() <= x2) && (location.getBlockY() >= y1 && location.getBlockY() <= y2)
+							&& (location.getBlockZ() >= z1 && location.getBlockZ() <= z2));
+		}
+		return false;
 	}
 
 	/**
@@ -875,6 +903,12 @@ public class RegionUtils {
 			printFlagHelpFor(player, EnumRegionFlag.ITEM_PICKUP, RegionText.REGION_FLAG_HELP_ITEM_PICKUP);
 			printFlagHelpFor(player, EnumRegionFlag.OTHER_LIQUIDS_FLOW, RegionText.REGION_FLAG_HELP_OTHER_LIQUIDS_FLOW);
 			printFlagHelpFor(player, EnumRegionFlag.HIDE_REGION, RegionText.REGION_FLAG_HELP_HIDE_REGION);
+			printFlagHelpFor(player, EnumRegionFlag.ICE_MELT, RegionText.REGION_FLAG_HELP_ICE_MELT);
+			printFlagHelpFor(player, EnumRegionFlag.VINES_GROWTH, RegionText.REGION_FLAG_HELP_VINES_GROWTH);
+			break;
+		case 10:
+			printFlagHelpFor(player, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
+			printFlagHelpFor(player, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
 			break;
 		}
 	}

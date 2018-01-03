@@ -46,6 +46,10 @@ public enum EnumRegionFlag {
 	HIDE_FLAGS("hideflags", false),
 	HIDE_MEMBERS("hidemembers", false),
 	HIDE_REGION("hideregion", false),
+	ICE_MELT("icemelt", true),
+	EXIT("exit", true),
+	ENTER("enter", true),
+	VINES_GROWTH("vinesgrowth", true),
 	SEND_CHAT("sendchat", true);
 	
 	private String NAME;
