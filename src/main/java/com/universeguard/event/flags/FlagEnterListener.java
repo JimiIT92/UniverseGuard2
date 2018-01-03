@@ -16,10 +16,12 @@ public class FlagEnterListener {
 
 	@Listener
 	public void onEnter(MoveEntityEvent event) {
-		Region region = RegionUtils.getRegion(event.getToTransform().getLocation());
-		Region destination = RegionUtils.getRegion(event.getFromTransform().getLocation());
-		if(region != null && destination != null && region.isLocal() && !region.getName().equalsIgnoreCase(destination.getName())) {
-			this.handleEvent(event, event.getToTransform().getLocation(), event.getTargetEntity() instanceof Player ? (Player)event.getTargetEntity() : null);
+		if(event.getTargetEntity() instanceof Player) {
+			Region region = RegionUtils.getRegion(event.getToTransform().getLocation());
+			Region destination = RegionUtils.getRegion(event.getFromTransform().getLocation());
+			if(region != null && destination != null && region.isLocal() && !region.getName().equalsIgnoreCase(destination.getName())) {
+				this.handleEvent(event, event.getToTransform().getLocation(), (Player)event.getTargetEntity());
+			}	
 		}
 	}
 	

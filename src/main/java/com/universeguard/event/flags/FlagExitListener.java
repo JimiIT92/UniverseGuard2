@@ -16,10 +16,12 @@ public class FlagExitListener {
 
 	@Listener
 	public void onExit(MoveEntityEvent event) {
-		Region region = RegionUtils.getRegion(event.getFromTransform().getLocation());
-		Region destination = RegionUtils.getRegion(event.getToTransform().getLocation());
-		if(region != null && destination != null && region.isLocal() && !region.getName().equalsIgnoreCase(destination.getName())) {
-			this.handleEvent(event, event.getFromTransform().getLocation(), event.getTargetEntity() instanceof Player ? (Player)event.getTargetEntity() : null);
+		if(event.getTargetEntity() instanceof Player) {
+			Region region = RegionUtils.getRegion(event.getFromTransform().getLocation());
+			Region destination = RegionUtils.getRegion(event.getToTransform().getLocation());
+			if(region != null && destination != null && region.isLocal() && !region.getName().equalsIgnoreCase(destination.getName())) {
+				this.handleEvent(event, event.getFromTransform().getLocation(), (Player)event.getTargetEntity());
+			}	
 		}
 	}
 	
