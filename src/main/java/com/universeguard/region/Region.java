@@ -320,6 +320,16 @@ public class Region {
 	}
 	
 	/**
+	 * Set all interacts for the Region
+	 * @param value The interact value
+	 */
+	public void setAllInteract(boolean value) {
+		for(RegionInteract i : this.INTERACTS) {
+			i.setEnabled(value);
+		}
+	}
+	
+	/**
 	 * Set a interact for the Region
 	 * @param interact The interact
 	 * @param value The interact value
@@ -441,6 +451,16 @@ public class Region {
 	}
 	
 	/**
+	 * Set the place value for all Vehicles in the Region
+	 * @param value The value
+	 */
+	public void setAllVehiclePlace(boolean value) {
+		for(RegionVehicle v : this.VEHICLES) {
+			v.setPlace(value);
+		}
+	}
+	
+	/**
 	 * Set the place value for a Vehicle in the Region
 	 * @param vehicle The Vehicle
 	 * @param value The value
@@ -463,6 +483,16 @@ public class Region {
 				return v.getDestroy();
 		}
 		return true;
+	}
+	
+	/**
+	 * Set the destroy value for all Vehicles in the Region
+	 * @param value The value
+	 */
+	public void setAllVehicleDestroy(boolean value) {
+		for(RegionVehicle v : this.VEHICLES) {
+			v.setDestroy(value);
+		}
 	}
 	
 	/**
@@ -491,6 +521,16 @@ public class Region {
 	}
 	
 	/**
+	 * Set a the damage value for all Explosions in the Region
+	 * @param value The value
+	 */
+	public void setAllExplosionDamage(boolean value) {
+		for(RegionExplosion e : this.EXPLOSIONS) {
+			e.setDamage(value);
+		}
+	}
+	
+	/**
 	 * Set a the damage value for an Explosion in the Region
 	 * @param explosion The Explosion
 	 * @param value The value
@@ -513,6 +553,16 @@ public class Region {
 				return e.getDestroy();
 		}
 		return true;
+	}
+	
+	/**
+	 * Set the destroy value of all Explosions in the Region
+	 * @param value The value
+	 */
+	public void setAllExplosionDestroy(boolean value) {
+		for(RegionExplosion e : this.EXPLOSIONS) {
+			e.setDestroy(value);
+		}
 	}
 	
 	/**
@@ -540,6 +590,7 @@ public class Region {
 		return true;
 	}
 	
+
 	/**
 	 * Set the spawn value of a Mob for the Region
 	 * @param mob The Mod

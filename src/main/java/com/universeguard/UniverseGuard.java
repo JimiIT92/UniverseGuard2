@@ -57,7 +57,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.3";
+	public static final String VERSION = "2.4";
 	/**
 	 * Plugin ID
 	 */
@@ -340,8 +340,8 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagSendChatListener());
 		EventUtils.registerEvent(new FlagIceMeltListener());
 		EventUtils.registerEvent(new FlagVinesGrowthListener());
-		EventUtils.registerEvent(new FlagExitListener());
-		EventUtils.registerEvent(new FlagEnterListener());
+		//EventUtils.registerEvent(new FlagExitListener());
+		//EventUtils.registerEvent(new FlagEnterListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())
@@ -350,10 +350,17 @@ public class UniverseGuard {
         	.submit(UniverseGuard.INSTANCE);
 		
 		Task.builder()
-		.execute(new FlagGamemodeListener())
-    	.interval(UniverseGuard.GAMEMODE_TIMER, TimeUnit.SECONDS)
-    	.name("Gamemode Timer Task")
-    	.submit(UniverseGuard.INSTANCE);
+			.execute(new FlagGamemodeListener())
+			.interval(UniverseGuard.GAMEMODE_TIMER, TimeUnit.SECONDS)
+			.name("Gamemode Timer Task")
+			.submit(UniverseGuard.INSTANCE);
+		
+		/*Task.builder()
+		.execute(new FlagMovementListener())
+		.interval(500, TimeUnit.MILLISECONDS)
+		.name("Movement Timer Task")
+		.submit(UniverseGuard.INSTANCE);*/
+		
 		// Debug utility. Used internally
 		boolean DEBUG = false;
 		if(DEBUG)

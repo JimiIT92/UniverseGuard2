@@ -54,7 +54,7 @@ public class FlagMobSpawnListener {
 		String name = type.getId().toLowerCase();
 		Region region = RegionUtils.getRegion(entity.getLocation());
 		if(region != null) {
-			boolean cancel = !region.getMobSpawn(name);
+			boolean cancel = !region.getMobSpawn("all") || !region.getMobSpawn(name);
 			if(player != null)
 				cancel = cancel && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
 			if(cancel) {

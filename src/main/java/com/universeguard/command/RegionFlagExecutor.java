@@ -47,7 +47,11 @@ public class RegionFlagExecutor implements CommandExecutor {
 						switch (subflag) {
 						case "interact":
 							EnumRegionInteract interact = FlagUtils.getInteract(name);
-							if (interact != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setAllInteract(value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (interact != null) {
 								region.setInteract(interact, value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
@@ -55,7 +59,11 @@ public class RegionFlagExecutor implements CommandExecutor {
 							break;
 						case "vehicleplace":
 							EnumRegionVehicle vehiclePlace = FlagUtils.getVehicle(name);
-							if (vehiclePlace != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setAllVehiclePlace(value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (vehiclePlace != null) {
 								region.setVehiclePlace(vehiclePlace, value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
@@ -63,7 +71,11 @@ public class RegionFlagExecutor implements CommandExecutor {
 							break;
 						case "vehicledestroy":
 							EnumRegionVehicle vehicleDestroy = FlagUtils.getVehicle(name);
-							if (vehicleDestroy != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setAllVehicleDestroy(value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (vehicleDestroy != null) {
 								region.setVehicleDestroy(vehicleDestroy, value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
@@ -71,7 +83,11 @@ public class RegionFlagExecutor implements CommandExecutor {
 							break;
 						case "explosiondamage":
 							EnumRegionExplosion explosionDamage = FlagUtils.getExplosion(name);
-							if (explosionDamage != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setAllExplosionDamage(value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (explosionDamage != null) {
 								region.setExplosionDamage(explosionDamage, value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
@@ -79,35 +95,55 @@ public class RegionFlagExecutor implements CommandExecutor {
 							break;
 						case "explosiondestroy":
 							EnumRegionExplosion explosionDestroy = FlagUtils.getExplosion(name);
-							if (explosionDestroy != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setAllExplosionDestroy(value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (explosionDestroy != null) {
 								region.setExplosionDestroy(explosionDestroy, value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
 								MessageUtils.sendErrorMessage(player, RegionText.REGION_FLAG_NOT_VALID.getValue());
 							break;
 						case "mobspawn":
-							if (FlagUtils.getMobId(name) != null) {
-								region.setMobSpawn(FlagUtils.getMobId(name), value);
+							if(name.equalsIgnoreCase("all")) {
+								region.setMobSpawn("all", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (FlagUtils.getMobId(name) != null) {
+								
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
 								MessageUtils.sendErrorMessage(player, RegionText.REGION_MOB_NOT_FOUND.getValue());
 							break;
 						case "mobdamage":
-							if (FlagUtils.getMobId(name) != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setMobDamage("all", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (FlagUtils.getMobId(name) != null) {
 								region.setMobDamage(FlagUtils.getMobId(name), value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
 								MessageUtils.sendErrorMessage(player, RegionText.REGION_MOB_NOT_FOUND.getValue());
 							break;
 						case "mobpve":
-							if (FlagUtils.getMobId(name) != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setMobPve("all", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (FlagUtils.getMobId(name) != null) {
 								region.setMobPve(FlagUtils.getMobId(name), value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
 								MessageUtils.sendErrorMessage(player, RegionText.REGION_MOB_NOT_FOUND.getValue());
 							break;
 						case "mobdrop":
-							if (FlagUtils.getMobId(name) != null) {
+							if(name.equalsIgnoreCase("all")) {
+								region.setMobDrop("all", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							}
+							else if (FlagUtils.getMobId(name) != null) {
 								region.setMobDrop(FlagUtils.getMobId(name), value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else

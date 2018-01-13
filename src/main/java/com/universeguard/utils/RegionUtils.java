@@ -516,6 +516,15 @@ public class RegionUtils {
 				}
 				player.sendMessage(Text.of(mobsDamage.toArray()));
 				
+				MessageUtils.sendMessage(player, RegionText.MOBS_DROP.getValue(), TextColors.YELLOW);
+				ArrayList<Text> mobsDrop = new ArrayList<Text>();
+				for (int i = 0; i < region.getMobs().size(); i++) {
+					RegionMob mob = region.getMobs().get(i);
+					mobsDrop.add(Text.of(mob.getDrop() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : ""));
+				}
+				player.sendMessage(Text.of(mobsDrop.toArray()));
+				
 				MessageUtils.sendMessage(player, RegionText.COMMANDS.getValue(), TextColors.YELLOW);
 				ArrayList<Text> commands = new ArrayList<Text>();
 				for (int i = 0; i < region.getCommands().size(); i++) {

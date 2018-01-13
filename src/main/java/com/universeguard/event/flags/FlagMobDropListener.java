@@ -43,7 +43,7 @@ public class FlagMobDropListener {
 		String name = type.getId().toLowerCase();
 		Region region = RegionUtils.getRegion(entity.getLocation());
 		if(region != null) {
-			boolean cancel = !region.getMobDrop(name);
+			boolean cancel = !region.getMobDrop("all") || !region.getMobDrop(name);
 			if(cancel) {
 				event.setCancelled(true);
 			}

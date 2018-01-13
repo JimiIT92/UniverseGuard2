@@ -42,7 +42,7 @@ public class FlagMobPveListener {
 		String name = type.getId().toLowerCase();
 		Region region = RegionUtils.getRegion(entity.getLocation());
 		if(region != null) {
-			boolean cancel = !region.getMobPve(name) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
+			boolean cancel = !region.getMobPve("all") || !region.getMobPve(name) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
 			if(cancel) {
 				event.setCancelled(true);
 				MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());

@@ -39,7 +39,7 @@ public class FlagMobDamageListener {
 		String name = type.getId().toLowerCase();
 		Region region = RegionUtils.getRegion(entity.getLocation());
 		if(region != null) {
-			boolean cancel = !region.getMobDamage(name);
+			boolean cancel = !region.getMobDamage("all") || !region.getMobDamage(name);
 			if(cancel) {
 				event.setCancelled(true);
 			}

@@ -76,6 +76,7 @@ public enum RegionText {
 	MOBS_SPAWN("Mobs spawn"),
 	MOBS_PVE("Mobs PvE"),
 	MOBS_DAMAGE("Mobs Damage"),
+	MOBS_DROP("Mobs Drop"),
 	COMMANDS("Commands"),
 	HELP("Help"),
 	FLAG_HELP("Flags Help"),

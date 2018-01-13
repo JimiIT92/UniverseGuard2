@@ -1,7 +1,7 @@
 package com.universeguard.event.flags;
 
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.Location;
@@ -16,16 +16,31 @@ public class FlagEnterListener {
 
 	@Listener
 	public void onEnter(MoveEntityEvent event) {
+		
 		if(event.getTargetEntity() instanceof Player) {
-			Region region = RegionUtils.getRegion(event.getToTransform().getLocation());
-			Region destination = RegionUtils.getRegion(event.getFromTransform().getLocation());
-			if(region != null && destination != null && region.isLocal() && !region.getName().equalsIgnoreCase(destination.getName())) {
-				this.handleEvent(event, event.getToTransform().getLocation(), (Player)event.getTargetEntity());
-			}	
+			this.handleEvent(event, (Player)event.getTargetEntity());
+		} else if(!event.getTargetEntity().getPassengers().isEmpty()) {
+			for(Entity passenger : event.getTargetEntity().getPassengers()) {
+				if(passenger instanceof Player) {
+					this.handleEvent(event, (Player)passenger);
+				}
+			}
 		}
 	}
 	
-	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
-		return RegionUtils.handleEvent(event, EnumRegionFlag.ENTER, location, player, RegionEventType.GLOBAL);
+	private boolean handleEvent(MoveEntityEvent event, Player player) {
+		Location<World> to = event.getToTransform().getLocation();
+		Region region = RegionUtils.getRegion(to);
+		if(region != null && region.isLocal() && !region.getFlag(EnumRegionFlag.ENTER)) {
+			Location<World> from = event.getFromTransform().getLocation();
+			if(to.getBlockX() != from.getBlockX() || to.getBlockY() != from.getBlockY() || to.getBlockZ() != from.getBlockZ()) {
+				Region destination = RegionUtils.getRegion(from);
+				if(destination != null && !region.getName().equalsIgnoreCase(destination.getName())) {
+					return RegionUtils.handleEvent(event, EnumRegionFlag.ENTER, to, player, RegionEventType.GLOBAL);
+				}	
+			}
+		}
+		
+		return true;
 	}
 }
