@@ -767,7 +767,7 @@ public class RegionUtils {
 			boolean cancel = flag.equals(EnumRegionFlag.INVINCIBLE) ? region.getFlag(flag) : !region.getFlag(flag);
 			if(player != null) {
 				if(type.equals(RegionEventType.LOCAL) && region.isLocal())
-					cancel = !RegionUtils.hasPermission(player, region);
+					cancel = cancel && !RegionUtils.hasPermission(player, region);
 				else
 					cancel = cancel && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
 			}
