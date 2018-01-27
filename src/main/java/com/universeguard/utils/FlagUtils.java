@@ -60,6 +60,10 @@ public class FlagUtils {
 			configNode.getNode("timers", "hunger").setValue(UniverseGuard.HUNGER_TIMER).setComment("The update frequency (in seconds) of the hunger flag timer");
 		if(configNode.getNode("timers", "gamemode").isVirtual())
 			configNode.getNode("timers", "gamemode").setValue(UniverseGuard.GAMEMODE_TIMER).setComment("The update frequency (in seconds) of the gamemode flag timer");
+		if(configNode.getNode("timers", "enter_flag").isVirtual())
+			configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
+		if(configNode.getNode("timers", "exit_flag").isVirtual())
+			configNode.getNode("timers", "exit_flag").setValue(UniverseGuard.EXIT_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the exit flag timer");
 	}
 	
 	/**
@@ -82,7 +86,9 @@ public class FlagUtils {
 			explosion.setDestroy(configNode.getNode("explosiondestroy", explosion.getName()).getBoolean());
 		}
 		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "hunger").getInt();
-		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "gamemode").getInt();
+		UniverseGuard.GAMEMODE_TIMER = configNode.getNode("timers", "gamemode").getInt();
+		UniverseGuard.ENTER_FLAG_TIMER = configNode.getNode("timers", "enter_flag").getInt();
+		UniverseGuard.EXIT_FLAG_TIMER = configNode.getNode("timers", "exit_flag").getInt();
 	}
 	
 	/**

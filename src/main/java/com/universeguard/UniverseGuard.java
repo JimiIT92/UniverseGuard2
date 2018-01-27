@@ -9,6 +9,7 @@ package com.universeguard;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -83,6 +84,14 @@ public class UniverseGuard {
 	 */
 	public static int GAMEMODE_TIMER = 5;
 	/**
+	 * The Enter Flag Timer update frequency (in milliseconds)
+	 */
+	public static int ENTER_FLAG_TIMER = 100;
+	/**
+	 * The Exit Flag Timer update frequency (in milliseconds)
+	 */
+	public static int EXIT_FLAG_TIMER = 100;
+	/**
 	 * Region Version Number
 	 */
 	public static final float REGION_VERSION = Float.valueOf(VERSION);
@@ -118,6 +127,11 @@ public class UniverseGuard {
 	private Game GAME;
 
 	/**
+	 * List of all regions, used to avoid massive reading from files
+	 */
+	public static ArrayList<Region> ALL_REGIONS;
+	
+	/**
 	 * onInit Method. Called on Plugin Load
 	 * @param event
 	 */
@@ -130,6 +144,8 @@ public class UniverseGuard {
 		INSTANCE = this;
 		// Load the configuration
 		this.loadConfig();
+		// Load the regions
+		UniverseGuard.ALL_REGIONS = RegionUtils.getAllRegions();
 		// Register the commands
 		this.registerCommands();
 		// Register the events
@@ -163,7 +179,7 @@ public class UniverseGuard {
 	 * Update regions to the latest RegionVersion
 	 */
 	private void updateRegions() {
-		for(Region region : RegionUtils.getAllRegions()) {
+		for(Region region : UniverseGuard.ALL_REGIONS) {
 			if(region.getVersion() != REGION_VERSION)
 				RegionUtils.update(region);
 		}
@@ -340,8 +356,6 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagSendChatListener());
 		EventUtils.registerEvent(new FlagIceMeltListener());
 		EventUtils.registerEvent(new FlagVinesGrowthListener());
-		//EventUtils.registerEvent(new FlagExitListener());
-		//EventUtils.registerEvent(new FlagEnterListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())
@@ -355,11 +369,17 @@ public class UniverseGuard {
 			.name("Gamemode Timer Task")
 			.submit(UniverseGuard.INSTANCE);
 		
+		Task.builder()
+			.execute(new FlagEnterListener())
+			.interval(UniverseGuard.ENTER_FLAG_TIMER, TimeUnit.MILLISECONDS)
+			.name("Enter Flag Timer Task")
+			.submit(UniverseGuard.INSTANCE);
+		
 		/*Task.builder()
-		.execute(new FlagMovementListener())
-		.interval(500, TimeUnit.MILLISECONDS)
-		.name("Movement Timer Task")
-		.submit(UniverseGuard.INSTANCE);*/
+		.execute(new FlagExitListener())
+			.interval(UniverseGuard.EXIT_FLAG_TIMER, TimeUnit.MILLISECONDS)
+			.name("Exit Flag Timer Task")
+			.submit(UniverseGuard.INSTANCE);*/
 		
 		// Debug utility. Used internally
 		boolean DEBUG = false;

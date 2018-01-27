@@ -34,6 +34,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.universeguard.UniverseGuard;
 import com.universeguard.region.GlobalRegion;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
@@ -86,6 +87,9 @@ public class RegionUtils {
 				file.createNewFile();
 			fileWriter = new FileWriter(file);
 			fileWriter.write(gson.toJson(region));
+			if(UniverseGuard.ALL_REGIONS.contains(region))
+				UniverseGuard.ALL_REGIONS.remove(region);
+			UniverseGuard.ALL_REGIONS.add(region);
 			return true;
 		} catch (IOException e) {
 			LogUtils.log(e);
@@ -115,9 +119,10 @@ public class RegionUtils {
 		if (!directory.exists())
 			return false;
 		File file = getFile(region);
-		if (file.exists())
-			return file.delete();
-
+		if (file.exists() && file.delete()) {
+			UniverseGuard.ALL_REGIONS.remove(region);
+			return true;
+		}
 		return false;
 	}
 
@@ -129,7 +134,7 @@ public class RegionUtils {
 	 * @return The Region with that name if exists, null otherwise
 	 */
 	public static Region load(String name) {
-		for (Region region : getAllRegions()) {
+		for (Region region : UniverseGuard.ALL_REGIONS) {
 			if (region.getName().equalsIgnoreCase(name))
 				return region;
 		}
@@ -440,7 +445,7 @@ public class RegionUtils {
 	 */
 	public static void printRegionsList(Player player) {
 		StringBuilder regions = new StringBuilder();
-		for (Region region : getAllRegions()) {
+		for (Region region : UniverseGuard.ALL_REGIONS) {
 			regions.append(region.getName() + ", ");
 		}
 		MessageUtils.sendMessage(player, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
@@ -702,7 +707,7 @@ public class RegionUtils {
 	 * @return true if the player has a Region, false otherwise
 	 */
 	public static boolean hasRegion(Player player) {
-		for (Region region : getAllRegions()) {
+		for (Region region : UniverseGuard.ALL_REGIONS) {
 			if (isMember(region, player))
 				return true;
 		}
@@ -829,7 +834,7 @@ public class RegionUtils {
 	 */
 	public static LocalRegion getLocalRegion(Location<World> location) {
 		LocalRegion region = null;
-		for (Region r : getAllRegions()) {
+		for (Region r : UniverseGuard.ALL_REGIONS) {
 			if (r.isLocal() && isInRegion((LocalRegion) r, location)) {
 				if (region == null || ((LocalRegion) r).getPriority() >= region.getPriority())
 					region = ((LocalRegion) r);
@@ -1074,7 +1079,7 @@ public class RegionUtils {
 	public static File getFile(Region region) {
 		if (region.getName().isEmpty()) {
 			int index = 0;
-			for (Region r : getAllRegions()) {
+			for (Region r : UniverseGuard.ALL_REGIONS) {
 				if (r.getName().toLowerCase().startsWith("region"))
 					index++;
 			}
