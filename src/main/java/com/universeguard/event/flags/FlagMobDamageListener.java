@@ -17,6 +17,7 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 
 import com.universeguard.region.Region;
+import com.universeguard.utils.FlagUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -36,13 +37,17 @@ public class FlagMobDamageListener {
 	private void handleEvent(DamageEntityEvent event, Entity entity)
 	{
 		EntityType type = entity.getType();
-		String name = type.getId().toLowerCase();
-		Region region = RegionUtils.getRegion(entity.getLocation());
-		if(region != null) {
-			boolean cancel = !region.getMobDamage("all") || !region.getMobDamage(name);
-			if(cancel) {
-				event.setCancelled(true);
+		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isExplosion(type) && !FlagUtils.isVehicle(type))
+		{
+			String name = type.getId().toLowerCase();
+			Region region = RegionUtils.getRegion(entity.getLocation());
+			if(region != null) {
+				boolean cancel = !region.getMobDamage("all") || !region.getMobDamage(name);
+				if(cancel) {
+					event.setCancelled(true);
+				}
 			}
 		}
+		
 	}
 }

@@ -58,6 +58,7 @@ import com.universeguard.region.enums.RegionType;
 /**
  * 
  * Utility class for regions
+ * 
  * @author Jimi
  *
  */
@@ -68,7 +69,9 @@ public class RegionUtils {
 
 	/**
 	 * Save a Region to a JSON file
-	 * @param region The Region
+	 * 
+	 * @param region
+	 *            The Region
 	 * @return true if the Region has been saved correctly, false otherwise
 	 */
 	public static boolean save(Region region) {
@@ -102,7 +105,9 @@ public class RegionUtils {
 
 	/**
 	 * Remove a Region from the regions folder
-	 * @param region The Region
+	 * 
+	 * @param region
+	 *            The Region
 	 * @return true if the Region has been removed correctly, false otherwise
 	 */
 	public static boolean remove(Region region) {
@@ -118,7 +123,9 @@ public class RegionUtils {
 
 	/**
 	 * Get a Region from name
-	 * @param name The name of the region
+	 * 
+	 * @param name
+	 *            The name of the region
 	 * @return The Region with that name if exists, null otherwise
 	 */
 	public static Region load(String name) {
@@ -131,7 +138,9 @@ public class RegionUtils {
 
 	/**
 	 * Update a Region to the latest RegionVersion
-	 * @param region The Region to update
+	 * 
+	 * @param region
+	 *            The Region to update
 	 */
 	public static void update(Region region) {
 		if (region.isLocal()) {
@@ -167,6 +176,7 @@ public class RegionUtils {
 
 	/**
 	 * Get All Regions
+	 * 
 	 * @return The list of all Regions
 	 */
 	public static ArrayList<Region> getAllRegions() {
@@ -181,103 +191,137 @@ public class RegionUtils {
 	/**
 	 * Check if there are old regions to convert
 	 */
-	public static boolean shouldConvertOldRegions()
-	{
+	public static boolean shouldConvertOldRegions() {
 		return getOldRegionFolder().exists() || getOldGlobalRegionFolder().exists();
 	}
-	
+
 	/**
-	 * Convert the old region format to the new one (from UniverseGuard to UniverseGuard2)
+	 * Convert the old region format to the new one (from UniverseGuard to
+	 * UniverseGuard2)
 	 */
-	public static void convertOldRegions()
-	{
-		if(getOldRegionFolder().exists())
+	public static void convertOldRegions() {
+		if (getOldRegionFolder().exists())
 			loadOldRegions(getOldRegionFolder(), RegionType.LOCAL);
-		if(getOldGlobalRegionFolder().exists())
+		if (getOldGlobalRegionFolder().exists())
 			loadOldRegions(getOldGlobalRegionFolder(), RegionType.GLOBAL);
 	}
-	
+
 	/**
-	 * Convert the old region format to the new one (from UniverseGuard to UniverseGuard2)
-	 * @param directory The folder where the old regions are
-	 * @param type The RegionType to convert
+	 * Convert the old region format to the new one (from UniverseGuard to
+	 * UniverseGuard2)
+	 * 
+	 * @param directory
+	 *            The folder where the old regions are
+	 * @param type
+	 *            The RegionType to convert
 	 */
-	public static void loadOldRegions(File directory, RegionType type) {		
+	public static void loadOldRegions(File directory, RegionType type) {
 		for (File file : directory.listFiles()) {
 			BufferedReader bufferedReader = null;
 			try {
 				bufferedReader = new BufferedReader(new FileReader(file));
 				JsonObject jsonObject = new JsonObject();
 				JsonParser parser = new JsonParser();
-	            JsonElement jsonElement = parser.parse(new FileReader(file));
-	            jsonObject = jsonElement.getAsJsonObject();
-	            for (Iterator<Entry<String, JsonElement>> elements = jsonObject.entrySet().iterator(); elements.hasNext();){
-	                Entry<String, JsonElement> element = elements.next();
-	            	JsonObject jObj = element.getValue().getAsJsonObject();
-	            	Region region = null;
-	            	if(type.equals(RegionType.LOCAL))
-	            		region = new LocalRegion(element.getKey());
-	            	else
-	            		region = new GlobalRegion(element.getKey());
-	            	
-	            	JsonObject flagObject = jObj.getAsJsonObject("flags");
-	            	for(EnumRegionFlag flag : EnumRegionFlag.values()) {
-	            		JsonElement flagElement = flagObject.get(flag.getName().toLowerCase());
-	            		region.setFlag(flag, flagElement != null ? flagElement.getAsBoolean() : flag.getValue());
-	            	}
-	            	JsonElement flagBuildElement = flagObject.get("build");
-	            	region.setFlag(EnumRegionFlag.PLACE, flagBuildElement != null ? flagBuildElement.getAsBoolean() : EnumRegionFlag.PLACE.getValue());
-	            	region.setFlag(EnumRegionFlag.DESTROY, flagBuildElement != null ? flagBuildElement.getAsBoolean() : EnumRegionFlag.DESTROY.getValue());
-	            	
-	            	JsonElement flagChestsElement = flagObject.get("chests");
-	            	region.setFlag(EnumRegionFlag.CHESTS, flagChestsElement != null ? flagChestsElement.getAsBoolean() : EnumRegionFlag.CHESTS.getValue());
-	            	region.setFlag(EnumRegionFlag.TRAPPED_CHESTS, flagChestsElement != null ? flagChestsElement.getAsBoolean() : EnumRegionFlag.TRAPPED_CHESTS.getValue());
-	            	
-	            	JsonElement flagUseElement = flagObject.get("use");
-	            	for(EnumRegionInteract interact : EnumRegionInteract.values())
-	            		region.setInteract(interact, flagUseElement != null ? flagUseElement.getAsBoolean() : interact.getValue());
-	            	
-	            	JsonElement flagVehiclePlaceElement = flagObject.get("vehicleplace");
-	            	for(EnumRegionVehicle vehicle : EnumRegionVehicle.values())
-	            		region.setVehiclePlace(vehicle, flagVehiclePlaceElement != null ? flagVehiclePlaceElement.getAsBoolean() : vehicle.getPlace());
-	            	
-	            	JsonElement flagVehicleDestroyElement = flagObject.get("vehicledestroy");
-	            	for(EnumRegionVehicle vehicle : EnumRegionVehicle.values())
-	            		region.setVehicleDestroy(vehicle, flagVehicleDestroyElement != null ? flagVehicleDestroyElement.getAsBoolean() : vehicle.getDestroy());
-	            	
-	            	JsonElement flagExplosionDestroyElement = flagObject.get("otherexplosions");
-	            	for(EnumRegionExplosion explosion : EnumRegionExplosion.values())
-	            		region.setExplosionDestroy(explosion, flagExplosionDestroyElement != null ? flagExplosionDestroyElement.getAsBoolean() : explosion.getDestroy());
-	            	
-	            	JsonElement flagExplosionDamageElement = flagObject.get("otherexplosionsdamage");
-	            	for(EnumRegionExplosion explosion : EnumRegionExplosion.values())
-	            		region.setExplosionDamage(explosion, flagExplosionDamageElement != null ? flagExplosionDamageElement.getAsBoolean() : explosion.getDamage());
-	            	
-	            	JsonElement flagTntElement = flagObject.get("tnt");
-	            	region.setExplosionDestroy(EnumRegionExplosion.TNT, flagTntElement != null ? flagTntElement.getAsBoolean() : EnumRegionExplosion.TNT.getDestroy());
-	            	JsonElement flagTntDamageElement = flagObject.get("tntdamage");
-	            	region.setExplosionDamage(EnumRegionExplosion.TNT, flagTntDamageElement != null ? flagTntDamageElement.getAsBoolean() : EnumRegionExplosion.TNT.getDamage());
-	            	
-	            	JsonElement flagCreeperElement = flagObject.get("creeperexplosions");
-	            	region.setExplosionDestroy(EnumRegionExplosion.CREEPER, flagCreeperElement != null ? flagCreeperElement.getAsBoolean() : EnumRegionExplosion.CREEPER.getDestroy());
-	            	JsonElement flagCreeperDamageElement = flagObject.get("mobdamage");
-	            	region.setExplosionDamage(EnumRegionExplosion.CREEPER, flagCreeperDamageElement != null ? flagCreeperDamageElement.getAsBoolean() : EnumRegionExplosion.CREEPER.getDamage());
-	            	
-	            	if(type.equals(RegionType.LOCAL)) {
-	            		JsonObject firstPoint = jObj.getAsJsonObject("pos1");
-	            		JsonObject secondPoint = jObj.getAsJsonObject("pos2");
-	            		JsonObject teleportPoint = jObj.getAsJsonObject("teleport");
-	            		JsonObject spawnPoint = jObj.getAsJsonObject("spawn");
-	            		((LocalRegion)region).setFirstPoint(new RegionLocation(firstPoint.get("x").getAsInt(), firstPoint.get("y").getAsInt(), firstPoint.get("z").getAsInt(), jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
-	            		((LocalRegion)region).setSecondPoint(new RegionLocation(secondPoint.get("x").getAsInt(), secondPoint.get("y").getAsInt(), secondPoint.get("z").getAsInt(), jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
-	            		((LocalRegion)region).setTeleportLocation(new RegionLocation(teleportPoint.get("x").getAsInt(), teleportPoint.get("y").getAsInt(), teleportPoint.get("z").getAsInt(), jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
-	            		((LocalRegion)region).setSpawnLocation(new RegionLocation(spawnPoint.get("x").getAsInt(), spawnPoint.get("y").getAsInt(), spawnPoint.get("z").getAsInt(), jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
-	            		((LocalRegion)region).setPriority(jObj.get("priority").getAsInt());
-	            		((LocalRegion)region).setGamemode(jObj.get("gamemode").getAsString());
-	            	}
-	            	
-	            	save(region);
-	              }
+				JsonElement jsonElement = parser.parse(new FileReader(file));
+				jsonObject = jsonElement.getAsJsonObject();
+				for (Iterator<Entry<String, JsonElement>> elements = jsonObject.entrySet().iterator(); elements
+						.hasNext();) {
+					Entry<String, JsonElement> element = elements.next();
+					JsonObject jObj = element.getValue().getAsJsonObject();
+					Region region = null;
+					if (type.equals(RegionType.LOCAL))
+						region = new LocalRegion(element.getKey());
+					else
+						region = new GlobalRegion(element.getKey());
+
+					JsonObject flagObject = jObj.getAsJsonObject("flags");
+					for (EnumRegionFlag flag : EnumRegionFlag.values()) {
+						JsonElement flagElement = flagObject.get(flag.getName().toLowerCase());
+						region.setFlag(flag, flagElement != null ? flagElement.getAsBoolean() : flag.getValue());
+					}
+					JsonElement flagBuildElement = flagObject.get("build");
+					region.setFlag(EnumRegionFlag.PLACE, flagBuildElement != null ? flagBuildElement.getAsBoolean()
+							: EnumRegionFlag.PLACE.getValue());
+					region.setFlag(EnumRegionFlag.DESTROY, flagBuildElement != null ? flagBuildElement.getAsBoolean()
+							: EnumRegionFlag.DESTROY.getValue());
+
+					JsonElement flagChestsElement = flagObject.get("chests");
+					region.setFlag(EnumRegionFlag.CHESTS, flagChestsElement != null ? flagChestsElement.getAsBoolean()
+							: EnumRegionFlag.CHESTS.getValue());
+					region.setFlag(EnumRegionFlag.TRAPPED_CHESTS,
+							flagChestsElement != null ? flagChestsElement.getAsBoolean()
+									: EnumRegionFlag.TRAPPED_CHESTS.getValue());
+
+					JsonElement flagUseElement = flagObject.get("use");
+					for (EnumRegionInteract interact : EnumRegionInteract.values())
+						region.setInteract(interact,
+								flagUseElement != null ? flagUseElement.getAsBoolean() : interact.getValue());
+
+					JsonElement flagVehiclePlaceElement = flagObject.get("vehicleplace");
+					for (EnumRegionVehicle vehicle : EnumRegionVehicle.values())
+						region.setVehiclePlace(vehicle,
+								flagVehiclePlaceElement != null ? flagVehiclePlaceElement.getAsBoolean()
+										: vehicle.getPlace());
+
+					JsonElement flagVehicleDestroyElement = flagObject.get("vehicledestroy");
+					for (EnumRegionVehicle vehicle : EnumRegionVehicle.values())
+						region.setVehicleDestroy(vehicle,
+								flagVehicleDestroyElement != null ? flagVehicleDestroyElement.getAsBoolean()
+										: vehicle.getDestroy());
+
+					JsonElement flagExplosionDestroyElement = flagObject.get("otherexplosions");
+					for (EnumRegionExplosion explosion : EnumRegionExplosion.values())
+						region.setExplosionDestroy(explosion,
+								flagExplosionDestroyElement != null ? flagExplosionDestroyElement.getAsBoolean()
+										: explosion.getDestroy());
+
+					JsonElement flagExplosionDamageElement = flagObject.get("otherexplosionsdamage");
+					for (EnumRegionExplosion explosion : EnumRegionExplosion.values())
+						region.setExplosionDamage(explosion,
+								flagExplosionDamageElement != null ? flagExplosionDamageElement.getAsBoolean()
+										: explosion.getDamage());
+
+					JsonElement flagTntElement = flagObject.get("tnt");
+					region.setExplosionDestroy(EnumRegionExplosion.TNT,
+							flagTntElement != null ? flagTntElement.getAsBoolean()
+									: EnumRegionExplosion.TNT.getDestroy());
+					JsonElement flagTntDamageElement = flagObject.get("tntdamage");
+					region.setExplosionDamage(EnumRegionExplosion.TNT,
+							flagTntDamageElement != null ? flagTntDamageElement.getAsBoolean()
+									: EnumRegionExplosion.TNT.getDamage());
+
+					JsonElement flagCreeperElement = flagObject.get("creeperexplosions");
+					region.setExplosionDestroy(EnumRegionExplosion.CREEPER,
+							flagCreeperElement != null ? flagCreeperElement.getAsBoolean()
+									: EnumRegionExplosion.CREEPER.getDestroy());
+					JsonElement flagCreeperDamageElement = flagObject.get("mobdamage");
+					region.setExplosionDamage(EnumRegionExplosion.CREEPER,
+							flagCreeperDamageElement != null ? flagCreeperDamageElement.getAsBoolean()
+									: EnumRegionExplosion.CREEPER.getDamage());
+
+					if (type.equals(RegionType.LOCAL)) {
+						JsonObject firstPoint = jObj.getAsJsonObject("pos1");
+						JsonObject secondPoint = jObj.getAsJsonObject("pos2");
+						JsonObject teleportPoint = jObj.getAsJsonObject("teleport");
+						JsonObject spawnPoint = jObj.getAsJsonObject("spawn");
+						((LocalRegion) region).setFirstPoint(new RegionLocation(firstPoint.get("x").getAsInt(),
+								firstPoint.get("y").getAsInt(), firstPoint.get("z").getAsInt(),
+								jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
+						((LocalRegion) region).setSecondPoint(new RegionLocation(secondPoint.get("x").getAsInt(),
+								secondPoint.get("y").getAsInt(), secondPoint.get("z").getAsInt(),
+								jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
+						((LocalRegion) region).setTeleportLocation(new RegionLocation(teleportPoint.get("x").getAsInt(),
+								teleportPoint.get("y").getAsInt(), teleportPoint.get("z").getAsInt(),
+								jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
+						((LocalRegion) region).setSpawnLocation(new RegionLocation(spawnPoint.get("x").getAsInt(),
+								spawnPoint.get("y").getAsInt(), spawnPoint.get("z").getAsInt(),
+								jObj.get("dimension").getAsString(), jObj.get("world").getAsString()));
+						((LocalRegion) region).setPriority(jObj.get("priority").getAsInt());
+						((LocalRegion) region).setGamemode(jObj.get("gamemode").getAsString());
+					}
+
+					save(region);
+				}
 
 			} catch (FileNotFoundException e) {
 				LogUtils.log(e);
@@ -294,11 +338,14 @@ public class RegionUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get all Regions of the given type
-	 * @param directory The folder where the regions are
-	 * @param type The RegionType to load
+	 * 
+	 * @param directory
+	 *            The folder where the regions are
+	 * @param type
+	 *            The RegionType to load
 	 * @return The list of the Regions of that given RegionType
 	 */
 	public static ArrayList<Region> loadRegions(File directory, RegionType type) {
@@ -336,8 +383,11 @@ public class RegionUtils {
 
 	/**
 	 * Set the pending Region for a player
-	 * @param player The player
-	 * @param region The Region
+	 * 
+	 * @param player
+	 *            The player
+	 * @param region
+	 *            The Region
 	 */
 	public static void setPendingRegion(Player player, Region region) {
 		if (region == null)
@@ -346,10 +396,12 @@ public class RegionUtils {
 			PENDINGS.put(player, region);
 		}
 	}
-	
+
 	/**
 	 * Get the pending region for a player
-	 * @param player The player
+	 * 
+	 * @param player
+	 *            The player
 	 * @return The pending Region of the player if exists, null otherwise
 	 */
 	public static Region getPendingRegion(Player player) {
@@ -358,8 +410,11 @@ public class RegionUtils {
 
 	/**
 	 * Update the pending region of a player
-	 * @param player The player
-	 * @param region The pending Region
+	 * 
+	 * @param player
+	 *            The player
+	 * @param region
+	 *            The pending Region
 	 */
 	public static void updatePendingRegion(Player player, Region region) {
 		setPendingRegion(player, null);
@@ -368,7 +423,9 @@ public class RegionUtils {
 
 	/**
 	 * Check if a player has a pending Region
-	 * @param player The player
+	 * 
+	 * @param player
+	 *            The player
 	 * @return true if the player has a pending Region, false otherwise
 	 */
 	public static boolean hasPendingRegion(Player player) {
@@ -377,7 +434,9 @@ public class RegionUtils {
 
 	/**
 	 * Shows the list of all Regions to a player
-	 * @param player The player
+	 * 
+	 * @param player
+	 *            The player
 	 */
 	public static void printRegionsList(Player player) {
 		StringBuilder regions = new StringBuilder();
@@ -390,7 +449,9 @@ public class RegionUtils {
 
 	/**
 	 * Check if a player is online
-	 * @param uuid The UUID of the player
+	 * 
+	 * @param uuid
+	 *            The UUID of the player
 	 * @return true if the player with that UUID is online, false otherwise
 	 */
 	public static boolean isOnline(UUID uuid) {
@@ -399,8 +460,11 @@ public class RegionUtils {
 
 	/**
 	 * Shows the region informations to a player
-	 * @param player The player
-	 * @param region The Region
+	 * 
+	 * @param player
+	 *            The player
+	 * @param region
+	 *            The Region
 	 */
 	public static void printRegion(Player player, Region region) {
 		MessageUtils.sendMessage(player, RegionText.REGION_INFO.getValue() + ": " + region.getName(), TextColors.GOLD);
@@ -515,7 +579,7 @@ public class RegionUtils {
 							i < region.getMobs().size() - 1 ? ", " : ""));
 				}
 				player.sendMessage(Text.of(mobsDamage.toArray()));
-				
+
 				MessageUtils.sendMessage(player, RegionText.MOBS_DROP.getValue(), TextColors.YELLOW);
 				ArrayList<Text> mobsDrop = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
@@ -524,7 +588,7 @@ public class RegionUtils {
 							i < region.getMobs().size() - 1 ? ", " : ""));
 				}
 				player.sendMessage(Text.of(mobsDrop.toArray()));
-				
+
 				MessageUtils.sendMessage(player, RegionText.COMMANDS.getValue(), TextColors.YELLOW);
 				ArrayList<Text> commands = new ArrayList<Text>();
 				for (int i = 0; i < region.getCommands().size(); i++) {
@@ -537,27 +601,31 @@ public class RegionUtils {
 
 		}
 	}
-	
+
 	/**
 	 * Get a player from it's UUID
 	 */
 	public static Player getPlayer(UUID uuid) {
-	    Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(uuid);
+		Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(uuid);
 
-	    if (onlinePlayer.isPresent()) {
-	        return onlinePlayer.get();
-	    }
+		if (onlinePlayer.isPresent()) {
+			return onlinePlayer.get();
+		}
 
-	    Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+		Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
 
-	    return userStorage.isPresent() ? userStorage.get().get(uuid).get().getPlayer().get() : null;
+		return userStorage.isPresent() ? userStorage.get().get(uuid).get().getPlayer().get() : null;
 	}
-	
+
 	/**
 	 * Get the member of a Region
-	 * @param region The Region
-	 * @param player The player
-	 * @return The RegionMember if the player is a member of that Region, null otherwise
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player
+	 * @return The RegionMember if the player is a member of that Region, null
+	 *         otherwise
 	 */
 	public static RegionMember getMember(LocalRegion region, Player player) {
 		for (RegionMember member : region.getMembers()) {
@@ -569,18 +637,24 @@ public class RegionUtils {
 
 	/**
 	 * Check if a player is a member of a Region
-	 * @param region The Region
-	 * @param player The player
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player
 	 * @return true if the player is a member of that Region, false otherwise
 	 */
 	public static boolean isMemberByUUID(Region region, UUID player) {
 		return isMember(region, getPlayer(player));
 	}
-	
+
 	/**
 	 * Check if a player is a member of a Region
-	 * @param region The Region
-	 * @param player The player
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player
 	 * @return true if the player is a member of that Region, false otherwise
 	 */
 	public static boolean isMember(Region region, Player player) {
@@ -592,8 +666,11 @@ public class RegionUtils {
 
 	/**
 	 * Check if a player is the owner of a Region
-	 * @param region The Region
-	 * @param player The player
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player
 	 * @return true is the player is the owner of that Region, false otherwise
 	 */
 	public static boolean isOwner(Region region, Player player) {
@@ -606,17 +683,22 @@ public class RegionUtils {
 
 	/**
 	 * Check if a player has a Region permission
-	 * @param player The Player
-	 * @param region The Region
+	 * 
+	 * @param player
+	 *            The Player
+	 * @param region
+	 *            The Region
 	 * @return true if the player has permissions in that Region, false otherwise
 	 */
 	public static boolean hasPermission(Player player, Region region) {
 		return PermissionUtils.hasPermission(player, RegionPermission.REGION) || isMember(region, player);
 	}
-	
+
 	/**
 	 * Check if a player has a Region
-	 * @param player The player
+	 * 
+	 * @param player
+	 *            The player
 	 * @return true if the player has a Region, false otherwise
 	 */
 	public static boolean hasRegion(Player player) {
@@ -628,9 +710,12 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Shows the Help page header for a player 
-	 * @param player The player
-	 * @param page The page to display
+	 * Shows the Help page header for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param page
+	 *            The page to display
 	 */
 	public static void printHelpHeader(Player player, int page) {
 		MessageUtils.sendMessage(player, RegionText.HELP.getValue() + "(" + String.valueOf(page) + "/4)",
@@ -638,9 +723,12 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Shows the FlagHelp page header for a player 
-	 * @param player The player
-	 * @param page The page to display
+	 * Shows the FlagHelp page header for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param page
+	 *            The page to display
 	 */
 	public static void printFlagHelpHeader(Player player, int page) {
 		MessageUtils.sendMessage(player, RegionText.FLAG_HELP.getValue() + "(" + String.valueOf(page) + "/10)",
@@ -648,46 +736,60 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Shows the command help text for a player 
-	 * @param player The player
-	 * @param command The command
-	 * @param text The help text
+	 * Shows the command help text for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param command
+	 *            The command
+	 * @param text
+	 *            The help text
 	 */
 	public static void printHelpFor(Player player, String command, RegionText text) {
 		MessageUtils.sendMessage(player, "/rg " + command + " - " + text.getValue(), TextColors.YELLOW);
 	}
 
 	/**
-	 * Shows the flag help text for a player 
-	 * @param player The player
-	 * @param flag The flag
-	 * @param text The help text
+	 * Shows the flag help text for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param flag
+	 *            The flag
+	 * @param text
+	 *            The help text
 	 */
 	public static void printFlagHelpFor(Player player, EnumRegionFlag flag, RegionText text) {
 		printFlagHelpFor(player, flag.getName(), text);
 	}
 
 	/**
-	 * Shows the flag help text for a player 
-	 * @param player The player
-	 * @param flag The flag
-	 * @param text The help text
+	 * Shows the flag help text for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param flag
+	 *            The flag
+	 * @param text
+	 *            The help text
 	 */
 	public static void printFlagHelpFor(Player player, String flag, RegionText text) {
 		MessageUtils.sendMessage(player, flag + " - " + text.getValue(), TextColors.YELLOW);
 	}
 
-
 	/**
 	 * Check if a location is in a Region
-	 * @param region The Region
-	 * @param location The location
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param location
+	 *            The location
 	 * @return true if that location is in that Region, false otherwise
 	 */
 	public static boolean isInRegion(LocalRegion region, Location<World> location) {
 		Location<World> pos1 = region.getFirstPoint().getLocation();
 		Location<World> pos2 = region.getSecondPoint().getLocation();
-		if(pos1 != null && pos2 != null) {
+		if (pos1 != null && pos2 != null) {
 			int x1 = Math.min(pos1.getBlockX(), pos2.getBlockX());
 			int y1 = Math.min(pos1.getBlockY(), pos2.getBlockY());
 			int z1 = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
@@ -696,8 +798,10 @@ public class RegionUtils {
 			int z2 = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
 
 			return region.getWorld().equals(region.getWorld())
-					&& region.getFirstPoint().getDimension().equalsIgnoreCase(location.getExtent().getDimension().getType().getId())
-					&& ((location.getBlockX() >= x1 && location.getBlockX() <= x2) && (location.getBlockY() >= y1 && location.getBlockY() <= y2)
+					&& region.getFirstPoint().getDimension()
+							.equalsIgnoreCase(location.getExtent().getDimension().getType().getId())
+					&& ((location.getBlockX() >= x1 && location.getBlockX() <= x2)
+							&& (location.getBlockY() >= y1 && location.getBlockY() <= y2)
 							&& (location.getBlockZ() >= z1 && location.getBlockZ() <= z2));
 		}
 		return false;
@@ -705,94 +809,126 @@ public class RegionUtils {
 
 	/**
 	 * Get a Region at a location
-	 * @param location The location
-	 * @return The Region at the given location if exists, the GlobalRegion of the location world otherwise
+	 * 
+	 * @param location
+	 *            The location
+	 * @return The Region at the given location if exists, the GlobalRegion of the
+	 *         location world otherwise
 	 */
 	public static Region getRegion(Location<World> location) {
 		LocalRegion localRegion = getLocalRegion(location);
 		return localRegion != null ? localRegion : getGlobalRegion(location);
 	}
-	
+
 	/**
 	 * Get a LocalRegion at a location
-	 * @param location The location
+	 * 
+	 * @param location
+	 *            The location
 	 * @return The LocalRegion at the given location if exists, null otherwise
 	 */
 	public static LocalRegion getLocalRegion(Location<World> location) {
 		LocalRegion region = null;
-		for(Region r : getAllRegions()) {
-			if(r.isLocal() && isInRegion((LocalRegion)r, location)) {
-				if(region == null || ((LocalRegion)r).getPriority() >= region.getPriority())
-					region = ((LocalRegion)r);
+		for (Region r : getAllRegions()) {
+			if (r.isLocal() && isInRegion((LocalRegion) r, location)) {
+				if (region == null || ((LocalRegion) r).getPriority() >= region.getPriority())
+					region = ((LocalRegion) r);
 			}
 		}
 		return region;
 	}
-	
+
 	/**
 	 * Get a GlobalRegion at a location
-	 * @param location The location
+	 * 
+	 * @param location
+	 *            The location
 	 * @return The GlobalRegion at the given location
 	 */
 	public static GlobalRegion getGlobalRegion(Location<World> location) {
-		return (GlobalRegion)load(location.getExtent().getName());
+		return (GlobalRegion) load(location.getExtent().getName());
 	}
 
 	/**
 	 * Handle a Flag event
-	 * @param event The event
-	 * @param flag The flag
-	 * @param location The location
-	 * @param player The player
-	 * @param type The EventType
+	 * 
+	 * @param event
+	 *            The event
+	 * @param flag
+	 *            The flag
+	 * @param location
+	 *            The location
+	 * @param player
+	 *            The player
+	 * @param type
+	 *            The EventType
 	 * @return true if the event has been cancelled, false otherwise
 	 */
-	public static boolean handleEvent(Cancellable event, EnumRegionFlag flag, Location<World> location, Player player, RegionEventType type) {
+	public static boolean handleEvent(Cancellable event, EnumRegionFlag flag, Location<World> location, Player player,
+			RegionEventType type) {
 		Region region = RegionUtils.getRegion(location);
 		return handleEvent(event, flag, region, player, type);
 	}
-	
+
 	/**
 	 * Handle a Flag event for a Region
-	 * @param event The event
-	 * @param flag The flag
-	 * @param region The Region
-	 * @param location The location
-	 * @param player The player
-	 * @param type The EventType
+	 * 
+	 * @param event
+	 *            The event
+	 * @param flag
+	 *            The flag
+	 * @param region
+	 *            The Region
+	 * @param location
+	 *            The location
+	 * @param player
+	 *            The player
+	 * @param type
+	 *            The EventType
 	 * @return true if the event has been cancelled, false otherwise
 	 */
-	private static boolean handleEvent(Cancellable event, EnumRegionFlag flag, Region region, Player player, RegionEventType type) {
-		if(region != null) {
+	private static boolean handleEvent(Cancellable event, EnumRegionFlag flag, Region region, Player player,
+			RegionEventType type) {
+		if (region != null) {
 			boolean cancel = flag.equals(EnumRegionFlag.INVINCIBLE) ? region.getFlag(flag) : !region.getFlag(flag);
-			if(player != null) {
-				if(type.equals(RegionEventType.LOCAL) && region.isLocal())
-					cancel = cancel && !RegionUtils.hasPermission(player, region);
-				else
-					cancel = cancel && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
+			if (player != null) {
+				if (type.equals(RegionEventType.LOCAL)) {
+					if (region.isLocal())
+						cancel = cancel && !RegionUtils.hasPermission(player, region);
+					else
+						if(PermissionUtils.hasPermission(player, RegionPermission.REGION))
+							cancel = false;
+				} else
+					if(PermissionUtils.hasPermission(player, RegionPermission.REGION))
+						cancel = false;
 			}
-			if(cancel) {
-				if(event != null)
+			if (cancel) {
+				if (event != null)
 					event.setCancelled(true);
-				if(player != null)
+				if (player != null)
 					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Handle the Interact event for a Region
-	 * @param event The event
-	 * @param interact The interact
-	 * @param region The Region
-	 * @param player The player
+	 * 
+	 * @param event
+	 *            The event
+	 * @param interact
+	 *            The interact
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player
 	 * @return true if the event has been cancelled, false otherwise
 	 */
 	public static boolean handleInteract(Cancellable event, EnumRegionInteract interact, Region region, Player player) {
-		if(region != null) {
-			if(!region.getInteract(interact) && !RegionUtils.hasPermission(player, region)) {
+		if (region != null) {
+			if (!region.getInteract(interact) && !RegionUtils.hasPermission(player, region)) {
 				event.setCancelled(true);
 				MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 				return true;
@@ -800,11 +936,14 @@ public class RegionUtils {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Shows a help page for a  player
-	 * @param player The player
-	 * @param page The page
+	 * Shows a help page for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param page
+	 *            The page
 	 */
 	public static void printHelpPage(Player player, int page) {
 		printHelpHeader(player, page);
@@ -840,11 +979,14 @@ public class RegionUtils {
 			break;
 		}
 	}
-	
+
 	/**
-	 * Shows a flag help page for a  player
-	 * @param player The player
-	 * @param page The page
+	 * Shows a flag help page for a player
+	 * 
+	 * @param player
+	 *            The player
+	 * @param page
+	 *            The page
 	 */
 	public static void printFlagHelpPage(Player player, int page) {
 		printFlagHelpHeader(player, page);
@@ -924,7 +1066,9 @@ public class RegionUtils {
 
 	/**
 	 * Get the JSON file of a Region
-	 * @param region The Region
+	 * 
+	 * @param region
+	 *            The Region
 	 * @return The JSON file of the Region
 	 */
 	public static File getFile(Region region) {
@@ -942,6 +1086,7 @@ public class RegionUtils {
 
 	/**
 	 * Get the Local Regions folder
+	 * 
 	 * @return The Local Regions folder
 	 */
 	public static File getRegionFolder() {
@@ -950,22 +1095,25 @@ public class RegionUtils {
 
 	/**
 	 * Get the Global Regions folder
+	 * 
 	 * @return The Global Regions folder
 	 */
 	public static File getGlobalRegionFolder() {
 		return new File(getConfigFolder() + "/globals");
 	}
-	
+
 	/**
 	 * Get the Old Local Regions folder
+	 * 
 	 * @return The Old Local Regions folder
 	 */
 	public static File getOldRegionFolder() {
 		return new File(getConfigFolder() + "/old/regions");
 	}
-	
+
 	/**
 	 * Get the Old Global Regions folder
+	 * 
 	 * @return The Old Global Regions folder
 	 */
 	public static File getOldGlobalRegionFolder() {
@@ -974,6 +1122,7 @@ public class RegionUtils {
 
 	/**
 	 * Get the Configuration folder
+	 * 
 	 * @return The Configuration folder
 	 */
 	public static String getConfigFolder() {

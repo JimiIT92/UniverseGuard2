@@ -18,6 +18,7 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 
 import com.universeguard.region.Region;
+import com.universeguard.utils.FlagUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -32,7 +33,7 @@ public class FlagMobDropListener {
 		if(!(cause.getEntity() instanceof Player) && cause.getType().equals(SpawnTypes.DROPPED_ITEM) && !event.getEntities().isEmpty()) {
 			Entity entity = cause.getEntity();
 			EntityType type = entity.getType();
-			if(!type.equals(EntityTypes.ITEM))
+			if(!type.equals(EntityTypes.ITEM) && !FlagUtils.isBlockEntity(type) && !FlagUtils.isExplosion(type) && !FlagUtils.isVehicle(type))
 				this.handleEvent(event, entity);
 		}
 	}

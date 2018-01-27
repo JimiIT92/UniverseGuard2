@@ -18,6 +18,7 @@ import org.spongepowered.api.event.filter.cause.First;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
+import com.universeguard.utils.FlagUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
@@ -39,14 +40,18 @@ public class FlagMobPveListener {
 	private void handleEvent(DamageEntityEvent event, Entity entity, Player player)
 	{
 		EntityType type = entity.getType();
-		String name = type.getId().toLowerCase();
-		Region region = RegionUtils.getRegion(entity.getLocation());
-		if(region != null) {
-			boolean cancel = !region.getMobPve("all") || !region.getMobPve(name) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
-			if(cancel) {
-				event.setCancelled(true);
-				MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isExplosion(type) && !FlagUtils.isVehicle(type))
+		{
+			String name = type.getId().toLowerCase();
+			Region region = RegionUtils.getRegion(entity.getLocation());
+			if(region != null) {
+				boolean cancel = !region.getMobPve("all") || !region.getMobPve(name) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
+				if(cancel) {
+					event.setCancelled(true);
+					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+				}
 			}
 		}
+		
 	}
 }
