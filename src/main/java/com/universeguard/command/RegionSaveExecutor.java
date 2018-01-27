@@ -41,7 +41,7 @@ public class RegionSaveExecutor implements CommandExecutor {
 						return CommandResult.empty();
 					}
 				}
-				if(RegionUtils.save(region)) {
+				if(RegionUtils.save(region, false)) {
 					RegionUtils.setPendingRegion(player, null);
 					MessageUtils.sendSuccessMessage(player, RegionText.REGION_SAVED.getValue());
 				} else

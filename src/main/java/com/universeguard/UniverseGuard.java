@@ -162,7 +162,7 @@ public class UniverseGuard {
 		LogUtils.print(RegionText.CONFIGURATION_UPDATING_REGIONS.getValue());
 		for(World w : Sponge.getServer().getWorlds()) {
 			if(RegionUtils.load(w.getName()) == null)
-				RegionUtils.save(new GlobalRegion(w.getName()));
+				RegionUtils.save(new GlobalRegion(w.getName()), false);
 		}
 		// Update regions to the latest RegionVersion
 		this.updateRegions();
@@ -179,9 +179,16 @@ public class UniverseGuard {
 	 * Update regions to the latest RegionVersion
 	 */
 	private void updateRegions() {
+		ArrayList<Region> updatedRegions = new ArrayList<Region>();
 		for(Region region : UniverseGuard.ALL_REGIONS) {
-			if(region.getVersion() != REGION_VERSION)
+			if(region.getVersion() != REGION_VERSION) {
 				RegionUtils.update(region);
+				updatedRegions.add(region);
+			}
+		}
+		for(Region region : updatedRegions) {
+			UniverseGuard.ALL_REGIONS.remove(region);
+			UniverseGuard.ALL_REGIONS.add(region);
 		}
 	}
 	/**

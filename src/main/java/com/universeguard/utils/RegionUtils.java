@@ -75,7 +75,7 @@ public class RegionUtils {
 	 *            The Region
 	 * @return true if the Region has been saved correctly, false otherwise
 	 */
-	public static boolean save(Region region) {
+	public static boolean save(Region region, boolean update) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 		FileWriter fileWriter = null;
 		try {
@@ -87,9 +87,8 @@ public class RegionUtils {
 				file.createNewFile();
 			fileWriter = new FileWriter(file);
 			fileWriter.write(gson.toJson(region));
-			if(UniverseGuard.ALL_REGIONS.contains(region))
-				UniverseGuard.ALL_REGIONS.remove(region);
-			UniverseGuard.ALL_REGIONS.add(region);
+			if(!update)
+				UniverseGuard.ALL_REGIONS.add(region);
 			return true;
 		} catch (IOException e) {
 			LogUtils.log(e);
@@ -164,7 +163,7 @@ public class RegionUtils {
 			newRegion.setGamemode(region.getGameMode());
 			newRegion.setName(region.getName());
 			newRegion.updateFlags();
-			save(newRegion);
+			save(newRegion, true);
 		} else {
 			GlobalRegion newRegion = new GlobalRegion(region.getName());
 			newRegion.setFlags(region.getFlags());
@@ -175,7 +174,7 @@ public class RegionUtils {
 			newRegion.setExplosions(region.getExplosions());
 			newRegion.setMobs(region.getMobs());
 			newRegion.updateFlags();
-			save(newRegion);
+			save(newRegion, true);
 		}
 	}
 
@@ -325,7 +324,7 @@ public class RegionUtils {
 						((LocalRegion) region).setGamemode(jObj.get("gamemode").getAsString());
 					}
 
-					save(region);
+					save(region, false);
 				}
 
 			} catch (FileNotFoundException e) {
