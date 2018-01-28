@@ -48,7 +48,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 /**
- *  
+ * 
  * Main Plugin Class
  * @author Jimi
  *
