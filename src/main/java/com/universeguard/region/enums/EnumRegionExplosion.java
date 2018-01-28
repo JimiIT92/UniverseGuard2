@@ -17,7 +17,8 @@ public enum EnumRegionExplosion {
 	CREEPER("creeper", true, true),
 	ENDER_CRYSTAL("endercrystal", true, true),
 	FIREBALL("fireball", true, true),
-	ENDERDRAGON("enderdragon", true, true);
+	ENDERDRAGON("enderdragon", true, true),
+	OTHER_EXPLOSIONS("otherexplosions", true, true);
 
 	private String NAME;
 	private boolean DAMAGE;

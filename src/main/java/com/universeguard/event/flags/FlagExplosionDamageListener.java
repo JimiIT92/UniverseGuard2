@@ -29,11 +29,15 @@ public class FlagExplosionDamageListener {
 	public void onExplosionDamage(DamageEntityEvent event, @Root EntityDamageSource source) {
 		if(source.isExplosive()) {
 			EntityType entity = source.getSource().getType();
-			if(FlagUtils.isExplosion(entity)) {
-				EnumRegionExplosion explosion = FlagUtils.getExplosion(entity);
-				Region region = RegionUtils.getRegion(event.getTargetEntity().getLocation());
-				if(region != null)
-					event.setCancelled(!region.getExplosionDamage(explosion));
+			Region region = RegionUtils.getRegion(event.getTargetEntity().getLocation());
+			if(region != null)
+			{
+				if(FlagUtils.isExplosion(entity)) {
+					EnumRegionExplosion explosion = FlagUtils.getExplosion(entity);
+						event.setCancelled(!region.getExplosionDamage(explosion));
+				}
+				else
+					event.setCancelled(!region.getExplosionDamage(EnumRegionExplosion.OTHER_EXPLOSIONS));
 			}
 		}
 	}
