@@ -1,0 +1,16 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'sponge'
+        url = 'https://repo.spongepowered.org/maven'
+    }
+}
+
+group = 'com.universeguard'
+version = '2.6'
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:6.0.0'
+}
