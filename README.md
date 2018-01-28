@@ -1,2 +1,1 @@
-# UniverseGuardAPI7
-API7 version of UniverseGuard2 Minecraft Sponge plugin
+# To get all the informations about the plugin, check the main repository at https://github.com/JimiIT92/UniverseGuard2
