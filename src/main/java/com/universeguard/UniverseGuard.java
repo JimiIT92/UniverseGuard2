@@ -251,6 +251,7 @@ public class UniverseGuard {
 		CommandSpec regionList = CommandUtils.buildCommandSpec("Show the list of all regions", new RegionListExecutor());
 		CommandSpec regionGamemode = CommandUtils.buildCommandSpec("Set the gamemode of a region", new RegionGamemodeExecutor(), RegionPermission.ALL.getValue(), GenericArguments.string(Text.of("gamemode")));
 		CommandSpec regionHere = CommandUtils.buildCommandSpec("Tells wich region you are currently in", new RegionHereExecutor());
+		CommandSpec regionReload = CommandUtils.buildCommandSpec("Reload cached regions", new RegionReloadExecutor(), RegionPermission.ALL.getValue());
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -315,6 +316,7 @@ public class UniverseGuard {
 				.child(regionExpand, "expand")
 				.child(regionFlagInfo, "flaginfo")
 				.child(regionHere, "here")
+				.child(regionReload, "reload")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

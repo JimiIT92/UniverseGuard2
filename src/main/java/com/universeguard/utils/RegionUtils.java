@@ -979,6 +979,7 @@ public class RegionUtils {
 			printHelpFor(player, "command [command]", RegionText.REGION_HELP_COMMAND);
 			printHelpFor(player, "expand [direction] (blocks)", RegionText.REGION_HELP_EXPAND);
 			printHelpFor(player, "here", RegionText.REGION_HELP_HERE);
+			printHelpFor(player, "reload", RegionText.REGION_HELP_RELOAD);
 			printHelpFor(player, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 			break;
 		}
