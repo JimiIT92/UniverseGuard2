@@ -38,10 +38,8 @@ public class FlagVehicleDestroyListener {
 	
 	private void handleEvent(InteractEntityEvent.Primary event, EnumRegionVehicle vehicle, Player player) {
 		Region region = RegionUtils.getRegion(player.getLocation());
-		if(region != null) {
-			boolean cancel = false;
-			if(vehicle != null)
-				cancel = !region.getVehicleDestroy(vehicle) && !RegionUtils.hasPermission(player, region);
+		if(region != null && vehicle != null) {
+			boolean cancel = !region.getVehicleDestroy(vehicle) && !RegionUtils.hasPermission(player, region);
 			if(cancel) {
 				event.setCancelled(true);
 				if(player != null)

@@ -35,28 +35,20 @@ public class FlagExplosionDestroyListener {
 			EntityType entity = event.getExplosion().getSourceExplosive().get().getType();
 			ArrayList<Region> regions = new ArrayList<Region>();
 			ArrayList<Location<World>> locations = new ArrayList<Location<World>>();
+			EnumRegionExplosion explosion;
+			
 			if (FlagUtils.isExplosion(entity)) {
-				EnumRegionExplosion explosion = FlagUtils.getExplosion(entity);
-				for (Location<World> location : event.getAffectedLocations()) {
-					if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
-						Region region = RegionUtils.getRegion(location);
-						if (region != null && !regions.contains(region)) {
-							if (!region.getExplosionDestroy(explosion)) {
-								regions.add(region);
-								locations.add(location);
-							}
-						}
-					}
-				}
+				explosion = FlagUtils.getExplosion(entity);
 			} else {
-				for (Location<World> location : event.getAffectedLocations()) {
-					if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
-						Region region = RegionUtils.getRegion(location);
-						if (region != null && !regions.contains(region)) {
-							if (!region.getExplosionDestroy(EnumRegionExplosion.OTHER_EXPLOSIONS)) {
-								regions.add(region);
-								locations.add(location);
-							}
+				explosion = EnumRegionExplosion.OTHER_EXPLOSIONS;
+			}
+			for (Location<World> location : event.getAffectedLocations()) {
+				if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
+					Region region = RegionUtils.getRegion(location);
+					if (region != null && !regions.contains(region)) {
+						if (!region.getExplosionDestroy(explosion)) {
+							regions.add(region);
+							locations.add(location);
 						}
 					}
 				}

@@ -7,6 +7,9 @@
  */
 package com.universeguard.utils;
 
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.Direction;
+
 import com.universeguard.region.enums.EnumDirection;
 
 /**
@@ -28,5 +31,23 @@ public class DirectionUtils {
 				return direction;
 		}
 		return null;
+	}
+
+	/**
+	 * Get a player's Direction
+	 * @param playerSelf The player whose direction to get
+	 * @return The Direction of the player
+	 */
+	public static Direction getPlayerDirection(Player playerSelf){
+	    Direction dir;
+	    double y = playerSelf.getTransform().getYaw();
+	    if( y < 0 ){y += 360;}
+	    y %= 360;
+	    int i = (int)((y+8) / 22.5);
+	    if(i >= 2 && i <= 6){dir = Direction.WEST;}
+	    else if(i >= 7 && i <= 9){dir = Direction.NORTH;}
+	    else if(i >= 10 && i <= 14){dir = Direction.EAST;}
+	    else {dir = Direction.SOUTH;}
+	    return dir;
 	}
 }
