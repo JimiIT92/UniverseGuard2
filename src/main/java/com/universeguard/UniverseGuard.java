@@ -162,7 +162,7 @@ public class UniverseGuard {
 		LogUtils.print(RegionText.CONFIGURATION_UPDATING_REGIONS.getValue());
 		for(World w : Sponge.getServer().getWorlds()) {
 			if(RegionUtils.load(w.getName()) == null)
-				RegionUtils.save(new GlobalRegion(w.getName()), false);
+				RegionUtils.save(new GlobalRegion(w.getName()));
 		}
 		// Update regions to the latest RegionVersion
 		this.updateRegions();
