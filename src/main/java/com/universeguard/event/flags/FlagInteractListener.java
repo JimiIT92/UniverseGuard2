@@ -83,18 +83,16 @@ public class FlagInteractListener {
 	
 	private void handleEvent(Cancellable event, EnumRegionInteract interact, Player player) {
 		Region region = RegionUtils.getRegion(player.getLocation());
-		if(region != null) {
+		if(region != null && interact != null) {
 			boolean cancel = false;
-			if(interact != null) {
-				if(region.isLocal())
-					cancel = !region.getInteract(interact) && !RegionUtils.hasPermission(player, region);
-				else
-					cancel = !region.getInteract(interact) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
-				if(cancel) {
-					event.setCancelled(true);
-					if(player != null)
-						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
-				}
+			if(region.isLocal())
+				cancel = !region.getInteract(interact) && !RegionUtils.hasPermission(player, region);
+			else
+				cancel = !region.getInteract(interact) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
+			if(cancel) {
+				event.setCancelled(true);
+				if(player != null)
+					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 			}
 		}
 		

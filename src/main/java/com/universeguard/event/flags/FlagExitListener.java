@@ -14,6 +14,7 @@ import org.spongepowered.api.util.Direction;
 import com.flowpowered.math.vector.Vector3i;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
+import com.universeguard.utils.DirectionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -27,38 +28,12 @@ public class FlagExitListener implements Runnable {
 	public void run() {
 		for(Player player : Sponge.getServer().getOnlinePlayers()) {
 			Region region = RegionUtils.getRegion(player.getLocation());
-			Direction direction = GetPlayerDirection(player);
+			Direction direction = DirectionUtils.getPlayerDirection(player);
 			if(region != null && region.isLocal() && !RegionUtils.hasPermission(player, region) && !region.getFlag(EnumRegionFlag.EXIT)) {
 				player.setLocation(player.getLocation().sub(getOffset(direction)));
 			}
 		}
 	}
-	
-	public Direction GetPlayerDirection(Player playerSelf){
-        Direction dir;
-        double y = playerSelf.getTransform().getYaw();
-        if( y < 0 ){y += 360;}
-        y %= 360;
-        int i = (int)((y+8) / 22.5);
-        if(i == 0){dir = Direction.SOUTH;}
-        else if(i == 1){dir = Direction.SOUTH;}
-        else if(i == 2){dir = Direction.WEST;}
-        else if(i == 3){dir = Direction.WEST;}
-        else if(i == 4){dir = Direction.WEST;}
-        else if(i == 5){dir = Direction.WEST;}
-        else if(i == 6){dir = Direction.WEST;}
-        else if(i == 7){dir = Direction.NORTH;}
-        else if(i == 8){dir = Direction.NORTH;}
-        else if(i == 9){dir = Direction.NORTH;}
-        else if(i == 10){dir = Direction.EAST;}
-        else if(i == 11){dir = Direction.EAST;}
-        else if(i == 12){dir = Direction.EAST;}
-        else if(i == 13){dir = Direction.EAST;}
-        else if(i == 14){dir = Direction.EAST;}
-        else if(i == 15){dir = Direction.SOUTH;}
-        else {dir = Direction.SOUTH;}
-        return dir;
-   }
 	
 	private static Vector3i getOffset(Direction direction) {
 		int offsetX = 0;
