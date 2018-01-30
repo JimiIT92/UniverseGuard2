@@ -30,30 +30,32 @@ import com.universeguard.utils.RegionUtils;
 public class FlagExplosionDestroyListener {
 
 	@Listener
-	public void onExplosionDamage(ExplosionEvent.Detonate event) {
+	public void onExplosionDestroy(ExplosionEvent.Detonate event) {
+		ArrayList<Region> regions = new ArrayList<Region>();
+		ArrayList<Location<World>> locations = new ArrayList<Location<World>>();
+		EnumRegionExplosion explosion;
 		if (event.getExplosion().getSourceExplosive().isPresent()) {
 			EntityType entity = event.getExplosion().getSourceExplosive().get().getType();
-			ArrayList<Region> regions = new ArrayList<Region>();
-			ArrayList<Location<World>> locations = new ArrayList<Location<World>>();
-			EnumRegionExplosion explosion;
-			
 			if (FlagUtils.isExplosion(entity)) {
 				explosion = FlagUtils.getExplosion(entity);
 			} else {
 				explosion = EnumRegionExplosion.OTHER_EXPLOSIONS;
 			}
-			for (Location<World> location : event.getAffectedLocations()) {
-				if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
-					Region region = RegionUtils.getRegion(location);
-					if (region != null && !regions.contains(region)) {
-						if (!region.getExplosionDestroy(explosion)) {
+		}
+		else
+			explosion = EnumRegionExplosion.OTHER_EXPLOSIONS;
+		for (Location<World> location : event.getAffectedLocations()) {
+			if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
+				Region region = RegionUtils.getRegion(location);
+				if (region != null) {
+					if (!region.getExplosionDestroy(explosion)) {
+						if(!regions.contains(region))
 							regions.add(region);
-							locations.add(location);
-						}
+						locations.add(location);
 					}
 				}
 			}
-			event.getAffectedLocations().removeAll(locations);
 		}
+		event.getAffectedLocations().removeAll(locations);
 	}
 }
