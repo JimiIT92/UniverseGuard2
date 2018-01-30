@@ -16,6 +16,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionInteract;
@@ -36,53 +38,53 @@ public class FlagInteractListener {
 	@Listener
 	public void onInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
 		BlockType block = event.getTargetBlock().getState().getType();
-		this.handleInteractBlock(event, block, player);
+		this.handleInteractBlock(event, event.getTargetBlock().getLocation().get(), block, player);
 	}
 	
 	@Listener
 	public void onInteract(InteractBlockEvent.Secondary.OffHand event, @First Player player) {
 		BlockType block = event.getTargetBlock().getState().getType();
-		this.handleInteractBlock(event, block, player);
+		this.handleInteractBlock(event, event.getTargetBlock().getLocation().get(), block, player);
 	}
 	
 	@Listener
 	public void onInteract(InteractEntityEvent.Primary.MainHand event, @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
 		if(entity.equals(EntityTypes.ITEM_FRAME))
-			this.handleEvent(event, EnumRegionInteract.ITEM_FRAME, player);
+			this.handleEvent(event, event.getTargetEntity().getLocation(), EnumRegionInteract.ITEM_FRAME, player);
 	}
 	
 	@Listener
 	public void onInteract(InteractEntityEvent.Primary.OffHand event, @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
 		if(entity.equals(EntityTypes.ITEM_FRAME))
-			this.handleEvent(event, EnumRegionInteract.ITEM_FRAME, player);
+			this.handleEvent(event, event.getTargetEntity().getLocation(), EnumRegionInteract.ITEM_FRAME, player);
 	}
 
 	@Listener
-	public void onInteract(InteractEntityEvent.Secondary.MainHand event, @First Player player) {
+	public void onInteract(InteractEntityEvent.Secondary.MainHand event, Location<World> location, @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
-		this.handleEntityInteract(event, entity, player);
+		this.handleEntityInteract(event, location, entity, player);
 	}
 	
 	@Listener
-	public void onInteract(InteractEntityEvent.Secondary.OffHand event, @First Player player) {
+	public void onInteract(InteractEntityEvent.Secondary.OffHand event, Location<World> location,  @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
-		this.handleEntityInteract(event, entity, player);
+		this.handleEntityInteract(event, location, entity, player);
 	}
 	
-	private void handleInteractBlock(InteractBlockEvent.Secondary event, BlockType block, Player player) {
+	private void handleInteractBlock(InteractBlockEvent.Secondary event, Location<World> location, BlockType block, Player player) {
 		EnumRegionInteract interact = FlagUtils.getInteract(block);
-		this.handleEvent(event, interact, player);
+		this.handleEvent(event, location, interact, player);
 	}
 	
-	private void handleEntityInteract(InteractEntityEvent.Secondary event, EntityType entity, Player player) {
+	private void handleEntityInteract(InteractEntityEvent.Secondary event, Location<World> location, EntityType entity, Player player) {
 		EnumRegionInteract interact = FlagUtils.getInteract(entity);
-		this.handleEvent(event, interact, player);
+		this.handleEvent(event, location, interact, player);
 	}
 	
-	private void handleEvent(Cancellable event, EnumRegionInteract interact, Player player) {
-		Region region = RegionUtils.getRegion(player.getLocation());
+	private void handleEvent(Cancellable event, Location<World> location, EnumRegionInteract interact, Player player) {
+		Region region = RegionUtils.getRegion(location);
 		if(region != null && interact != null) {
 			boolean cancel = false;
 			if(region.isLocal())
