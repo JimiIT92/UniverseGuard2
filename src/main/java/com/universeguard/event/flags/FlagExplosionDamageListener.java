@@ -9,6 +9,7 @@ package com.universeguard.event.flags;
 
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -16,7 +17,6 @@ import org.spongepowered.api.event.filter.cause.Root;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionExplosion;
 import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.LogUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -27,8 +27,18 @@ import com.universeguard.utils.RegionUtils;
 public class FlagExplosionDamageListener {
 
 	@Listener
+	public void onExplosionDamage(DamageEntityEvent event, @Root DamageSource source) {
+		if(source.isExplosive() && !(source instanceof EntityDamageSource)) {
+			Region region = RegionUtils.getRegion(event.getTargetEntity().getLocation());
+			if(region != null)
+			{
+				event.setCancelled(!region.getExplosionDamage(EnumRegionExplosion.OTHER_EXPLOSIONS));
+			}
+		}
+	}
+	
+	@Listener
 	public void onExplosionDamage(DamageEntityEvent event, @Root EntityDamageSource source) {
-		LogUtils.print("SOURCE: " + source.toString());
 		if(source.isExplosive()) {
 			EntityType entity = source.getSource().getType();
 			Region region = RegionUtils.getRegion(event.getTargetEntity().getLocation());
@@ -39,7 +49,6 @@ public class FlagExplosionDamageListener {
 						event.setCancelled(!region.getExplosionDamage(explosion));
 				}
 				else {
-					LogUtils.print("VALUE: " + !region.getExplosionDamage(EnumRegionExplosion.OTHER_EXPLOSIONS));
 					event.setCancelled(!region.getExplosionDamage(EnumRegionExplosion.OTHER_EXPLOSIONS));
 				}
 			}
