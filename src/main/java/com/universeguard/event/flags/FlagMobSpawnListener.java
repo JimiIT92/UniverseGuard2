@@ -52,7 +52,7 @@ public class FlagMobSpawnListener {
 	private void handleEvent(SpawnEntityEvent event, Entity entity, Player player)
 	{
 		EntityType type = entity.getType();
-		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isExplosion(type) && !FlagUtils.isVehicle(type))
+		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type))
 		{
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());

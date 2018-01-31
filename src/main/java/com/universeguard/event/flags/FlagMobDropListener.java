@@ -33,7 +33,7 @@ public class FlagMobDropListener {
 		if(!(cause.getEntity() instanceof Player) && cause.getType().equals(SpawnTypes.DROPPED_ITEM) && !event.getEntities().isEmpty()) {
 			Entity entity = cause.getEntity();
 			EntityType type = entity.getType();
-			if(!type.equals(EntityTypes.ITEM) && !FlagUtils.isBlockEntity(type) && !FlagUtils.isExplosion(type) && !FlagUtils.isVehicle(type))
+			if(!type.equals(EntityTypes.ITEM) && !FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type))
 				this.handleEvent(event, entity);
 		}
 	}
