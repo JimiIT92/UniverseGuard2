@@ -53,7 +53,7 @@ public class RegionRemoveExecutor implements CommandExecutor {
 								localRegion.removeMember(member);
 								if(RegionUtils.save(localRegion)) {
 									MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + member.getName());
-									MessageUtils.sendMessage(member, RegionText.REMOVED_FROM_REGION.getValue() + ": " + member.getName(), TextColors.GOLD);	
+									MessageUtils.sendMessage(member, RegionText.REMOVED_FROM_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
 								} else
 									MessageUtils.sendErrorMessage(player, RegionText.REGION_REMOVE_MEMBER_EXCEPTION.getValue());
 							}
