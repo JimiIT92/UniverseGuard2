@@ -57,7 +57,7 @@ public class RegionAddExecutor implements CommandExecutor {
 									localRegion.addMember(member, role);
 									if(RegionUtils.save(localRegion)) {
 										MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + member.getName());
-										MessageUtils.sendMessage(member, RegionText.ADDED_TO_REGION.getValue() + ": " + member.getName(), TextColors.GOLD);	
+										MessageUtils.sendMessage(member, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
 									} else
 										MessageUtils.sendErrorMessage(player, RegionText.REGION_ADD_MEMBER_EXCEPTION.getValue());
 								}
