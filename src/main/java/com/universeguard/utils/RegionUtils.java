@@ -626,8 +626,12 @@ public class RegionUtils {
 		}
 
 		Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-
-		return userStorage.isPresent() ? userStorage.get().get(uuid).get().getPlayer().get() : null;
+		if(userStorage.isPresent() && userStorage.get().get(uuid).isPresent()) {
+			if(userStorage.get().get(uuid).get().getPlayer().isPresent())
+				return userStorage.get().get(uuid).get().getPlayer().get();
+			return null;
+		}
+		return null;
 	}
 
 	/**
