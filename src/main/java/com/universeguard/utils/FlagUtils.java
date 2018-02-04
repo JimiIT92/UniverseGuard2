@@ -235,7 +235,10 @@ public class FlagUtils {
 	 * @return true if the EntityType is a Block Entity, false otherwise
 	 */
 	public static boolean isBlockEntity(EntityType type) {
-		return type.equals(EntityTypes.ENDER_CRYSTAL) || type.equals(EntityTypes.PAINTING) || type.equals(EntityTypes.ITEM_FRAME) || type.equals(EntityTypes.ARMOR_STAND);
+		return type.equals(EntityTypes.ENDER_CRYSTAL) || 
+				type.equals(EntityTypes.PAINTING) || 
+				type.equals(EntityTypes.ITEM_FRAME) || 
+				type.equals(EntityTypes.ARMOR_STAND);
 	}
 	
 	/**

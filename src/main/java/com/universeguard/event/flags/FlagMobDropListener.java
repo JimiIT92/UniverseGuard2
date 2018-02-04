@@ -10,6 +10,7 @@ package com.universeguard.event.flags;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
@@ -33,7 +34,7 @@ public class FlagMobDropListener {
 		if(!(cause.getEntity() instanceof Player) && cause.getType().equals(SpawnTypes.DROPPED_ITEM) && !event.getEntities().isEmpty()) {
 			Entity entity = cause.getEntity();
 			EntityType type = entity.getType();
-			if(!type.equals(EntityTypes.ITEM) && !FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type))
+			if(!type.equals(EntityTypes.ITEM) && !FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type) && entity instanceof Living)
 				this.handleEvent(event, entity);
 		}
 	}

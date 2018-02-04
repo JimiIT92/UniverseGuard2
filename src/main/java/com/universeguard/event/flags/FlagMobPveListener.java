@@ -9,6 +9,7 @@ package com.universeguard.event.flags;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
@@ -40,7 +41,7 @@ public class FlagMobPveListener {
 	private void handleEvent(DamageEntityEvent event, Entity entity, Player player)
 	{
 		EntityType type = entity.getType();
-		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type))
+		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type) && entity instanceof Living)
 		{
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());

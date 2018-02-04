@@ -8,17 +8,21 @@
 package com.universeguard.event.flags;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionExplosion;
 import com.universeguard.utils.FlagUtils;
+import com.universeguard.utils.LogUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -31,7 +35,6 @@ public class FlagExplosionDestroyListener {
 
 	@Listener
 	public void onExplosionDestroy(ExplosionEvent.Detonate event) {
-		ArrayList<Region> regions = new ArrayList<Region>();
 		ArrayList<Location<World>> locations = new ArrayList<Location<World>>();
 		EnumRegionExplosion explosion;
 		if (event.getExplosion().getSourceExplosive().isPresent()) {
@@ -41,21 +44,41 @@ public class FlagExplosionDestroyListener {
 			} else {
 				explosion = EnumRegionExplosion.OTHER_EXPLOSIONS;
 			}
-		}
-		else
+		} else {
 			explosion = EnumRegionExplosion.OTHER_EXPLOSIONS;
-		for (Location<World> location : event.getAffectedLocations()) {
-			if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
-				Region region = RegionUtils.getRegion(location);
+		}
+
+		List<Location<World>> entityLocations = new ArrayList<Location<World>>();
+		List<Vector3i> entityVectors = new ArrayList<Vector3i>();
+
+		for (Entity entity : event.getEntities()) {
+			if (FlagUtils.isBlockEntity(entity.getType())) {
+				Region region = RegionUtils.getRegion(entity.getLocation());
 				if (region != null) {
 					if (!region.getExplosionDestroy(explosion)) {
-						if(!regions.contains(region))
-							regions.add(region);
-						locations.add(location);
+						entityLocations.add(entity.getLocation());
+						entityVectors.add(new Vector3i(entity.getLocation().getBlockX(),
+								entity.getLocation().getBlockY(), entity.getLocation().getBlockZ()));
 					}
 				}
 			}
 		}
+
+		for (Location<World> location : event.getAffectedLocations()) {
+			if (!entityVectors
+					.contains(new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ()))) {
+				if (event.getTargetWorld().getBlock(location.getBlockPosition()).getType() != BlockTypes.AIR) {
+					Region region = RegionUtils.getRegion(location);
+					if (region != null) {
+						if (!region.getExplosionDestroy(explosion)) {
+							locations.add(location);
+						}
+					}
+				}
+			}
+		}
+
+		event.getAffectedLocations().removeAll(entityLocations);
 		event.getAffectedLocations().removeAll(locations);
 	}
 }
