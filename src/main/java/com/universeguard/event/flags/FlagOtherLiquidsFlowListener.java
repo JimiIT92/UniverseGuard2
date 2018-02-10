@@ -10,6 +10,7 @@ package com.universeguard.event.flags;
 import java.util.Optional;
 
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
@@ -38,8 +39,9 @@ public class FlagOtherLiquidsFlowListener {
 			Location<World> location = event.getLocations().get(event.getLocations().size() - 1);
 			Optional<MatterProperty> matter = block.getState().getProperty(MatterProperty.class);
 			if(matter.isPresent() && matter.get().getValue().equals(Matter.LIQUID)) {
-				if(!block.getState().getType().equals(BlockTypes.WATER) && !block.getState().getType().equals(BlockTypes.FLOWING_WATER) &&
-						!block.getState().getType().equals(BlockTypes.LAVA) && !block.getState().getType().equals(BlockTypes.FLOWING_LAVA)) {
+				BlockType blockType = block.getState().getType();
+				if(!(blockType.equals(BlockTypes.WATER) || blockType.equals(BlockTypes.FLOWING_WATER) ||
+						blockType.equals(BlockTypes.LAVA) || blockType.equals(BlockTypes.FLOWING_LAVA))) {
 					this.handleEvent(event, location, null);
 				}
 			}

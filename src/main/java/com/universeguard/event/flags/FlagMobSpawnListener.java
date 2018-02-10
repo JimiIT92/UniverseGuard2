@@ -9,8 +9,14 @@ package com.universeguard.event.flags;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.cause.Root;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionPermission;
@@ -27,27 +33,31 @@ import com.universeguard.utils.RegionUtils;
  */
 public class FlagMobSpawnListener {
 
-	/*@Listener
-	public void onMobSpawn(SpawnEntityEvent event, @Root EntitySpawnCause cause) {
+	@Listener
+	public void onMobSpawn(SpawnEntityEvent event, @Root Entity cause) {
 		if(!event.getEntities().isEmpty()) {
-			if(cause.getEntity() instanceof Player)
-				this.handleEvent(event, event.getEntities().get(0), (Player)cause.getEntity());
+			if(cause instanceof Player)
+				this.handleEvent(event, event.getEntities().get(0), (Player)cause);
 			else
 				this.handleEvent(event, event.getEntities().get(0), null);
 		}
 	}
 	
 	@Listener
-	public void onMobSpawn(SpawnEntityEvent event, @Root SpawnCause cause) {
-		if(!event.getEntities().isEmpty() && !(cause.getType().equals(SpawnTypes.PLACEMENT)) && !(cause.getType().equals(SpawnTypes.DROPPED_ITEM)) && !(cause.getType().equals(SpawnTypes.CHUNK_LOAD))) {
-			this.handleEvent(event, event.getEntities().get(0), null);
+	public void onMobSpawn(SpawnEntityEvent event) {
+		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE)) {
+			SpawnType type = event.getContext().get(EventContextKeys.SPAWN_TYPE).get();
+			if(!event.getEntities().isEmpty() && !(type.equals(SpawnTypes.PLACEMENT)) && 
+					!(type.equals(SpawnTypes.DROPPED_ITEM)) && !(type.equals(SpawnTypes.CHUNK_LOAD))) {
+				this.handleEvent(event, event.getEntities().get(0), null);
+			}	
 		}
-	}*/
+	}
 	
 	private void handleEvent(SpawnEntityEvent event, Entity entity, Player player)
 	{
 		EntityType type = entity.getType();
-		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isExplosion(type) && !FlagUtils.isVehicle(type))
+		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type) && entity instanceof Living)
 		{
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());

@@ -111,7 +111,7 @@ public class RegionFlagExecutor implements CommandExecutor {
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							}
 							else if (FlagUtils.getMobId(name) != null) {
-								
+								region.setMobSpawn(FlagUtils.getMobId(name), value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							} else
 								MessageUtils.sendErrorMessage(player, RegionText.REGION_MOB_NOT_FOUND.getValue());

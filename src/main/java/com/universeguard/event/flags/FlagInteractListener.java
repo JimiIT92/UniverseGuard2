@@ -8,6 +8,7 @@
 package com.universeguard.event.flags;
 
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -16,6 +17,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionInteract;
@@ -32,69 +35,65 @@ import com.universeguard.utils.RegionUtils;
  *
  */
 public class FlagInteractListener {
-
+	
 	@Listener
-	public void onInteract(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
+	public void onInteractBlockSecondaryMainhand(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
 		BlockType block = event.getTargetBlock().getState().getType();
-		this.handleInteractBlock(event, block, player);
+		if(event.getTargetBlock().getLocation().isPresent() && !block.equals(BlockTypes.AIR)) {
+			EnumRegionInteract interact = FlagUtils.getInteract(block);
+			this.handleEvent(event, event.getTargetBlock().getLocation().get(), interact, player);
+		}
 	}
 	
 	@Listener
-	public void onInteract(InteractBlockEvent.Secondary.OffHand event, @First Player player) {
+	public void onInteractBlockSecondaryOffhand(InteractBlockEvent.Secondary.OffHand event, @First Player player) {
 		BlockType block = event.getTargetBlock().getState().getType();
-		this.handleInteractBlock(event, block, player);
+		if(event.getTargetBlock().getLocation().isPresent() && !block.equals(BlockTypes.AIR)) {
+			EnumRegionInteract interact = FlagUtils.getInteract(block);
+			this.handleEvent(event, event.getTargetBlock().getLocation().get(), interact, player);
+		}
 	}
 	
 	@Listener
-	public void onInteract(InteractEntityEvent.Primary.MainHand event, @First Player player) {
+	public void onInteractEntityPrimaryMainhand(InteractEntityEvent.Primary.MainHand event, @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
 		if(entity.equals(EntityTypes.ITEM_FRAME))
-			this.handleEvent(event, EnumRegionInteract.ITEM_FRAME, player);
+			this.handleEvent(event, event.getTargetEntity().getLocation(), EnumRegionInteract.ITEM_FRAME, player);
 	}
 	
 	@Listener
-	public void onInteract(InteractEntityEvent.Primary.OffHand event, @First Player player) {
+	public void onInteractEntityPrimaryOffhand(InteractEntityEvent.Primary.OffHand event, @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
 		if(entity.equals(EntityTypes.ITEM_FRAME))
-			this.handleEvent(event, EnumRegionInteract.ITEM_FRAME, player);
+			this.handleEvent(event, event.getTargetEntity().getLocation(), EnumRegionInteract.ITEM_FRAME, player);
 	}
 
 	@Listener
-	public void onInteract(InteractEntityEvent.Secondary.MainHand event, @First Player player) {
+	public void onInteractEntitySecondaryMainhand(InteractEntityEvent.Secondary.MainHand event, @First Player player) {
 		EntityType entity = event.getTargetEntity().getType();
-		this.handleEntityInteract(event, entity, player);
-	}
-	
-	@Listener
-	public void onInteract(InteractEntityEvent.Secondary.OffHand event, @First Player player) {
-		EntityType entity = event.getTargetEntity().getType();
-		this.handleEntityInteract(event, entity, player);
-	}
-	
-	private void handleInteractBlock(InteractBlockEvent.Secondary event, BlockType block, Player player) {
-		EnumRegionInteract interact = FlagUtils.getInteract(block);
-		this.handleEvent(event, interact, player);
-	}
-	
-	private void handleEntityInteract(InteractEntityEvent.Secondary event, EntityType entity, Player player) {
 		EnumRegionInteract interact = FlagUtils.getInteract(entity);
-		this.handleEvent(event, interact, player);
+		this.handleEvent(event, event.getTargetEntity().getLocation(), interact, player);
 	}
 	
-	private void handleEvent(Cancellable event, EnumRegionInteract interact, Player player) {
-		Region region = RegionUtils.getRegion(player.getLocation());
-		if(region != null) {
+	@Listener
+	public void onInteractEntitySecondaryOffhand(InteractEntityEvent.Secondary.OffHand event, @First Player player) {
+		EntityType entity = event.getTargetEntity().getType();
+		EnumRegionInteract interact = FlagUtils.getInteract(entity);
+		this.handleEvent(event, event.getTargetEntity().getLocation(), interact, player);
+	}
+	
+	private void handleEvent(Cancellable event, Location<World> location, EnumRegionInteract interact, Player player) {
+		Region region = RegionUtils.getRegion(location);
+		if(region != null && interact != null) {
 			boolean cancel = false;
-			if(interact != null) {
-				if(region.isLocal())
-					cancel = !region.getInteract(interact) && !RegionUtils.hasPermission(player, region);
-				else
-					cancel = !region.getInteract(interact) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
-				if(cancel) {
-					event.setCancelled(true);
-					if(player != null)
-						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
-				}
+			if(region.isLocal())
+				cancel = !region.getInteract(interact) && !RegionUtils.hasPermission(player, region);
+			else
+				cancel = !region.getInteract(interact) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
+			if(cancel) {
+				event.setCancelled(true);
+				if(player != null)
+					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 			}
 		}
 		

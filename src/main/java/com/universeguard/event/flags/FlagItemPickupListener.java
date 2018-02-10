@@ -27,7 +27,7 @@ import com.universeguard.utils.RegionUtils;
 public class FlagItemPickupListener {
 	
 	@Listener
-	public void onItemPickup(Pickup event, @First Player player) {
+	public void onItemPickup(Pickup.Pre event, @First Player player) {
 		this.handleEvent(event, player.getLocation(), player);
 	}
 

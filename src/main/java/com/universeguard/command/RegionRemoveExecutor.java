@@ -15,7 +15,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.universeguard.UniverseGuard;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionText;
@@ -52,11 +51,9 @@ public class RegionRemoveExecutor implements CommandExecutor {
 							localRegion = (LocalRegion) region;
 							if(RegionUtils.isMember(localRegion, member)) {
 								localRegion.removeMember(member);
-								if(RegionUtils.save(localRegion, true)) {
-									UniverseGuard.ALL_REGIONS.remove(region);
-									UniverseGuard.ALL_REGIONS.add(region);
+								if(RegionUtils.save(localRegion)) {
 									MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + member.getName());
-									MessageUtils.sendMessage(member, RegionText.REMOVED_FROM_REGION.getValue() + ": " + member.getName(), TextColors.GOLD);	
+									MessageUtils.sendMessage(member, RegionText.REMOVED_FROM_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
 								} else
 									MessageUtils.sendErrorMessage(player, RegionText.REGION_REMOVE_MEMBER_EXCEPTION.getValue());
 							}

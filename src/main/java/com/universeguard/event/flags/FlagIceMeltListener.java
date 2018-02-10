@@ -1,5 +1,6 @@
 package com.universeguard.event.flags;
 
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
@@ -17,10 +18,12 @@ public class FlagIceMeltListener {
 
 	@Listener
 	public void onIceMelt(ChangeBlockEvent.Place event, @Root LocatableBlock block) {
+		BlockType blockType = event.getTransactions().get(0).getFinal().getState().getType();
 		if(!event.getTransactions().isEmpty() 
-				&& block.getBlockState().getType().equals(BlockTypes.ICE) && (event.getTransactions().get(0).getFinal().getState().getType().equals(BlockTypes.WATER) ||
-						event.getTransactions().get(0).getFinal().getState().getType().equals(BlockTypes.FLOWING_WATER) ||
-						event.getTransactions().get(0).getFinal().getState().getType().equals(BlockTypes.AIR))) {
+			&& block.getBlockState().getType().equals(BlockTypes.ICE)
+			&& (blockType.equals(BlockTypes.WATER) ||
+				blockType.equals(BlockTypes.FLOWING_WATER) ||
+				blockType.equals(BlockTypes.AIR))) {
 			this.handleEvent(event, block.getLocation());
 		}
 	}

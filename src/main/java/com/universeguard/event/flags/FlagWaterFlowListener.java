@@ -42,7 +42,8 @@ public class FlagWaterFlowListener {
 			Location<World> location = event.getLocations().get(event.getLocations().size() - 1);
 			Optional<MatterProperty> matter = block.getState().getProperty(MatterProperty.class);
 			if(matter.isPresent() && matter.get().getValue().equals(Matter.LIQUID)) {
-				if(block.getState().getType().equals(BlockTypes.WATER) || block.getState().getType().equals(BlockTypes.FLOWING_WATER)) {
+				BlockType blockType = block.getState().getType();
+				if(blockType.equals(BlockTypes.WATER) || blockType.equals(BlockTypes.FLOWING_WATER)) {
 					this.handleEvent(event, location, null);
 				}
 			}
