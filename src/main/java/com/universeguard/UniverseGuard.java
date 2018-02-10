@@ -88,10 +88,6 @@ public class UniverseGuard {
 	 */
 	public static int ENTER_FLAG_TIMER = 100;
 	/**
-	 * The Exit Flag Timer update frequency (in milliseconds)
-	 */
-	public static int EXIT_FLAG_TIMER = 100;
-	/**
 	 * Region Version Number
 	 */
 	public static final float REGION_VERSION = Float.valueOf(VERSION);
@@ -365,6 +361,7 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagSendChatListener());
 		EventUtils.registerEvent(new FlagIceMeltListener());
 		EventUtils.registerEvent(new FlagVinesGrowthListener());
+		EventUtils.registerEvent(new FlagExitListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())
@@ -384,14 +381,8 @@ public class UniverseGuard {
 			.name("Enter Flag Timer Task")
 			.submit(UniverseGuard.INSTANCE);
 		
-		/*Task.builder()
-		.execute(new FlagExitListener())
-			.interval(UniverseGuard.EXIT_FLAG_TIMER, TimeUnit.MILLISECONDS)
-			.name("Exit Flag Timer Task")
-			.submit(UniverseGuard.INSTANCE);*/
-		
 		// Debug utility. Used internally
-		boolean DEBUG = false;
+		boolean DEBUG = true;
 		if(DEBUG)
 			EventUtils.registerEvent(new EventListener());
 	}
