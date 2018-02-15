@@ -28,7 +28,7 @@ public class FlagExplosionDamageListener {
 
 	@Listener
 	public void onExplosionDamage(DamageEntityEvent event, @Root DamageSource source) {
-		if(source.isExplosive() && !(source instanceof EntityDamageSource)) {
+		if(source.isExplosive() && !(source instanceof EntityDamageSource) && !FlagUtils.isBlockEntity(event.getTargetEntity().getType())) {
 			Region region = RegionUtils.getRegion(event.getTargetEntity().getLocation());
 			if(region != null)
 			{
@@ -39,7 +39,7 @@ public class FlagExplosionDamageListener {
 	
 	@Listener
 	public void onExplosionDamage(DamageEntityEvent event, @Root EntityDamageSource source) {
-		if(source.isExplosive()) {
+		if(source.isExplosive() && !FlagUtils.isBlockEntity(event.getTargetEntity().getType())) {
 			EntityType entity = source.getSource().getType();
 			Region region = RegionUtils.getRegion(event.getTargetEntity().getLocation());
 			if(region != null)

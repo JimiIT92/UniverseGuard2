@@ -40,7 +40,7 @@ public class RegionFlagExecutor implements CommandExecutor {
 			if (RegionUtils.hasPendingRegion(player)) {
 				if (args.hasAny("subflag") && args.hasAny("flag") && args.hasAny("value")) {
 					Region region = RegionUtils.getPendingRegion(player);
-					boolean value = args.<Boolean>getOne("value").get();
+					boolean value = Boolean.valueOf(args.<String>getOne("value").get());
 					String name = args.<String>getOne("flag").get();
 					String subflag = args.<String>getOne("subflag").get();
 					if (!subflag.equalsIgnoreCase("flag")) {
