@@ -12,6 +12,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
@@ -42,7 +43,7 @@ public class FlagDestroyListener {
 	public void onEntityDestroyed(InteractEntityEvent.Primary event, @First Player player) {
 		Entity targetEntity = event.getTargetEntity();
 		EntityType type = targetEntity.getType();
-		if(FlagUtils.isBlockEntity(type))
+		if(FlagUtils.isBlockEntity(type) || !(targetEntity instanceof Living))
 			this.handleEvent(event, targetEntity.getLocation(), player);
 	}
 	
@@ -62,7 +63,7 @@ public class FlagDestroyListener {
 		if(block.equals(BlockTypes.WATER) || block.equals(BlockTypes.FLOWING_WATER) ||
 				block.equals(BlockTypes.LAVA) || block.equals(BlockTypes.FLOWING_LAVA)) {
 			if(player.getItemInHand(event.getHandType()).isPresent()) {
-				ItemType item = player.getItemInHand(event.getHandType()).get().getItem();
+				ItemType item = player.getItemInHand(event.getHandType()).get().getType();
 				if(item.equals(ItemTypes.BUCKET) || item.equals(ItemTypes.WATER_BUCKET) || item.equals(ItemTypes.LAVA_BUCKET))
 					this.handleEvent(event, player.getLocation(), player);	
 			}
