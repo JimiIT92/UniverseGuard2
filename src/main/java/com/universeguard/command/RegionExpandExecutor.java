@@ -18,7 +18,6 @@ import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumDirection;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.DirectionUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionLocationUtils;
 import com.universeguard.utils.RegionUtils;
@@ -37,7 +36,7 @@ public class RegionExpandExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if(args.hasAny("direction")) {
 				if(RegionUtils.hasPendingRegion(player)) {
-					EnumDirection direction = DirectionUtils.getDirection(args.<String>getOne("direction").get());
+					EnumDirection direction = args.<EnumDirection>getOne("direction").get();
 					if(direction != null) {
 						Region region = RegionUtils.getPendingRegion(player);
 						if(region.isLocal()) {

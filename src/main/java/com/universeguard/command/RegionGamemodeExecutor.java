@@ -18,7 +18,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.GameModeUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionUtils;
 
@@ -36,7 +35,7 @@ public class RegionGamemodeExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if (RegionUtils.hasPendingRegion(player)) {
 				if (args.hasAny("gamemode")) {
-					GameMode gameMode = GameModeUtils.getGameMode(args.<String>getOne("gamemode").get());
+					GameMode gameMode = args.<GameMode>getOne("gamemode").get();
 					if (gameMode != GameModes.NOT_SET) {
 						Region region = RegionUtils.getPendingRegion(player);
 						region.setGamemode(gameMode.getId());
