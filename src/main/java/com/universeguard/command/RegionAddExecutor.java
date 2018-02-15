@@ -20,7 +20,6 @@ import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.RegionRoleUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -37,7 +36,7 @@ public class RegionAddExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if (args.hasAny("role") && args.hasAny("name")) {
 				Player member = args.<Player>getOne("name").get();
-				RegionRole role = RegionRoleUtils.getRole(args.<String>getOne("role").get().toUpperCase());
+				RegionRole role = args.<RegionRole>getOne("role").get();
 				if(role != null) {
 					if (!RegionUtils.hasRegion(member)) {
 						Region region = null;
