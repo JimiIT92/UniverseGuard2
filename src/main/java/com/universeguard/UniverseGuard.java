@@ -30,9 +30,77 @@ import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import com.universeguard.command.*;
-import com.universeguard.event.*;
-import com.universeguard.event.flags.*;
+import com.universeguard.command.RegionAddExecutor;
+import com.universeguard.command.RegionCommandExecutor;
+import com.universeguard.command.RegionDeleteExecutor;
+import com.universeguard.command.RegionEditExecutor;
+import com.universeguard.command.RegionExecutor;
+import com.universeguard.command.RegionExpandExecutor;
+import com.universeguard.command.RegionFlagExecutor;
+import com.universeguard.command.RegionFlagInfoExecutor;
+import com.universeguard.command.RegionGamemodeExecutor;
+import com.universeguard.command.RegionHelpExecutor;
+import com.universeguard.command.RegionHereExecutor;
+import com.universeguard.command.RegionInfoExecutor;
+import com.universeguard.command.RegionListExecutor;
+import com.universeguard.command.RegionNameExecutor;
+import com.universeguard.command.RegionPriorityExecutor;
+import com.universeguard.command.RegionReloadExecutor;
+import com.universeguard.command.RegionRemoveExecutor;
+import com.universeguard.command.RegionSaveExecutor;
+import com.universeguard.command.RegionSetSpawnExecutor;
+import com.universeguard.command.RegionSetTeleportExecutor;
+import com.universeguard.command.RegionSpawnExecutor;
+import com.universeguard.command.RegionTeleportExecutor;
+import com.universeguard.command.argument.BooleanElement;
+import com.universeguard.command.argument.CommandNameElement;
+import com.universeguard.command.argument.RegionNameElement;
+import com.universeguard.command.argument.SubflagCommandElement;
+import com.universeguard.event.EventListener;
+import com.universeguard.event.EventRegionSelect;
+import com.universeguard.event.flags.FlagCactusDamageListener;
+import com.universeguard.event.flags.FlagChestsListener;
+import com.universeguard.event.flags.FlagCommandListener;
+import com.universeguard.event.flags.FlagDestroyListener;
+import com.universeguard.event.flags.FlagDrownListener;
+import com.universeguard.event.flags.FlagEnderChestsListener;
+import com.universeguard.event.flags.FlagEnderDragonBlockDamageListener;
+import com.universeguard.event.flags.FlagEnderPearlListener;
+import com.universeguard.event.flags.FlagEndermanGriefListener;
+import com.universeguard.event.flags.FlagEnterListener;
+import com.universeguard.event.flags.FlagExitListener;
+import com.universeguard.event.flags.FlagExpDropListener;
+import com.universeguard.event.flags.FlagExplosionDamageListener;
+import com.universeguard.event.flags.FlagExplosionDestroyListener;
+import com.universeguard.event.flags.FlagFallDamageListener;
+import com.universeguard.event.flags.FlagFireDamageListener;
+import com.universeguard.event.flags.FlagFireSpreadListener;
+import com.universeguard.event.flags.FlagGamemodeListener;
+import com.universeguard.event.flags.FlagHungerListener;
+import com.universeguard.event.flags.FlagIceMeltListener;
+import com.universeguard.event.flags.FlagInteractListener;
+import com.universeguard.event.flags.FlagInvincibleListener;
+import com.universeguard.event.flags.FlagItemDropListener;
+import com.universeguard.event.flags.FlagItemPickupListener;
+import com.universeguard.event.flags.FlagLavaFlowListener;
+import com.universeguard.event.flags.FlagLeafDecayListener;
+import com.universeguard.event.flags.FlagLighterListener;
+import com.universeguard.event.flags.FlagMobDamageListener;
+import com.universeguard.event.flags.FlagMobDropListener;
+import com.universeguard.event.flags.FlagMobPveListener;
+import com.universeguard.event.flags.FlagMobSpawnListener;
+import com.universeguard.event.flags.FlagOtherLiquidsFlowListener;
+import com.universeguard.event.flags.FlagPlaceListener;
+import com.universeguard.event.flags.FlagPotionSplashListener;
+import com.universeguard.event.flags.FlagPvpListener;
+import com.universeguard.event.flags.FlagSendChatListener;
+import com.universeguard.event.flags.FlagSleepListener;
+import com.universeguard.event.flags.FlagTrappedChestsListener;
+import com.universeguard.event.flags.FlagVehicleDestroyListener;
+import com.universeguard.event.flags.FlagVehiclePlaceListener;
+import com.universeguard.event.flags.FlagVinesGrowthListener;
+import com.universeguard.event.flags.FlagWallDamageListener;
+import com.universeguard.event.flags.FlagWaterFlowListener;
 import com.universeguard.region.GlobalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumDirection;
@@ -47,8 +115,6 @@ import com.universeguard.utils.LogUtils;
 import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 import com.universeguard.utils.TranslationUtils;
-import com.universeguard.command.argument.CommandNameElement;
-import com.universeguard.command.argument.RegionNameElement;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -64,7 +130,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.6";
+	public static final String VERSION = "2.7";
 	/**
 	 * Plugin ID
 	 */
@@ -184,13 +250,11 @@ public class UniverseGuard {
 		ArrayList<Region> updatedRegions = new ArrayList<Region>();
 		for(Region region : UniverseGuard.ALL_REGIONS) {
 			if(region.getVersion() != REGION_VERSION) {
-				RegionUtils.update(region);
 				updatedRegions.add(region);
 			}
 		}
 		for(Region region : updatedRegions) {
-			UniverseGuard.ALL_REGIONS.remove(region);
-			UniverseGuard.ALL_REGIONS.add(region);
+			RegionUtils.update(region);
 		}
 	}
 	/**
@@ -262,7 +326,7 @@ public class UniverseGuard {
 		
 		CommandSpec regionHelp = CommandSpec.builder().description(Text.of("Show help"))
 				.executor(new RegionHelpExecutor())
-				.arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))), GenericArguments.optional(GenericArguments.bool(Text.of("flags"))))
+				.arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))), GenericArguments.optional(new BooleanElement(Text.of("flags"))))
 				.build();
 		
 		CommandSpec regionAdd = CommandSpec.builder().description(Text.of("Add a player into a region"))
@@ -279,13 +343,13 @@ public class UniverseGuard {
 		
 		CommandSpec regionFlag = CommandSpec.builder().description(Text.of("Set the flag of a region"))
 				.executor(new RegionFlagExecutor())
-				.arguments(GenericArguments.string(Text.of("subflag")), GenericArguments.string(Text.of("flag")), GenericArguments.bool(Text.of("value")))
+				.arguments(new SubflagCommandElement(Text.of("subflag")), GenericArguments.string(Text.of("flag")), new BooleanElement(Text.of("value")))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		
 		CommandSpec regionCommand = CommandSpec.builder().description(Text.of("Allow or disallow a command in a region"))
 				.executor(new RegionCommandExecutor())
-				.arguments(GenericArguments.bool(Text.of("value")), new CommandNameElement(Text.of("command")))
+				.arguments(new BooleanElement(Text.of("value")), new CommandNameElement(Text.of("command")))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		
