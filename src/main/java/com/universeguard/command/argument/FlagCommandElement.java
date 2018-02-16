@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.PatternMatchingCommandElement;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.Text;
@@ -15,7 +18,6 @@ import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.EnumRegionInteract;
 import com.universeguard.region.enums.EnumRegionSubflag;
 import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.utils.LogUtils;
 
 /**
  * This class is used by the Sponge CommandSpec 
@@ -27,14 +29,21 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 	private EnumRegionSubflag subFlag;
 	public FlagCommandElement(Text key) {
 		super(key);
-		this.subFlag = EnumRegionSubflag.MOBPVE;
 	}
+	
+    public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
+    	try {
+    		String subflag = context.<String>getOne("subflag").get();
+    		this.subFlag = Enum.valueOf(EnumRegionSubflag.class, subflag.toUpperCase());
+		} catch (Exception ex){ 
+			this.subFlag = null; 
+		}
+        super.parse(source, args, context);
+    }
 
 	@Override
 	protected Iterable<String> getChoices(CommandSource source) {
-		LogUtils.print(source.getActiveContexts().toString());
 		//Based on the subFlag variable will return a different list.
-		//I don't know if this can be done, but is worth a try :) 
 		ArrayList<String> flags = new ArrayList<String>();
 		if(this.subFlag != null) {
 			switch(subFlag) {

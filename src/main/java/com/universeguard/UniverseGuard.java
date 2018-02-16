@@ -54,6 +54,7 @@ import com.universeguard.command.RegionSpawnExecutor;
 import com.universeguard.command.RegionTeleportExecutor;
 import com.universeguard.command.argument.BooleanElement;
 import com.universeguard.command.argument.CommandNameElement;
+import com.universeguard.command.argument.FlagCommandElement;
 import com.universeguard.command.argument.RegionNameElement;
 import com.universeguard.command.argument.SubflagCommandElement;
 import com.universeguard.event.EventListener;
@@ -343,7 +344,7 @@ public class UniverseGuard {
 		
 		CommandSpec regionFlag = CommandSpec.builder().description(Text.of("Set the flag of a region"))
 				.executor(new RegionFlagExecutor())
-				.arguments(new SubflagCommandElement(Text.of("subflag")), GenericArguments.string(Text.of("flag")), new BooleanElement(Text.of("value")))
+				.arguments(new SubflagCommandElement(Text.of("subflag")), new FlagCommandElement(Text.of("flag")), new BooleanElement(Text.of("value")))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		

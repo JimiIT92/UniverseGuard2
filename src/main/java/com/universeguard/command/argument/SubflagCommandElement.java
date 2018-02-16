@@ -31,7 +31,4 @@ public class SubflagCommandElement extends PatternMatchingCommandElement{
 	protected Object getValue(String choice) throws IllegalArgumentException {
 		return choice;
 	}
-	
-
-
 }
