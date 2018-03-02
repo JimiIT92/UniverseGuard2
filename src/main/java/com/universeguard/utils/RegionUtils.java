@@ -89,7 +89,7 @@ public class RegionUtils {
 			fileWriter.write(gson.toJson(region));
 			Region cachedRegion = null;
 			for(Region cached : UniverseGuard.ALL_REGIONS) {
-				if(cached.getName().equalsIgnoreCase(region.getName())) {
+				if(cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
 					cachedRegion = cached;
 					break;
 				}
@@ -98,6 +98,7 @@ public class RegionUtils {
 				UniverseGuard.ALL_REGIONS.remove(cachedRegion);
 			}
 			UniverseGuard.ALL_REGIONS.add(region);
+			saveIndex();
 			return true;
 		} catch (IOException e) {
 			LogUtils.log(e);
@@ -115,6 +116,7 @@ public class RegionUtils {
 		}
 	}
 
+	
 	/**
 	 * Remove a Region from the regions folder
 	 * 
@@ -129,11 +131,65 @@ public class RegionUtils {
 		File file = getFile(region);
 		if (file.exists() && file.delete()) {
 			UniverseGuard.ALL_REGIONS.remove(region);
+			saveIndex();
 			return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Remove a Region from the regions folder 
+	 * 
+	 * @param region
+	 *            The Region
+	 * @return true if the Region has been removed correctly, false otherwise
+	 */
+	public static boolean removeByName(Region region) {
+		File directory = region.isLocal() ? getRegionFolder() : getGlobalRegionFolder();
+		if (!directory.exists())
+			return false;
+		File file = getFileByName(region);
+		if (file.exists() && file.delete()) {
+			UniverseGuard.ALL_REGIONS.remove(region);
+			saveIndex();
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Save a Regions index file
+	 */
+	public static void saveIndex() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+		FileWriter fileWriter = null;
+		try {
+			File directory = new File(getConfigFolder());
+			if (!directory.exists())
+				directory.mkdirs();
+			File file = new File(getConfigFolder() + "/"+ "index.json");
+			if (!file.exists())
+				file.createNewFile();
+			fileWriter = new FileWriter(file);
+			HashMap<String, UUID> regions = new HashMap<String, UUID>();
+			for(Region region : UniverseGuard.ALL_REGIONS)
+				regions.put(region.getName(), region.getId());
+			fileWriter.write(gson.toJson(regions));
+		} catch (IOException e) {
+			LogUtils.log(e);
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue());
+		} finally {
+			if (fileWriter != null) {
+				try {
+					fileWriter.close();
+				} catch (IOException e) {
+					LogUtils.log(e);
+					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue());
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Get a Region from name
 	 * 
@@ -148,6 +204,21 @@ public class RegionUtils {
 		}
 		return null;
 	}
+	
+	/**
+	 * Get a Region from ID
+	 * 
+	 * @param name
+	 *            The ID of the region
+	 * @return The Region with that name if exists, null otherwise
+	 */
+	public static Region load(UUID id) {
+		for (Region region : UniverseGuard.ALL_REGIONS) {
+			if (region.getId().compareTo(id) == 0)
+				return region;
+		}
+		return null;
+	}
 
 	/**
 	 * Update a Region to the latest RegionVersion
@@ -156,13 +227,16 @@ public class RegionUtils {
 	 *            The Region to update
 	 */
 	public static void update(Region region) {
+		boolean removeOld = false;
 		if (region.isLocal()) {
 			LocalRegion newRegion = new LocalRegion(region.getName(), ((LocalRegion) region).getFirstPoint(),
 					((LocalRegion) region).getSecondPoint());
 			newRegion.setMembers(((LocalRegion) region).getMembers());
 			newRegion.setPriority(((LocalRegion) region).getPriority());
-			newRegion.setSpawnLocation(((LocalRegion) region).getSpawnLocation());
-			newRegion.setTeleportLocation(((LocalRegion) region).getTeleportLocation());
+			if(((LocalRegion) region).getSpawnLocation() != null)
+				newRegion.setSpawnLocation(((LocalRegion) region).getSpawnLocation());
+			if(((LocalRegion) region).getTeleportLocation() != null)
+				newRegion.setTeleportLocation(((LocalRegion) region).getTeleportLocation());
 			newRegion.setFlags(region.getFlags());
 			newRegion.setCommands(region.getCommands());
 			newRegion.setInteracts(region.getInteracts());
@@ -172,7 +246,7 @@ public class RegionUtils {
 			newRegion.setGamemode(region.getGameMode());
 			newRegion.setName(region.getName());
 			newRegion.updateFlags();
-			save(newRegion);
+			removeOld = save(newRegion);
 		} else {
 			GlobalRegion newRegion = new GlobalRegion(region.getName());
 			newRegion.setFlags(region.getFlags());
@@ -183,7 +257,13 @@ public class RegionUtils {
 			newRegion.setExplosions(region.getExplosions());
 			newRegion.setMobs(region.getMobs());
 			newRegion.updateFlags();
-			save(newRegion);
+			removeOld = save(newRegion);
+		}
+		if(removeOld && region.getVersion() <= 2.6) {
+			if(region.getId() == null)
+				removeByName(region);
+			else
+				remove(region);
 		}
 	}
 
@@ -814,7 +894,7 @@ public class RegionUtils {
 			int y2 = Math.max(pos1.getBlockY(), pos2.getBlockY());
 			int z2 = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
 
-			return region.getWorld().equals(region.getWorld())
+			return region.getWorld().equals(location.getExtent())
 					&& region.getFirstPoint().getDimension()
 							.equalsIgnoreCase(location.getExtent().getDimension().getType().getId())
 					&& ((location.getBlockX() >= x1 && location.getBlockX() <= x2)
@@ -836,6 +916,18 @@ public class RegionUtils {
 		LocalRegion localRegion = getLocalRegion(location);
 		return localRegion != null ? localRegion : getGlobalRegion(location);
 	}
+	
+	/**
+	 * Get all Regions at a location
+	 * 
+	 * @param location
+	 *            The location
+	 * @return The Regions at the given location if exists, null otherwise
+	 */
+	public static ArrayList<LocalRegion> getAllRegionsAt(Location<World> location) {
+		ArrayList<LocalRegion> localRegions = getAllLocalRegionsAt(location);
+		return localRegions;
+	}
 
 	/**
 	 * Get a LocalRegion at a location
@@ -855,6 +947,23 @@ public class RegionUtils {
 		return region;
 	}
 
+	/**
+	 * Get all LocalRegions at a location
+	 * 
+	 * @param location
+	 *            The location
+	 * @return The LocalRegions at the given location if exists, null otherwise
+	 */
+	public static ArrayList<LocalRegion> getAllLocalRegionsAt(Location<World> location) {
+		ArrayList<LocalRegion> regions = new ArrayList<LocalRegion>();
+		for (Region r : UniverseGuard.ALL_REGIONS) {
+			if (r.isLocal() && isInRegion((LocalRegion) r, location)) {
+				regions.add((LocalRegion) r);
+			}
+		}
+		return regions;
+	}
+	
 	/**
 	 * Get a GlobalRegion at a location
 	 * 
@@ -1090,6 +1199,26 @@ public class RegionUtils {
 	 * @return The JSON file of the Region
 	 */
 	public static File getFile(Region region) {
+		if (region.getName().isEmpty()) {
+			int index = 0;
+			for (Region r : UniverseGuard.ALL_REGIONS) {
+				if (r.getName().toLowerCase().startsWith("region"))
+					index++;
+			}
+			region.setName("Region" + String.valueOf(index));
+		}
+		return new File((region.getType() == RegionType.LOCAL ? getRegionFolder() : getGlobalRegionFolder()) + "/"
+				+ region.getId().toString() + ".json");
+	}
+	
+	/**
+	 * Get the JSON file of a Region based on it's name
+	 * 
+	 * @param region
+	 *            The Region
+	 * @return The JSON file of the Region
+	 */
+	public static File getFileByName(Region region) {
 		if (region.getName().isEmpty()) {
 			int index = 0;
 			for (Region r : UniverseGuard.ALL_REGIONS) {

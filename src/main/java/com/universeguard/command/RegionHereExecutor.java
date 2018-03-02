@@ -7,6 +7,8 @@
  */
 package com.universeguard.command;
 
+import java.util.ArrayList;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -15,7 +17,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.universeguard.region.Region;
+import com.universeguard.region.LocalRegion;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
@@ -33,9 +35,14 @@ public class RegionHereExecutor implements CommandExecutor {
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (src instanceof Player) {
 			Player player = (Player) src;
-			Region region = RegionUtils.getRegion(player.getLocation());
-			if(region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION))
-				MessageUtils.sendMessage(player, RegionText.REGION.getValue() + ": " + region.getName(), RegionUtils.isMember(region, player) ? TextColors.GOLD : TextColors.GREEN);
+			ArrayList<LocalRegion> regions = RegionUtils.getAllLocalRegionsAt(player.getLocation());
+			String regionList = "";
+			for(LocalRegion region : regions) {
+				if(!region.getFlag(EnumRegionFlag.HIDE_REGION))
+					regionList += region.getName() + ", ";
+			}
+			if(!regionList.isEmpty())
+				MessageUtils.sendMessage(player, RegionText.REGION.getValue() + ": " + regionList.substring(0, regionList.length() - 2), TextColors.GREEN);
 			else
 				MessageUtils.sendErrorMessage(player, RegionText.NO_REGION_HERE.getValue());
 		}

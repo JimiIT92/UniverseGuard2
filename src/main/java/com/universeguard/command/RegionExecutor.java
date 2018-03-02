@@ -32,7 +32,8 @@ public class RegionExecutor implements CommandExecutor {
 		if(src instanceof Player) {
 			Player player = (Player)src;
 			if(PermissionUtils.hasAllPermissions(player)) {
-				InventoryUtils.addItemStackToInventory(player, InventoryUtils.getSelector());
+				if(InventoryUtils.addItemStackToHotbar(player, InventoryUtils.getSelector()))
+					MessageUtils.sendHotbarSuccessMessage(player, RegionText.REGION_SELECTOR_ADDED.getValue());
 				return CommandResult.success();
 			}
 			else

@@ -161,6 +161,10 @@ public class UniverseGuard {
 	 */
 	public static int ENTER_FLAG_TIMER = 100;
 	/**
+	 * Sets if players can be in more Regions
+	 */
+	public static boolean UNIQUE_REGIONS = true;
+	/**
 	 * Region Version Number
 	 */
 	public static final float REGION_VERSION = Float.valueOf(VERSION);
@@ -257,6 +261,7 @@ public class UniverseGuard {
 		for(Region region : updatedRegions) {
 			RegionUtils.update(region);
 		}
+		RegionUtils.saveIndex();
 	}
 	/**
 	 * Load configuration
@@ -356,7 +361,7 @@ public class UniverseGuard {
 		
 		CommandSpec regionExpand = CommandSpec.builder().description(Text.of("Expand the selection area of a region"))
 				.executor(new RegionExpandExecutor())
-				.arguments(GenericArguments.enumValue(Text.of("direction"), EnumDirection.class), GenericArguments.optional(GenericArguments.integer(Text.of("value"))))
+				.arguments(GenericArguments.enumValue(Text.of("direction"), EnumDirection.class), GenericArguments.optional(GenericArguments.integer(Text.of("blocks"))))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		
@@ -452,8 +457,6 @@ public class UniverseGuard {
 			.submit(UniverseGuard.INSTANCE);
 		
 		// Debug utility. Used internally
-		boolean DEBUG = false;
-		if(DEBUG)
-			EventUtils.registerEvent(new EventListener());
+		//EventUtils.registerEvent(new EventListener());
 	}
 }

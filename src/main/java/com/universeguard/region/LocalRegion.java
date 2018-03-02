@@ -75,7 +75,7 @@ public class LocalRegion extends Region {
 		this.SPAWN_LOCATION = secondPoint;
 		this.MEMBERS = new ArrayList<RegionMember>();
 	}
-
+	
 	/**
 	 * Set the first point base on location
 	 * @param location The location
