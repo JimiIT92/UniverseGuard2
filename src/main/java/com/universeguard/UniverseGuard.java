@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.universeguard.command.RegionAddExecutor;
 import com.universeguard.command.RegionCommandExecutor;
+import com.universeguard.command.RegionCopyExecutor;
 import com.universeguard.command.RegionDeleteExecutor;
 import com.universeguard.command.RegionEditExecutor;
 import com.universeguard.command.RegionExecutor;
@@ -329,6 +330,7 @@ public class UniverseGuard {
 		CommandSpec regionReload = CommandUtils.buildCommandSpec("Reload cached regions", new RegionReloadExecutor(), RegionPermission.ALL.getValue());
 		CommandSpec regionFarewell = CommandUtils.buildCommandSpec("Set the farewell message of a region", new RegionFarewellExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
 		CommandSpec regionGreeting = CommandUtils.buildCommandSpec("Set the greeting message of a region", new RegionGreetingExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
+		CommandSpec regionCopy = CommandUtils.buildCommandSpec("Copy a region into a new one", new RegionCopyExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")), GenericArguments.remainingJoinedStrings(Text.of("newRegion")));
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -395,6 +397,7 @@ public class UniverseGuard {
 				.child(regionReload, "reload")
 				.child(regionFarewell, "farewell")
 				.child(regionGreeting, "greeting")
+				.child(regionCopy, "copy")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

@@ -116,6 +116,31 @@ public class RegionUtils {
 		}
 	}
 
+	/**
+	 * Save a Region to a JSON file
+	 * 
+	 * @param region
+	 *            The Region
+	 * @return true if the Region has been saved correctly, false otherwise
+	 */
+	public static LocalRegion copy(LocalRegion region, String newRegionName) {
+		LocalRegion newRegion = new LocalRegion(newRegionName, region.getFirstPoint(), region.getSecondPoint());
+		newRegion.setPriority(region.getPriority());
+		newRegion.setTeleportLocation(region.getTeleportLocation());
+		newRegion.setSpawnLocation(region.getSpawnLocation());
+		newRegion.setFarewellMessage(region.getFarewellMessage());
+		newRegion.setGreetingMessage(region.getGreetingMessage());
+		if(!UniverseGuard.UNIQUE_REGIONS) {
+			newRegion.setMembers(region.getMembers());
+		}
+		newRegion.setFlags(region.getFlags());
+		newRegion.setInteracts(region.getInteracts());
+		newRegion.setVehicles(region.getVehicles());
+		newRegion.setExplosions(region.getExplosions());
+		newRegion.setMobs(region.getMobs());
+		newRegion.setCommands(region.getCommands());
+		return newRegion;
+	}
 	
 	/**
 	 * Remove a Region from the regions folder
