@@ -36,9 +36,11 @@ import com.universeguard.command.RegionDeleteExecutor;
 import com.universeguard.command.RegionEditExecutor;
 import com.universeguard.command.RegionExecutor;
 import com.universeguard.command.RegionExpandExecutor;
+import com.universeguard.command.RegionFarewellExecutor;
 import com.universeguard.command.RegionFlagExecutor;
 import com.universeguard.command.RegionFlagInfoExecutor;
 import com.universeguard.command.RegionGamemodeExecutor;
+import com.universeguard.command.RegionGreetingExecutor;
 import com.universeguard.command.RegionHelpExecutor;
 import com.universeguard.command.RegionHereExecutor;
 import com.universeguard.command.RegionInfoExecutor;
@@ -57,7 +59,6 @@ import com.universeguard.command.argument.CommandNameElement;
 import com.universeguard.command.argument.FlagCommandElement;
 import com.universeguard.command.argument.RegionNameElement;
 import com.universeguard.command.argument.SubflagCommandElement;
-import com.universeguard.event.EventListener;
 import com.universeguard.event.EventRegionSelect;
 import com.universeguard.event.flags.FlagCactusDamageListener;
 import com.universeguard.event.flags.FlagChestsListener;
@@ -74,9 +75,11 @@ import com.universeguard.event.flags.FlagExpDropListener;
 import com.universeguard.event.flags.FlagExplosionDamageListener;
 import com.universeguard.event.flags.FlagExplosionDestroyListener;
 import com.universeguard.event.flags.FlagFallDamageListener;
+import com.universeguard.event.flags.FlagFarewellListener;
 import com.universeguard.event.flags.FlagFireDamageListener;
 import com.universeguard.event.flags.FlagFireSpreadListener;
 import com.universeguard.event.flags.FlagGamemodeListener;
+import com.universeguard.event.flags.FlagGreetingListener;
 import com.universeguard.event.flags.FlagHungerListener;
 import com.universeguard.event.flags.FlagIceMeltListener;
 import com.universeguard.event.flags.FlagInteractListener;
@@ -324,6 +327,8 @@ public class UniverseGuard {
 		CommandSpec regionGamemode = CommandUtils.buildCommandSpec("Set the gamemode of a region", new RegionGamemodeExecutor(), RegionPermission.ALL.getValue(), GenericArguments.catalogedElement(Text.of("gamemode"), GameMode.class));
 		CommandSpec regionHere = CommandUtils.buildCommandSpec("Tells wich region you are currently in", new RegionHereExecutor());
 		CommandSpec regionReload = CommandUtils.buildCommandSpec("Reload cached regions", new RegionReloadExecutor(), RegionPermission.ALL.getValue());
+		CommandSpec regionFarewell = CommandUtils.buildCommandSpec("Set the farewell message of a region", new RegionFarewellExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
+		CommandSpec regionGreeting = CommandUtils.buildCommandSpec("Set the greeting message of a region", new RegionGreetingExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -388,6 +393,8 @@ public class UniverseGuard {
 				.child(regionFlagInfo, "flaginfo")
 				.child(regionHere, "here")
 				.child(regionReload, "reload")
+				.child(regionFarewell, "farewell")
+				.child(regionGreeting, "greeting")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
@@ -437,6 +444,8 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagIceMeltListener());
 		EventUtils.registerEvent(new FlagVinesGrowthListener());
 		EventUtils.registerEvent(new FlagExitListener());
+		EventUtils.registerEvent(new FlagFarewellListener());
+		EventUtils.registerEvent(new FlagGreetingListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())

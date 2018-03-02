@@ -51,7 +51,14 @@ public class LocalRegion extends Region {
 	 * Region members
 	 */
 	private ArrayList<RegionMember> MEMBERS;
-	
+	/**
+	 * Region Farewell message
+	 */
+	private String FAREWELL_MESSAGE;
+	/**
+	 * Region Greeting message
+	 */
+	private String GREETING_MESSAGE;
 	/**
 	 * LocalRegion Constructor
 	 * @param name The Region name
@@ -74,6 +81,8 @@ public class LocalRegion extends Region {
 		this.TELEPORT_LOCATION = firstPoint;
 		this.SPAWN_LOCATION = secondPoint;
 		this.MEMBERS = new ArrayList<RegionMember>();
+		this.FAREWELL_MESSAGE = "";
+		this.GREETING_MESSAGE = "";
 	}
 	
 	/**
@@ -212,6 +221,38 @@ public class LocalRegion extends Region {
 		}
 		if(toRemove != null)
 			this.MEMBERS.remove(toRemove);
+	}
+	
+	/**
+	 * Set the Farewell message
+	 * @param message the Farewell message
+	 */
+	public void setFarewellMessage(String message) {
+		this.FAREWELL_MESSAGE = message;
+	}
+	
+	/**
+	 * Get the Farewell message
+	 * @return the Farewell message
+	 */
+	public String getFarewellMessage() {
+		return this.FAREWELL_MESSAGE;
+	}
+	
+	/**
+	 * Set the Greeting message
+	 * @param message the Greeting message
+	 */
+	public void setGreetingMessage(String message) {
+		this.GREETING_MESSAGE = message;
+	}
+	
+	/**
+	 * Get the Greeting message
+	 * @return the Greeting message
+	 */
+	public String getGreetingMessage() {
+		return this.GREETING_MESSAGE;
 	}
 	
 	/**

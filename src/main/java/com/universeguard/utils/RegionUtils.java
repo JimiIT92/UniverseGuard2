@@ -568,6 +568,12 @@ public class RegionUtils {
 			MessageUtils.sendMessage(player,
 					RegionText.PRIORITY.getValue() + ": " + String.valueOf(localRegion.getPriority()),
 					TextColors.YELLOW);
+			if(!localRegion.getFarewellMessage().isEmpty())
+				MessageUtils.sendMessage(player,
+						RegionText.FAREWELL_MESSAGE.getValue() + ": " + localRegion.getFarewellMessage(), TextColors.RED);
+			if(!localRegion.getGreetingMessage().isEmpty())
+				MessageUtils.sendMessage(player,
+						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(), TextColors.GREEN);
 			if (!localRegion.getFlag(EnumRegionFlag.HIDE_LOCATIONS)) {
 				MessageUtils.sendMessage(player,
 						RegionText.FROM.getValue() + ": " + localRegion.getFirstPoint().toString(), TextColors.AQUA);
@@ -815,7 +821,7 @@ public class RegionUtils {
 	 *            The page to display
 	 */
 	public static void printHelpHeader(Player player, int page) {
-		MessageUtils.sendMessage(player, RegionText.HELP.getValue() + "(" + String.valueOf(page) + "/4)",
+		MessageUtils.sendMessage(player, RegionText.HELP.getValue() + "(" + String.valueOf(page) + "/5)",
 				TextColors.GOLD);
 	}
 
@@ -1102,8 +1108,11 @@ public class RegionUtils {
 			printHelpFor(player, "expand [direction] (blocks)", RegionText.REGION_HELP_EXPAND);
 			printHelpFor(player, "here", RegionText.REGION_HELP_HERE);
 			printHelpFor(player, "reload", RegionText.REGION_HELP_RELOAD);
-			printHelpFor(player, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 			break;
+		case 5:
+			printHelpFor(player, "farewell", RegionText.REGION_HELP_FAREWELL);
+			printHelpFor(player, "greeting", RegionText.REGION_HELP_GREETING);
+			printHelpFor(player, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 		}
 	}
 

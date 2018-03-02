@@ -18,7 +18,7 @@ import com.universeguard.utils.DirectionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
- * Handler for the hunger flag
+ * Handler for the enter flag
  * @author Jimi
  *
  */
