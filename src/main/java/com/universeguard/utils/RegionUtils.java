@@ -1113,6 +1113,7 @@ public class RegionUtils {
 			printHelpFor(player, "farewell", RegionText.REGION_HELP_FAREWELL);
 			printHelpFor(player, "greeting", RegionText.REGION_HELP_GREETING);
 			printHelpFor(player, "help (flag) (page)", RegionText.REGION_HELP_HELP);
+			break;
 		}
 	}
 
