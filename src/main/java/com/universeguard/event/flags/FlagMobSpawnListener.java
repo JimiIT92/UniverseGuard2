@@ -9,7 +9,10 @@ package com.universeguard.event.flags;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Creature;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.animal.Animal;
+import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -62,7 +65,12 @@ public class FlagMobSpawnListener {
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());
 			if(region != null) {
-				boolean cancel = !region.getMobSpawn("all") || !region.getMobSpawn(name);
+				boolean relatedAllFlag = !region.getMobSpawn("all");
+				if(entity instanceof Monster)
+					relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allhostile");
+				if(entity instanceof Creature || entity instanceof Animal)
+					relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allpassive");
+				boolean cancel = relatedAllFlag || !region.getMobSpawn(name);
 				if(player != null)
 					cancel = cancel && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
 				if(cancel) {

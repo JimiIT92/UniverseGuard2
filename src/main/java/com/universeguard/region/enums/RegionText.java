@@ -15,6 +15,7 @@ package com.universeguard.region.enums;
 public enum RegionText {
 	REGION("Region"),
 	NO_REGION_HERE("There's no Region here!"),
+	NO_REGION_AT("There's no Region at the specified location!"),
 	LOADING("Loading..."),
 	LOADED("Loaded!"),
 	LOADING_CONFIGURATION("Loading Configuration"),

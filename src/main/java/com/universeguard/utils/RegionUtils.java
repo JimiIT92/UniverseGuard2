@@ -559,7 +559,8 @@ public class RegionUtils {
 	public static void printRegionsList(Player player) {
 		StringBuilder regions = new StringBuilder();
 		for (Region region : UniverseGuard.ALL_REGIONS) {
-			regions.append(region.getName() + ", ");
+			if(!region.getFlag(EnumRegionFlag.HIDE_REGION))
+				regions.append(region.getName() + ", ");
 		}
 		MessageUtils.sendMessage(player, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
 		MessageUtils.sendMessage(player, regions.substring(0, regions.length() - 2), TextColors.YELLOW);
@@ -988,7 +989,7 @@ public class RegionUtils {
 	public static ArrayList<LocalRegion> getAllLocalRegionsAt(Location<World> location) {
 		ArrayList<LocalRegion> regions = new ArrayList<LocalRegion>();
 		for (Region r : UniverseGuard.ALL_REGIONS) {
-			if (r.isLocal() && isInRegion((LocalRegion) r, location)) {
+			if (r.isLocal() && isInRegion((LocalRegion) r, location) && !r.getFlag(EnumRegionFlag.HIDE_REGION)) {
 				regions.add((LocalRegion) r);
 			}
 		}

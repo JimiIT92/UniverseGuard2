@@ -54,16 +54,19 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 			case INTERACT:
 				for(EnumRegionInteract interact : EnumRegionInteract.values())
 					flags.add(interact.getName().toLowerCase());
+				flags.add("all");
 				break;
 			case EXPLOSIONDAMAGE:
 			case EXPLOSIONDESTROY:
 				for(EnumRegionExplosion explosion : EnumRegionExplosion.values())
 					flags.add(explosion.getName().toLowerCase());
+				flags.add("all");
 				break;
 			case VEHICLEPLACE:
 			case VEHICLEDESTROY:
 				for(EnumRegionVehicle vehicle : EnumRegionVehicle.values())
 					flags.add(vehicle.getName().toLowerCase());
+				flags.add("all");
 				break;
 			case MOBSPAWN:
 			case MOBPVE:
@@ -72,6 +75,8 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 					flags.addAll(Sponge.getRegistry().getAllOf(EntityType.class).stream()
 						    .map(CatalogType::getId).collect(Collectors.toList()));
 					flags.add("all");
+					flags.add("allhostile");
+					flags.add("allpassive");
 			default: break;
 			}
 		}

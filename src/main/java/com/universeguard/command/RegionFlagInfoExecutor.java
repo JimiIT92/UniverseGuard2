@@ -35,7 +35,7 @@ public class RegionFlagInfoExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if (args.hasAny("flag") && args.hasAny("name")) {
 				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null) {
+				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
 					EnumRegionFlag flag = args.<EnumRegionFlag>getOne("flag").get();
 					if(flag != null) {
 						if(region.getFlag(EnumRegionFlag.HIDE_FLAGS))

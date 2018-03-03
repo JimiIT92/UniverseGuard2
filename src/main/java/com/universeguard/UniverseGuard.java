@@ -31,6 +31,7 @@ import org.spongepowered.api.world.World;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.universeguard.command.RegionAddExecutor;
+import com.universeguard.command.RegionAtExecutor;
 import com.universeguard.command.RegionCommandExecutor;
 import com.universeguard.command.RegionCopyExecutor;
 import com.universeguard.command.RegionDeleteExecutor;
@@ -60,6 +61,7 @@ import com.universeguard.command.argument.CommandNameElement;
 import com.universeguard.command.argument.FlagCommandElement;
 import com.universeguard.command.argument.RegionNameElement;
 import com.universeguard.command.argument.SubflagCommandElement;
+import com.universeguard.event.EventListener;
 import com.universeguard.event.EventRegionSelect;
 import com.universeguard.event.flags.FlagCactusDamageListener;
 import com.universeguard.event.flags.FlagChestsListener;
@@ -331,6 +333,7 @@ public class UniverseGuard {
 		CommandSpec regionFarewell = CommandUtils.buildCommandSpec("Set the farewell message of a region", new RegionFarewellExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
 		CommandSpec regionGreeting = CommandUtils.buildCommandSpec("Set the greeting message of a region", new RegionGreetingExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
 		CommandSpec regionCopy = CommandUtils.buildCommandSpec("Copy a region into a new one", new RegionCopyExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")), GenericArguments.remainingJoinedStrings(Text.of("newRegion")));
+		CommandSpec regionAt = CommandUtils.buildCommandSpec("Tells wich region are at the give location", new RegionAtExecutor(), GenericArguments.location(Text.of("location")));
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -398,6 +401,7 @@ public class UniverseGuard {
 				.child(regionFarewell, "farewell")
 				.child(regionGreeting, "greeting")
 				.child(regionCopy, "copy")
+				.child(regionAt, "at")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
@@ -469,6 +473,8 @@ public class UniverseGuard {
 			.submit(UniverseGuard.INSTANCE);
 		
 		// Debug utility. Used internally
-		//EventUtils.registerEvent(new EventListener());
+		boolean debug = false;
+		if(debug)
+			EventUtils.registerEvent(new EventListener());
 	}
 }
