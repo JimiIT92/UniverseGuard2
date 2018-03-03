@@ -9,9 +9,6 @@ package com.universeguard.event.flags;
 
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.persistence.DataTranslator;
-import org.spongepowered.api.data.persistence.DataTranslators;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,8 +22,6 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -48,12 +43,8 @@ public class FlagInteractListener {
 	
 	@Listener
 	public void onItemCraft(ClickInventoryEvent event, @Root Player player, @Getter("getTargetInventory") Inventory inventory) {
-
-	    if (inventory.getArchetype() == InventoryArchetypes.PLAYER) {
-	        Inventory craftingOutputs = inventory.query(DataQuery.of());
-	        craftingOutputs.slots().forEach(slot -> slot.peek().ifPresent(itemStack -> {
-	        	this.handleEvent(event, player.getLocation(), EnumRegionInteract.CRAFTING_TABLE, player);
-	        }));
+		if (inventory.getArchetype() == InventoryArchetypes.PLAYER) {
+			this.handleEvent(event, player.getLocation(), EnumRegionInteract.CRAFTING_TABLE, player);
 	    }
 	}
 	

@@ -102,7 +102,7 @@ public class FlagDestroyListener {
 			}
 		}
 	}
-	
+
 	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
 		return RegionUtils.handleEvent(event, EnumRegionFlag.DESTROY, location, player, RegionEventType.LOCAL);
 	}
