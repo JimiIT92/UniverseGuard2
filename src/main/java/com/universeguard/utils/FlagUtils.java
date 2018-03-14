@@ -62,6 +62,8 @@ public class FlagUtils {
 			configNode.getNode("timers", "gamemode").setValue(UniverseGuard.GAMEMODE_TIMER).setComment("The update frequency (in seconds) of the gamemode flag timer");
 		if(configNode.getNode("timers", "enter_flag").isVirtual())
 			configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
+		if(configNode.getNode("players", "unique_regions").isVirtual())
+			configNode.getNode("players", "unique_regions").setValue(UniverseGuard.UNIQUE_REGIONS).setComment("Sets if players can be in more Regions");
 	}
 	
 	/**
@@ -86,6 +88,7 @@ public class FlagUtils {
 		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "hunger").getInt();
 		UniverseGuard.GAMEMODE_TIMER = configNode.getNode("timers", "gamemode").getInt();
 		UniverseGuard.ENTER_FLAG_TIMER = configNode.getNode("timers", "enter_flag").getInt();
+		UniverseGuard.UNIQUE_REGIONS = configNode.getNode("players", "unique_regions").getBoolean();
 	}
 	
 	/**

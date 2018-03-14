@@ -7,61 +7,58 @@
  */
 package com.universeguard.command;
 
+import java.util.ArrayList;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import com.universeguard.region.LocalRegion;
-import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
  * 
- * Command Handler for /rg tp
+ * Command Handler for /rg at
  * @author Jimi
  *
  */
-public class RegionTeleportExecutor implements CommandExecutor {
+public class RegionAtExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (src instanceof Player) {
 			Player player = (Player) src;
-			if (args.hasAny("name")) {
-				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
-					if(region.isLocal()) {
-						Region current = RegionUtils.getRegion(player.getLocation());
-						if(current != null && current.getFlag(EnumRegionFlag.EXIT) && region.getFlag(EnumRegionFlag.CAN_TP) && region.getFlag(EnumRegionFlag.ENTER))
-							player.setLocation(((LocalRegion)region).getTeleportLocation().getLocation());
-						else if(!PermissionUtils.hasPermission(player, RegionPermission.REGION))
-							MessageUtils.sendErrorMessage(player, RegionText.REGION_NO_TP.getValue());
-					}
-					else
-						MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
-				} else
-					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
+			if(args.hasAny("location")) {
+				Location<World> location = args.<Location<World>>getOne("location").get();
+				ArrayList<LocalRegion> regions = RegionUtils.getAllLocalRegionsAt(location);
+				String regionList = "";
+				for(LocalRegion region : regions) {
+					if(!region.getFlag(EnumRegionFlag.HIDE_REGION))
+						regionList += region.getName() + ", ";
+				}
+				if(!regionList.isEmpty())
+					MessageUtils.sendMessage(player, RegionText.REGION.getValue() + ": " + regionList.substring(0, regionList.length() - 2), TextColors.GREEN);
+				else
+					MessageUtils.sendErrorMessage(player, RegionText.NO_REGION_AT.getValue());
 			} else {
 				MessageUtils.sendErrorMessage(player, getCommandUsage());
 			}
+			
 		}
 
 		return CommandResult.empty();
 	}
-	/**
-	 * Command Usage
-	 * @return
-	 */
-	private String getCommandUsage() {
-		return "/rg tp <name>";
-	}
 
+	private String getCommandUsage() {
+		return "/rg at <location>";
+	}
 }

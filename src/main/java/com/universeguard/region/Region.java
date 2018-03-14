@@ -8,6 +8,7 @@
 package com.universeguard.region;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
@@ -36,6 +37,10 @@ public class Region {
 	 * Region Version
 	 */
 	private float VERSION = UniverseGuard.REGION_VERSION;
+	/**
+	 * Region ID
+	 */
+	private UUID ID;
 	/**
 	 * Region Type
 	 */
@@ -97,6 +102,7 @@ public class Region {
 	 * @param gamemode The Region GameMode
 	 */
 	public Region(RegionType type, String name, String gamemode) {
+		this.ID = UUID.randomUUID();
 		this.TYPE = type;
 		this.NAME = name;
 		this.GAMEMODE = gamemode;
@@ -104,6 +110,22 @@ public class Region {
 		this.initFlags();
 	}
 	
+
+	/**
+	 * Set the Region ID
+	 * @param id The Region ID
+	 */
+	public void setId(UUID id) {
+		this.ID = id;
+	}
+	
+	/**
+	 * Get the Region ID
+	 * @return
+	 */
+	public UUID getId() {
+		return this.ID;
+	}
 	/**
 	 * INitialize Region flags
 	 */

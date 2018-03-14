@@ -14,21 +14,21 @@ import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
- * Handler for the exit flag
+ * Handler for the Farewell message
  * @author Jimi
  *
  */
-public class FlagExitListener {
+public class FlagFarewellListener {
 	
 	@Listener
-	public void onExit(MoveEntityEvent event) {
+	public void onFarewell(MoveEntityEvent event) {
 		if(event.getTargetEntity() instanceof Player)
 			this.handleEvent(event, (Player)event.getTargetEntity());
 		else if(!event.getTargetEntity().getPassengers().isEmpty()) {
@@ -47,10 +47,9 @@ public class FlagExitListener {
 		if(regionFrom.isLocal()) {
 			Location<World> to = event.getToTransform().getLocation();
 			Region regionTo = RegionUtils.getRegion(to);
-			if(regionFrom != null && regionTo != null && regionFrom != regionTo && !regionFrom.getFlag(EnumRegionFlag.EXIT)
-					&& !RegionUtils.hasPermission(player, regionFrom)) {
-				event.setCancelled(true);
-				MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+			if(regionFrom != null && regionTo != null && regionFrom != regionTo && regionFrom.getFlag(EnumRegionFlag.EXIT) &&
+					!((LocalRegion)regionFrom).getFarewellMessage().isEmpty()) {
+				MessageUtils.sendHotbarErrorMessage(player, ((LocalRegion)regionFrom).getFarewellMessage());
 			}
 		}
 	}

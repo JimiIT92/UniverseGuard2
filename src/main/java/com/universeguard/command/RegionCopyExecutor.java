@@ -16,36 +16,36 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
  * 
- * Command Handler for /rg tp
+ * Command Handler for /rg copy
  * @author Jimi
  *
  */
-public class RegionTeleportExecutor implements CommandExecutor {
+public class RegionCopyExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if (src instanceof Player) {
 			Player player = (Player) src;
-			if (args.hasAny("name")) {
+			if (args.hasAny("name") && args.hasAny("newRegion")) {
 				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
+				if (region != null) {
 					if(region.isLocal()) {
-						Region current = RegionUtils.getRegion(player.getLocation());
-						if(current != null && current.getFlag(EnumRegionFlag.EXIT) && region.getFlag(EnumRegionFlag.CAN_TP) && region.getFlag(EnumRegionFlag.ENTER))
-							player.setLocation(((LocalRegion)region).getTeleportLocation().getLocation());
-						else if(!PermissionUtils.hasPermission(player, RegionPermission.REGION))
-							MessageUtils.sendErrorMessage(player, RegionText.REGION_NO_TP.getValue());
-					}
-					else
+						String newRegion = args.<String>getOne("newRegion").get();
+						if(RegionUtils.load(newRegion) == null) {
+							if(RegionUtils.save(RegionUtils.copy((LocalRegion)region, newRegion))) {
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_COPIED.getValue());	
+							} else
+								MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_COPIED.getValue());
+						}
+						else
+							MessageUtils.sendErrorMessage(player, RegionText.REGION_NAME_NOT_VALID.getValue());
+					} else
 						MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
 				} else
 					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
@@ -56,12 +56,9 @@ public class RegionTeleportExecutor implements CommandExecutor {
 
 		return CommandResult.empty();
 	}
-	/**
-	 * Command Usage
-	 * @return
-	 */
+
 	private String getCommandUsage() {
-		return "/rg tp <name>";
+		return "/rg copy <Region1> <Region2>";
 	}
 
 }

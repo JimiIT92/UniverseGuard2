@@ -42,6 +42,7 @@ public class FlagItemDropListener {
 			this.handleEvent(event, cause.getEntity().getLocation(), null);
 	}
 
+	
 	@Listener
 	public void onItemDropFromInventory(SpawnEntityEvent event, @Root EntitySpawnCause cause) {
 		if(cause.getEntity() instanceof Player && cause.getType().equals(SpawnTypes.PLACEMENT) && !event.getEntities().isEmpty()) {

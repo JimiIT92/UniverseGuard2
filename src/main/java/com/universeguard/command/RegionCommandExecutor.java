@@ -36,7 +36,7 @@ public class RegionCommandExecutor implements CommandExecutor {
 				if(args.hasAny("command") && args.hasAny("value")) {
 					String command = args.<String>getOne("command").get();
 					if(CommandUtils.isValid(command)) {
-						boolean value = args.<Boolean>getOne("value").get();
+						boolean value = Boolean.valueOf(args.<String>getOne("value").get());
 						Region region = RegionUtils.getPendingRegion(player);
 						if(value) {
 							region.enableCommand(command);

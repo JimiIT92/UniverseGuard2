@@ -15,12 +15,12 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.format.TextColors;
 
+import com.universeguard.UniverseGuard;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.RegionRoleUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -37,9 +37,9 @@ public class RegionAddExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if (args.hasAny("role") && args.hasAny("name")) {
 				Player member = args.<Player>getOne("name").get();
-				RegionRole role = RegionRoleUtils.getRole(args.<String>getOne("role").get().toUpperCase());
+				RegionRole role = args.<RegionRole>getOne("role").get();
 				if(role != null) {
-					if (!RegionUtils.hasRegion(member)) {
+					if (!RegionUtils.hasRegion(member) || !UniverseGuard.UNIQUE_REGIONS) {
 						Region region = null;
 						LocalRegion localRegion = null;
 						if (RegionUtils.hasPendingRegion(player)) {

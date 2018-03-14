@@ -18,7 +18,6 @@ import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumDirection;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.DirectionUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionLocationUtils;
 import com.universeguard.utils.RegionUtils;
@@ -37,18 +36,21 @@ public class RegionExpandExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if(args.hasAny("direction")) {
 				if(RegionUtils.hasPendingRegion(player)) {
-					EnumDirection direction = DirectionUtils.getDirection(args.<String>getOne("direction").get());
+					EnumDirection direction = args.<EnumDirection>getOne("direction").get();
 					if(direction != null) {
 						Region region = RegionUtils.getPendingRegion(player);
 						if(region.isLocal()) {
 							LocalRegion localRegion = (LocalRegion) region;
-							boolean hasBlocks = args.hasAny("blocks");
-							int blocks = 0;
-							if(hasBlocks)
-								blocks = args.<Integer>getOne("blocks").get();
-							RegionLocationUtils.expandPoint(localRegion, direction, hasBlocks, blocks);
-							MessageUtils.sendMessage(player, RegionText.REGION_EXPANDED.getValue());
-							RegionUtils.updatePendingRegion(player, localRegion);
+							if(localRegion.getFirstPoint() != null && localRegion.getSecondPoint() != null) {
+								boolean hasBlocks = args.hasAny("blocks");
+								int blocks = 0;
+								if(hasBlocks)
+									blocks = args.<Integer>getOne("blocks").get();
+								RegionLocationUtils.expandPoint(localRegion, direction, hasBlocks, blocks);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_EXPANDED.getValue());
+								RegionUtils.updatePendingRegion(player, localRegion);	
+							} else
+								MessageUtils.sendErrorMessage(player, RegionText.REGION_NO_POINT.getValue());
 						}
 						else
 							MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());

@@ -18,7 +18,6 @@ import org.spongepowered.api.text.format.TextColors;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.FlagUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionUtils;
 
@@ -36,8 +35,8 @@ public class RegionFlagInfoExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if (args.hasAny("flag") && args.hasAny("name")) {
 				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null) {
-					EnumRegionFlag flag = FlagUtils.getFlag(args.<String>getOne("flag").get());
+				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
+					EnumRegionFlag flag = args.<EnumRegionFlag>getOne("flag").get();
 					if(flag != null) {
 						if(region.getFlag(EnumRegionFlag.HIDE_FLAGS))
 							MessageUtils.sendMessage(player, RegionText.FLAG_HIDDEN.getValue(), TextColors.RED);

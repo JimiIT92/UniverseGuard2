@@ -15,7 +15,11 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -60,8 +64,24 @@ public class InventoryUtils {
 	 * @param player The Player
 	 * @param itemStack The ItemStack
 	 */
-	public static void addItemStackToInventory(Player player, ItemStack itemStack) {
-		player.getInventory().offer(itemStack);
+	public static boolean addItemStackToInventory(Player player, ItemStack itemStack) {
+		return player.getInventory().offer(itemStack).getType().equals(InventoryTransactionResult.Type.SUCCESS);
+	}
+	
+	/**
+	 * Add an ItemStack to a player's hotbar
+	 * @param player The Player
+	 * @param itemStack The ItemStack
+	 */
+	public static boolean addItemStackToHotbar(Player player, ItemStack itemStack) {
+		Inventory inventory = player.getInventory().query(Hotbar.class);
+		if(inventory instanceof Hotbar) {
+			Hotbar hotbar = (Hotbar)inventory;
+			if(hotbar.set(new SlotIndex(hotbar.getSelectedSlotIndex()), itemStack).getType().equals(InventoryTransactionResult.Type.FAILURE))
+				return addItemStackToInventory(player, itemStack);
+			return true;
+		}
+		return false;
 	}
 	
 	/**

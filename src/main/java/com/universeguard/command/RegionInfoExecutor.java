@@ -15,6 +15,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.Region;
+import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionUtils;
@@ -33,7 +34,7 @@ public class RegionInfoExecutor implements CommandExecutor {
 			Player player = (Player) src;
 			if (args.hasAny("name")) {
 				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null) {
+				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
 					RegionUtils.printRegion(player, region);
 				} else
 					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());

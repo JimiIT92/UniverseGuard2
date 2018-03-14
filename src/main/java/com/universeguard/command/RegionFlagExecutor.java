@@ -40,7 +40,7 @@ public class RegionFlagExecutor implements CommandExecutor {
 			if (RegionUtils.hasPendingRegion(player)) {
 				if (args.hasAny("subflag") && args.hasAny("flag") && args.hasAny("value")) {
 					Region region = RegionUtils.getPendingRegion(player);
-					boolean value = args.<Boolean>getOne("value").get();
+					boolean value = Boolean.valueOf(args.<String>getOne("value").get());
 					String name = args.<String>getOne("flag").get();
 					String subflag = args.<String>getOne("subflag").get();
 					if (!subflag.equalsIgnoreCase("flag")) {
@@ -109,6 +109,12 @@ public class RegionFlagExecutor implements CommandExecutor {
 							if(name.equalsIgnoreCase("all")) {
 								region.setMobSpawn("all", value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allhostile")) {
+								region.setMobSpawn("allhostile", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allpassive")) {
+								region.setMobSpawn("allpassive", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							}
 							else if (FlagUtils.getMobId(name) != null) {
 								region.setMobSpawn(FlagUtils.getMobId(name), value);
@@ -119,6 +125,12 @@ public class RegionFlagExecutor implements CommandExecutor {
 						case "mobdamage":
 							if(name.equalsIgnoreCase("all")) {
 								region.setMobDamage("all", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allhostile")) {
+								region.setMobDamage("allhostile", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allpassive")) {
+								region.setMobDamage("allpassive", value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							}
 							else if (FlagUtils.getMobId(name) != null) {
@@ -131,6 +143,12 @@ public class RegionFlagExecutor implements CommandExecutor {
 							if(name.equalsIgnoreCase("all")) {
 								region.setMobPve("all", value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allhostile")) {
+								region.setMobPve("allhostile", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allpassive")) {
+								region.setMobPve("allpassive", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							}
 							else if (FlagUtils.getMobId(name) != null) {
 								region.setMobPve(FlagUtils.getMobId(name), value);
@@ -141,6 +159,12 @@ public class RegionFlagExecutor implements CommandExecutor {
 						case "mobdrop":
 							if(name.equalsIgnoreCase("all")) {
 								region.setMobDrop("all", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allhostile")) {
+								region.setMobDrop("allhostile", value);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
+							} else if(name.equalsIgnoreCase("allpassive")) {
+								region.setMobDrop("allpassive", value);
 								MessageUtils.sendSuccessMessage(player, RegionText.REGION_FLAG_UPDATED.getValue());
 							}
 							else if (FlagUtils.getMobId(name) != null) {
