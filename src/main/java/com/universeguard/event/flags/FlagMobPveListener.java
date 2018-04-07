@@ -49,11 +49,11 @@ public class FlagMobPveListener {
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());
 			if(region != null) {
-				boolean relatedAllFlag = !region.getMobSpawn("all");
+				boolean relatedAllFlag = !region.getMobPve("all");
 				if(entity instanceof Monster)
-					relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allhostile");
+					relatedAllFlag =  relatedAllFlag || !region.getMobPve("allhostile");
 				if(entity instanceof Creature || entity instanceof Animal)
-					relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allpassive");
+					relatedAllFlag =  relatedAllFlag || !region.getMobPve("allpassive");
 				boolean cancel = relatedAllFlag || !region.getMobPve(name) && !PermissionUtils.hasPermission(player, RegionPermission.REGION);
 				if(cancel) {
 					event.setCancelled(true);

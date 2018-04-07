@@ -200,11 +200,29 @@ public class LocalRegion extends Region {
 	}
 
 	/**
+	 * Add a Player with the specified Role to the Region by giving it's UUID and username
+	 * @param player The player's UUID
+	 * @param username The player's username
+	 * @param role The role
+	 */
+	public void addMemberByUUIDAndUsername(UUID player, String username, RegionRole role) {
+		this.MEMBERS.add(new RegionMember(player, username, role));
+	}
+	
+	/**
 	 * Remove a member from the Region
 	 * @param player The player
 	 */
 	public void removeMemberByUUID(UUID player) {
-		this.removeMember(RegionUtils.getPlayer(player));
+		RegionMember toRemove = null;
+		for(RegionMember member : this.MEMBERS) {
+			if(member.getUUID().equals(player)) {
+				toRemove = member;
+				break;
+			}
+		}
+		if(toRemove != null)
+			this.MEMBERS.remove(toRemove);
 	}
 	
 	/**
@@ -212,15 +230,7 @@ public class LocalRegion extends Region {
 	 * @param player The player
 	 */
 	public void removeMember(Player player) {
-		RegionMember toRemove = null;
-		for(RegionMember member : this.MEMBERS) {
-			if(member.getUUID().equals(player.getUniqueId())) {
-				toRemove = member;
-				break;
-			}
-		}
-		if(toRemove != null)
-			this.MEMBERS.remove(toRemove);
+		removeMemberByUUID(player.getUniqueId());
 	}
 	
 	/**

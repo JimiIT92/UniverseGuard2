@@ -48,11 +48,11 @@ public class FlagMobDropListener {
 		String name = type.getId().toLowerCase();
 		Region region = RegionUtils.getRegion(entity.getLocation());
 		if(region != null) {
-			boolean relatedAllFlag = !region.getMobSpawn("all");
+			boolean relatedAllFlag = !region.getMobDrop("all");
 			if(entity instanceof Monster)
-				relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allhostile");
+				relatedAllFlag =  relatedAllFlag || !region.getMobDrop("allhostile");
 			if(entity instanceof Creature || entity instanceof Animal)
-				relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allpassive");
+				relatedAllFlag =  relatedAllFlag || !region.getMobDrop("allpassive");
 			boolean cancel = relatedAllFlag || !region.getMobDrop(name);
 			if(cancel) {
 				event.setCancelled(true);

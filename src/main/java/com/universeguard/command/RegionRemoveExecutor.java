@@ -7,6 +7,8 @@
  */
 package com.universeguard.command;
 
+import java.util.UUID;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -24,6 +26,7 @@ import com.universeguard.utils.RegionUtils;
 /**
  * 
  * Command Handler for /rg remove
+ * 
  * @author Jimi
  *
  */
@@ -34,8 +37,9 @@ public class RegionRemoveExecutor implements CommandExecutor {
 		if (src instanceof Player) {
 			Player player = (Player) src;
 			if (args.hasAny("name")) {
-				Player member = args.<Player>getOne("name").get();
-				if (RegionUtils.hasRegion(member)) {
+				String username = args.<String>getOne("name").get();
+				UUID member = RegionUtils.getPlayerUUID(username);
+				if (member != null && RegionUtils.hasRegionByUUID(member)) {
 					Region region = null;
 					LocalRegion localRegion = null;
 					if (RegionUtils.hasPendingRegion(player)) {
@@ -46,18 +50,25 @@ public class RegionRemoveExecutor implements CommandExecutor {
 						} else
 							MessageUtils.sendErrorMessage(player, getCommandUsage());
 					}
-					if(region != null) {
-						if(region.isLocal()) {
+					if (region != null) {
+						if (region.isLocal()) {
 							localRegion = (LocalRegion) region;
-							if(RegionUtils.isMember(localRegion, member)) {
-								localRegion.removeMember(member);
-								if(RegionUtils.save(localRegion)) {
-									MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + member.getName());
-									MessageUtils.sendMessage(member, RegionText.REMOVED_FROM_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
+							if (RegionUtils.isMemberByUUID(localRegion, member)) {
+								localRegion.removeMemberByUUID(member);
+								if (RegionUtils.save(localRegion)) {
+									MessageUtils.sendSuccessMessage(player,
+											RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + username);
+									if(RegionUtils.isOnline(member)) {
+										Player onlinePlayer = RegionUtils.getPlayer(member);
+										if(onlinePlayer != null)
+											MessageUtils.sendMessage(onlinePlayer,
+													RegionText.REMOVED_FROM_REGION.getValue() + ": " + region.getName(),
+													TextColors.GOLD);
+									}
 								} else
-									MessageUtils.sendErrorMessage(player, RegionText.REGION_REMOVE_MEMBER_EXCEPTION.getValue());
-							}
-							else
+									MessageUtils.sendErrorMessage(player,
+											RegionText.REGION_REMOVE_MEMBER_EXCEPTION.getValue());
+							} else
 								MessageUtils.sendErrorMessage(player, RegionText.PLAYER_NO_REGION.getValue());
 						} else
 							MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
@@ -65,6 +76,7 @@ public class RegionRemoveExecutor implements CommandExecutor {
 						MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
 				} else
 					MessageUtils.sendErrorMessage(player, RegionText.PLAYER_NO_REGION.getValue());
+
 			} else {
 				MessageUtils.sendErrorMessage(player, getCommandUsage());
 			}

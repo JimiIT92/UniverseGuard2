@@ -7,6 +7,8 @@
  */
 package com.universeguard.command;
 
+import java.util.UUID;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -36,10 +38,11 @@ public class RegionAddExecutor implements CommandExecutor {
 		if (src instanceof Player) {
 			Player player = (Player) src;
 			if (args.hasAny("role") && args.hasAny("name")) {
-				Player member = args.<Player>getOne("name").get();
+				String username = args.<String>getOne("name").get();
+				UUID member = RegionUtils.getPlayerUUID(username);
 				RegionRole role = args.<RegionRole>getOne("role").get();
-				if(role != null) {
-					if (!RegionUtils.hasRegion(member) || !UniverseGuard.UNIQUE_REGIONS) {
+				if(role != null && member != null) {
+					if (!RegionUtils.hasRegionByUUID(member) || !UniverseGuard.UNIQUE_REGIONS) {
 						Region region = null;
 						LocalRegion localRegion = null;
 						if (RegionUtils.hasPendingRegion(player)) {
@@ -53,11 +56,15 @@ public class RegionAddExecutor implements CommandExecutor {
 						if(region != null) {
 							if(region.isLocal()) {
 								localRegion = (LocalRegion) region;
-								if(!RegionUtils.isMember(localRegion, member)) {
-									localRegion.addMember(member, role);
+								if(!RegionUtils.isMemberByUUID(localRegion, member)) {
+									localRegion.addMemberByUUIDAndUsername(member, username, role);
 									if(RegionUtils.save(localRegion)) {
-										MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + member.getName());
-										MessageUtils.sendMessage(member, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
+										MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + username);
+										if(RegionUtils.isOnline(member)) {
+											Player onlinePlayer = RegionUtils.getPlayer(member);
+											if(player != null)
+												MessageUtils.sendMessage(onlinePlayer, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
+										}
 									} else
 										MessageUtils.sendErrorMessage(player, RegionText.REGION_ADD_MEMBER_EXCEPTION.getValue());
 								}
@@ -83,5 +90,5 @@ public class RegionAddExecutor implements CommandExecutor {
 	private String getCommandUsage() {
 		return "/rg add <role> <player> (region)";
 	}
-
+	
 }

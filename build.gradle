@@ -9,7 +9,7 @@ repositories {
 }
 
 group = 'com.universeguard'
-version = '2.7'
+version = '2.8'
 
 dependencies {
     compile 'org.spongepowered:spongeapi:6.0.0'

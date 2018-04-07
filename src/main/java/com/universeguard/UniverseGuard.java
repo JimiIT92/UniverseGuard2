@@ -137,7 +137,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.7";
+	public static final String VERSION = "2.8";
 	/**
 	 * Plugin ID
 	 */
@@ -347,13 +347,13 @@ public class UniverseGuard {
 		
 		CommandSpec regionAdd = CommandSpec.builder().description(Text.of("Add a player into a region"))
 				.executor(new RegionAddExecutor())
-				.arguments(GenericArguments.enumValue(Text.of("role"), RegionRole.class), GenericArguments.player(Text.of("name")), new RegionNameElement(Text.of("region")))
+				.arguments(GenericArguments.enumValue(Text.of("role"), RegionRole.class), GenericArguments.string(Text.of("name")), new RegionNameElement(Text.of("region")))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		
 		CommandSpec regionRemove = CommandSpec.builder().description(Text.of("Remove a player from a region"))
 				.executor(new RegionRemoveExecutor())
-				.arguments(GenericArguments.player(Text.of("name")), new RegionNameElement(Text.of("region")))
+				.arguments(GenericArguments.string(Text.of("name")), new RegionNameElement(Text.of("region")))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		

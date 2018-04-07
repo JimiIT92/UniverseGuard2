@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
@@ -284,7 +285,7 @@ public class RegionUtils {
 			newRegion.updateFlags();
 			removeOld = save(newRegion);
 		}
-		if(removeOld && region.getVersion() <= 2.6) {
+		if(removeOld) {
 			if(region.getId() == null)
 				removeByName(region);
 			else
@@ -763,6 +764,24 @@ public class RegionUtils {
 		}
 		return null;
 	}
+	
+	/**
+	 * Get the member of a Region by UUID
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player's UUID
+	 * @return The RegionMember if the player is a member of that Region, null
+	 *         otherwise
+	 */
+	public static RegionMember getMember(LocalRegion region, UUID player) {
+		for (RegionMember member : region.getMembers()) {
+			if (member.getUUID().equals(player))
+				return member;
+		}
+		return null;
+	}
 
 	/**
 	 * Check if a player is a member of a Region
@@ -833,6 +852,21 @@ public class RegionUtils {
 	public static boolean hasRegion(Player player) {
 		for (Region region : UniverseGuard.ALL_REGIONS) {
 			if (isMember(region, player))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if a player has a Region given it's UUID
+	 * 
+	 * @param player
+	 *            The player's UUID
+	 * @return true if the player has a Region, false otherwise
+	 */
+	public static boolean hasRegionByUUID(UUID player) {
+		for (Region region : UniverseGuard.ALL_REGIONS) {
+			if (isMemberByUUID(region, player))
 				return true;
 		}
 		return false;
@@ -1225,6 +1259,28 @@ public class RegionUtils {
 			printFlagHelpFor(player, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
 			break;
 		}
+	}
+	
+
+	/**
+	 * Get a player from it's username. Used to get datas about offline players that has been
+	 * at least once on the server
+	 * @param username the Player's username
+	 * @return The player
+	 */
+	public static UUID getPlayerUUID(String username) {
+		Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(username);
+
+	    if (onlinePlayer.isPresent()) {
+	        return onlinePlayer.get().getUniqueId();
+	    }
+		
+		Optional<User> user = Sponge.getServiceManager().provide(UserStorageService.class).get().get(username);
+
+		if (user.isPresent())
+			return user.get().getUniqueId();
+
+		return null;
 	}
 
 	/**
