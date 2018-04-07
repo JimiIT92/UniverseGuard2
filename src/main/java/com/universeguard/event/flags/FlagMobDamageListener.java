@@ -45,11 +45,11 @@ public class FlagMobDamageListener {
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());
 			if(region != null) {
-				boolean relatedAllFlag = !region.getMobSpawn("all");
+				boolean relatedAllFlag = !region.getMobDamage("all");
 				if(entity instanceof Monster)
-					relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allhostile");
+					relatedAllFlag =  relatedAllFlag || !region.getMobDamage("allhostile");
 				if(entity instanceof Creature || entity instanceof Animal)
-					relatedAllFlag =  relatedAllFlag || !region.getMobSpawn("allpassive");
+					relatedAllFlag =  relatedAllFlag || !region.getMobDamage("allpassive");
 				boolean cancel = relatedAllFlag || !region.getMobDamage(name);
 				if(cancel) {
 					event.setCancelled(true);

@@ -24,8 +24,12 @@ public class RegionMember {
 	private RegionRole ROLE;
 	
 	public RegionMember(Player player, RegionRole role) {
-		this.UUID = player.getUniqueId();
-		this.USERNAME = player.getName();
+		this(player.getUniqueId(), player.getName(), role);
+	}
+	
+	public RegionMember(UUID player, String username, RegionRole role) {
+		this.UUID = player;
+		this.USERNAME = username;
 		this.ROLE = role;
 	}
 	

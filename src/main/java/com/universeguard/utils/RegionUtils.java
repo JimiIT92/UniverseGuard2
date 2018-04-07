@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
@@ -88,13 +89,13 @@ public class RegionUtils {
 			fileWriter = new FileWriter(file);
 			fileWriter.write(gson.toJson(region));
 			Region cachedRegion = null;
-			for(Region cached : UniverseGuard.ALL_REGIONS) {
-				if(cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
+			for (Region cached : UniverseGuard.ALL_REGIONS) {
+				if (cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
 					cachedRegion = cached;
 					break;
 				}
 			}
-			if(cachedRegion != null) {
+			if (cachedRegion != null) {
 				UniverseGuard.ALL_REGIONS.remove(cachedRegion);
 			}
 			UniverseGuard.ALL_REGIONS.add(region);
@@ -130,7 +131,7 @@ public class RegionUtils {
 		newRegion.setSpawnLocation(region.getSpawnLocation());
 		newRegion.setFarewellMessage(region.getFarewellMessage());
 		newRegion.setGreetingMessage(region.getGreetingMessage());
-		if(!UniverseGuard.UNIQUE_REGIONS) {
+		if (!UniverseGuard.UNIQUE_REGIONS) {
 			newRegion.setMembers(region.getMembers());
 		}
 		newRegion.setFlags(region.getFlags());
@@ -141,7 +142,7 @@ public class RegionUtils {
 		newRegion.setCommands(region.getCommands());
 		return newRegion;
 	}
-	
+
 	/**
 	 * Remove a Region from the regions folder
 	 * 
@@ -163,7 +164,7 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Remove a Region from the regions folder 
+	 * Remove a Region from the regions folder
 	 * 
 	 * @param region
 	 *            The Region
@@ -181,7 +182,7 @@ public class RegionUtils {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Save a Regions index file
 	 */
@@ -192,12 +193,12 @@ public class RegionUtils {
 			File directory = new File(getConfigFolder());
 			if (!directory.exists())
 				directory.mkdirs();
-			File file = new File(getConfigFolder() + "/"+ "index.json");
+			File file = new File(getConfigFolder() + "/" + "index.json");
 			if (!file.exists())
 				file.createNewFile();
 			fileWriter = new FileWriter(file);
 			HashMap<String, UUID> regions = new HashMap<String, UUID>();
-			for(Region region : UniverseGuard.ALL_REGIONS)
+			for (Region region : UniverseGuard.ALL_REGIONS)
 				regions.put(region.getName(), region.getId());
 			fileWriter.write(gson.toJson(regions));
 		} catch (IOException e) {
@@ -214,7 +215,7 @@ public class RegionUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get a Region from name
 	 * 
@@ -229,7 +230,7 @@ public class RegionUtils {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get a Region from ID
 	 * 
@@ -258,9 +259,9 @@ public class RegionUtils {
 					((LocalRegion) region).getSecondPoint());
 			newRegion.setMembers(((LocalRegion) region).getMembers());
 			newRegion.setPriority(((LocalRegion) region).getPriority());
-			if(((LocalRegion) region).getSpawnLocation() != null)
+			if (((LocalRegion) region).getSpawnLocation() != null)
 				newRegion.setSpawnLocation(((LocalRegion) region).getSpawnLocation());
-			if(((LocalRegion) region).getTeleportLocation() != null)
+			if (((LocalRegion) region).getTeleportLocation() != null)
 				newRegion.setTeleportLocation(((LocalRegion) region).getTeleportLocation());
 			newRegion.setFlags(region.getFlags());
 			newRegion.setCommands(region.getCommands());
@@ -284,8 +285,8 @@ public class RegionUtils {
 			newRegion.updateFlags();
 			removeOld = save(newRegion);
 		}
-		if(removeOld && region.getVersion() <= 2.6) {
-			if(region.getId() == null)
+		if (removeOld) {
+			if (region.getId() == null)
 				removeByName(region);
 			else
 				remove(region);
@@ -559,7 +560,7 @@ public class RegionUtils {
 	public static void printRegionsList(Player player) {
 		StringBuilder regions = new StringBuilder();
 		for (Region region : UniverseGuard.ALL_REGIONS) {
-			if(!region.getFlag(EnumRegionFlag.HIDE_REGION))
+			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
 				regions.append(region.getName() + ", ");
 		}
 		MessageUtils.sendMessage(player, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
@@ -594,12 +595,14 @@ public class RegionUtils {
 			MessageUtils.sendMessage(player,
 					RegionText.PRIORITY.getValue() + ": " + String.valueOf(localRegion.getPriority()),
 					TextColors.YELLOW);
-			if(!localRegion.getFarewellMessage().isEmpty())
+			if (!localRegion.getFarewellMessage().isEmpty())
 				MessageUtils.sendMessage(player,
-						RegionText.FAREWELL_MESSAGE.getValue() + ": " + localRegion.getFarewellMessage(), TextColors.RED);
-			if(!localRegion.getGreetingMessage().isEmpty())
+						RegionText.FAREWELL_MESSAGE.getValue() + ": " + localRegion.getFarewellMessage(),
+						TextColors.RED);
+			if (!localRegion.getGreetingMessage().isEmpty())
 				MessageUtils.sendMessage(player,
-						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(), TextColors.GREEN);
+						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(),
+						TextColors.GREEN);
 			if (!localRegion.getFlag(EnumRegionFlag.HIDE_LOCATIONS)) {
 				MessageUtils.sendMessage(player,
 						RegionText.FROM.getValue() + ": " + localRegion.getFirstPoint().toString(), TextColors.AQUA);
@@ -738,8 +741,8 @@ public class RegionUtils {
 		}
 
 		Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-		if(userStorage.isPresent() && userStorage.get().get(uuid).isPresent()) {
-			if(userStorage.get().get(uuid).get().getPlayer().isPresent())
+		if (userStorage.isPresent() && userStorage.get().get(uuid).isPresent()) {
+			if (userStorage.get().get(uuid).get().getPlayer().isPresent())
 				return userStorage.get().get(uuid).get().getPlayer().get();
 			return null;
 		}
@@ -765,6 +768,24 @@ public class RegionUtils {
 	}
 
 	/**
+	 * Get the member of a Region by UUID
+	 * 
+	 * @param region
+	 *            The Region
+	 * @param player
+	 *            The player's UUID
+	 * @return The RegionMember if the player is a member of that Region, null
+	 *         otherwise
+	 */
+	public static RegionMember getMember(LocalRegion region, UUID player) {
+		for (RegionMember member : region.getMembers()) {
+			if (member.getUUID().equals(player))
+				return member;
+		}
+		return null;
+	}
+	
+	/**
 	 * Check if a player is a member of a Region
 	 * 
 	 * @param region
@@ -774,7 +795,10 @@ public class RegionUtils {
 	 * @return true if the player is a member of that Region, false otherwise
 	 */
 	public static boolean isMemberByUUID(Region region, UUID player) {
-		return isMember(region, getPlayer(player));
+		if (region.isLocal()) {
+			return getMember((LocalRegion) region, player) != null;
+		}
+		return false;
 	}
 
 	/**
@@ -833,6 +857,21 @@ public class RegionUtils {
 	public static boolean hasRegion(Player player) {
 		for (Region region : UniverseGuard.ALL_REGIONS) {
 			if (isMember(region, player))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if a player has a Region given it's UUID
+	 * 
+	 * @param player
+	 *            The player's UUID
+	 * @return true if the player has a Region, false otherwise
+	 */
+	public static boolean hasRegionByUUID(UUID player) {
+		for (Region region : UniverseGuard.ALL_REGIONS) {
+			if (isMemberByUUID(region, player))
 				return true;
 		}
 		return false;
@@ -948,7 +987,7 @@ public class RegionUtils {
 		LocalRegion localRegion = getLocalRegion(location);
 		return localRegion != null ? localRegion : getGlobalRegion(location);
 	}
-	
+
 	/**
 	 * Get all Regions at a location
 	 * 
@@ -995,7 +1034,7 @@ public class RegionUtils {
 		}
 		return regions;
 	}
-	
+
 	/**
 	 * Get a GlobalRegion at a location
 	 * 
@@ -1053,12 +1092,10 @@ public class RegionUtils {
 				if (type.equals(RegionEventType.LOCAL)) {
 					if (region.isLocal())
 						cancel = cancel && !RegionUtils.hasPermission(player, region);
-					else
-						if(PermissionUtils.hasPermission(player, RegionPermission.REGION))
-							cancel = false;
-				} else
-					if(PermissionUtils.hasPermission(player, RegionPermission.REGION))
+					else if (PermissionUtils.hasPermission(player, RegionPermission.REGION))
 						cancel = false;
+				} else if (PermissionUtils.hasPermission(player, RegionPermission.REGION))
+					cancel = false;
 			}
 			if (cancel) {
 				if (event != null)
@@ -1228,6 +1265,27 @@ public class RegionUtils {
 	}
 
 	/**
+	 * Get a player from it's username. Used to get datas about offline players that has been
+	 * at least once on the server
+	 * @param username the Player's username
+	 * @return The player
+	 */
+	public static UUID getPlayerUUID(String username) {
+		Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(username);
+
+	    if (onlinePlayer.isPresent()) {
+	        return onlinePlayer.get().getUniqueId();
+	    }
+		
+		Optional<User> user = Sponge.getServiceManager().provide(UserStorageService.class).get().get(username);
+
+		if (user.isPresent())
+			return user.get().getUniqueId();
+
+		return null;
+	}
+
+	/**
 	 * Get the JSON file of a Region
 	 * 
 	 * @param region
@@ -1246,7 +1304,7 @@ public class RegionUtils {
 		return new File((region.getType() == RegionType.LOCAL ? getRegionFolder() : getGlobalRegionFolder()) + "/"
 				+ region.getId().toString() + ".json");
 	}
-	
+
 	/**
 	 * Get the JSON file of a Region based on it's name
 	 * 
