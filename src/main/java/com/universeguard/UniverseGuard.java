@@ -26,6 +26,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Lists;
@@ -34,6 +35,7 @@ import com.universeguard.command.RegionAddExecutor;
 import com.universeguard.command.RegionAtExecutor;
 import com.universeguard.command.RegionCommandExecutor;
 import com.universeguard.command.RegionCopyExecutor;
+import com.universeguard.command.RegionCreateExecutor;
 import com.universeguard.command.RegionDeleteExecutor;
 import com.universeguard.command.RegionEditExecutor;
 import com.universeguard.command.RegionExecutor;
@@ -229,6 +231,7 @@ public class UniverseGuard {
 		this.registerCommands();
 		// Register the events
 		this.registerEvents();
+		
 		LogUtils.print(RegionText.LOADED.getValue());
 	}
 	/**
@@ -316,24 +319,25 @@ public class UniverseGuard {
 	 * Register commands
 	 */
 	private void registerCommands() {
-		CommandSpec regionSave = CommandUtils.buildCommandSpec("Save a region", new RegionSaveExecutor(), RegionPermission.ALL.getValue());
-		CommandSpec regionName = CommandUtils.buildCommandSpec("Set the name of a region", new RegionNameExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("name")));
-		CommandSpec regionDelete = CommandUtils.buildCommandSpec("Delete a region", new RegionDeleteExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")));
-		CommandSpec regionEdit = CommandUtils.buildCommandSpec("Allow editing a region", new RegionEditExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")));
+		CommandSpec regionSave = CommandUtils.buildCommandSpec("Save a region", new RegionSaveExecutor(), RegionPermission.CREATE.getValue());
+		CommandSpec regionName = CommandUtils.buildCommandSpec("Set the name of a region", new RegionNameExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.remainingJoinedStrings(Text.of("name")));
+		CommandSpec regionDelete = CommandUtils.buildCommandSpec("Delete a region", new RegionDeleteExecutor(), RegionPermission.DELETE.getValue(), new RegionNameElement(Text.of("name")));
+		CommandSpec regionEdit = CommandUtils.buildCommandSpec("Allow editing a region", new RegionEditExecutor(), RegionPermission.EDIT.getValue(), new RegionNameElement(Text.of("name")));
 		CommandSpec regionInfo = CommandUtils.buildCommandSpec("Get informations about a region", new RegionInfoExecutor(), new RegionNameElement(Text.of("name")));
-		CommandSpec regionPriority = CommandUtils.buildCommandSpec("Set the priority of a region", new RegionPriorityExecutor(), RegionPermission.ALL.getValue(), GenericArguments.integer(Text.of("priority")));
-		CommandSpec regionSetTeleport = CommandUtils.buildCommandSpec("Set the teleport location of a region", new RegionSetTeleportExecutor(), RegionPermission.ALL.getValue(), GenericArguments.location(Text.of("location")));
-		CommandSpec regionSetSpawn = CommandUtils.buildCommandSpec("Set the spawn location of a region", new RegionSetSpawnExecutor(), RegionPermission.ALL.getValue(), GenericArguments.location(Text.of("location")));
+		CommandSpec regionPriority = CommandUtils.buildCommandSpec("Set the priority of a region", new RegionPriorityExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.integer(Text.of("priority")));
+		CommandSpec regionSetTeleport = CommandUtils.buildCommandSpec("Set the teleport location of a region", new RegionSetTeleportExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.location(Text.of("location")));
+		CommandSpec regionSetSpawn = CommandUtils.buildCommandSpec("Set the spawn location of a region", new RegionSetSpawnExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.location(Text.of("location")));
 		CommandSpec regionTeleport = CommandUtils.buildCommandSpec("Teleports to a region teleport location", new RegionTeleportExecutor(), new RegionNameElement(Text.of("name")));
 		CommandSpec regionSpawn = CommandUtils.buildCommandSpec("Teleports to a region spawn location", new RegionSpawnExecutor(), new RegionNameElement(Text.of("name")));
 		CommandSpec regionList = CommandUtils.buildCommandSpec("Show the list of all regions", new RegionListExecutor());
-		CommandSpec regionGamemode = CommandUtils.buildCommandSpec("Set the gamemode of a region", new RegionGamemodeExecutor(), RegionPermission.ALL.getValue(), GenericArguments.catalogedElement(Text.of("gamemode"), GameMode.class));
+		CommandSpec regionGamemode = CommandUtils.buildCommandSpec("Set the gamemode of a region", new RegionGamemodeExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.catalogedElement(Text.of("gamemode"), GameMode.class));
 		CommandSpec regionHere = CommandUtils.buildCommandSpec("Tells wich region you are currently in", new RegionHereExecutor());
 		CommandSpec regionReload = CommandUtils.buildCommandSpec("Reload cached regions", new RegionReloadExecutor(), RegionPermission.ALL.getValue());
-		CommandSpec regionFarewell = CommandUtils.buildCommandSpec("Set the farewell message of a region", new RegionFarewellExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
-		CommandSpec regionGreeting = CommandUtils.buildCommandSpec("Set the greeting message of a region", new RegionGreetingExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
+		CommandSpec regionFarewell = CommandUtils.buildCommandSpec("Set the farewell message of a region", new RegionFarewellExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
+		CommandSpec regionGreeting = CommandUtils.buildCommandSpec("Set the greeting message of a region", new RegionGreetingExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
 		CommandSpec regionCopy = CommandUtils.buildCommandSpec("Copy a region into a new one", new RegionCopyExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")), GenericArguments.remainingJoinedStrings(Text.of("newRegion")));
 		CommandSpec regionAt = CommandUtils.buildCommandSpec("Tells wich region are at the give location", new RegionAtExecutor(), GenericArguments.location(Text.of("location")));
+		CommandSpec regionCreate = CommandUtils.buildCommandSpec("Create a region at thge specified location", new RegionCreateExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.integer(Text.of("x1")), GenericArguments.integer(Text.of("y1")), GenericArguments.integer(Text.of("z1")), GenericArguments.integer(Text.of("x2")), GenericArguments.integer(Text.of("y2")), GenericArguments.integer(Text.of("z2")), GenericArguments.catalogedElement(Text.of("dimension"), DimensionType.class), GenericArguments.string(Text.of("world")), GenericArguments.remainingJoinedStrings(Text.of("name")));
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -360,19 +364,19 @@ public class UniverseGuard {
 		CommandSpec regionFlag = CommandSpec.builder().description(Text.of("Set the flag of a region"))
 				.executor(new RegionFlagExecutor())
 				.arguments(new SubflagCommandElement(Text.of("subflag")), new FlagCommandElement(Text.of("flag")), new BooleanElement(Text.of("value")))
-				.permission(RegionPermission.ALL.getValue())
+				.permission(RegionPermission.CREATE.getValue())
 				.build();
 		
 		CommandSpec regionCommand = CommandSpec.builder().description(Text.of("Allow or disallow a command in a region"))
 				.executor(new RegionCommandExecutor())
 				.arguments(new BooleanElement(Text.of("value")), new CommandNameElement(Text.of("command")))
-				.permission(RegionPermission.ALL.getValue())
+				.permission(RegionPermission.CREATE.getValue())
 				.build();
 		
 		CommandSpec regionExpand = CommandSpec.builder().description(Text.of("Expand the selection area of a region"))
 				.executor(new RegionExpandExecutor())
 				.arguments(GenericArguments.enumValue(Text.of("direction"), EnumDirection.class), GenericArguments.optional(GenericArguments.integer(Text.of("blocks"))))
-				.permission(RegionPermission.ALL.getValue())
+				.permission(RegionPermission.CREATE.getValue())
 				.build();
 		
 		CommandSpec region = CommandSpec.builder().description(Text.of("Region command"))
@@ -402,6 +406,7 @@ public class UniverseGuard {
 				.child(regionGreeting, "greeting")
 				.child(regionCopy, "copy")
 				.child(regionAt, "at")
+				.child(regionCreate, "create")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

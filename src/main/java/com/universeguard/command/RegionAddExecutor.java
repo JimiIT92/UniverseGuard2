@@ -35,53 +35,50 @@ public class RegionAddExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (src instanceof Player) {
-			Player player = (Player) src;
-			if (args.hasAny("role") && args.hasAny("name")) {
-				String username = args.<String>getOne("name").get();
-				UUID member = RegionUtils.getPlayerUUID(username);
-				RegionRole role = args.<RegionRole>getOne("role").get();
-				if(role != null && member != null) {
-					if (!RegionUtils.hasRegionByUUID(member) || !UniverseGuard.UNIQUE_REGIONS) {
-						Region region = null;
-						LocalRegion localRegion = null;
-						if (RegionUtils.hasPendingRegion(player)) {
-							region = RegionUtils.getPendingRegion(player);
-						} else {
-							if (args.hasAny("region")) {
-								region = RegionUtils.load(args.<String>getOne("region").get());
-							} else
-								MessageUtils.sendErrorMessage(player, getCommandUsage());
-						}
-						if(region != null) {
-							if(region.isLocal()) {
-								localRegion = (LocalRegion) region;
-								if(!RegionUtils.isMemberByUUID(localRegion, member)) {
-									localRegion.addMemberByUUIDAndUsername(member, username, role);
-									if(RegionUtils.save(localRegion)) {
-										MessageUtils.sendSuccessMessage(player, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + username);
-										if(RegionUtils.isOnline(member)) {
-											Player onlinePlayer = RegionUtils.getPlayer(member);
-											if(player != null)
-												MessageUtils.sendMessage(onlinePlayer, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
-										}
-									} else
-										MessageUtils.sendErrorMessage(player, RegionText.REGION_ADD_MEMBER_EXCEPTION.getValue());
-								}
-								else
-									MessageUtils.sendErrorMessage(player, RegionText.PLAYER_IN_REGION.getValue());
-							} else
-								MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
+		if (args.hasAny("role") && args.hasAny("name")) {
+			String username = args.<String>getOne("name").get();
+			UUID member = RegionUtils.getPlayerUUID(username);
+			RegionRole role = args.<RegionRole>getOne("role").get();
+			if(role != null && member != null) {
+				if (!RegionUtils.hasRegionByUUID(member) || !UniverseGuard.UNIQUE_REGIONS) {
+					Region region = null;
+					LocalRegion localRegion = null;
+					if (RegionUtils.hasPendingRegion(src)) {
+						region = RegionUtils.getPendingRegion(src);
+					} else {
+						if (args.hasAny("region")) {
+							region = RegionUtils.load(args.<String>getOne("region").get());
 						} else
-							MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
+							MessageUtils.sendErrorMessage(src, getCommandUsage());
+					}
+					if(region != null) {
+						if(region.isLocal()) {
+							localRegion = (LocalRegion) region;
+							if(!RegionUtils.isMemberByUUID(localRegion, member)) {
+								localRegion.addMemberByUUIDAndUsername(member, username, role);
+								if(RegionUtils.save(localRegion)) {
+									MessageUtils.sendSuccessMessage(src, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + username);
+									if(RegionUtils.isOnline(member)) {
+										Player onlinePlayer = RegionUtils.getPlayer(member);
+										if(onlinePlayer != null)
+											MessageUtils.sendMessage(onlinePlayer, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
+									}
+								} else
+									MessageUtils.sendErrorMessage(src, RegionText.REGION_ADD_MEMBER_EXCEPTION.getValue());
+							}
+							else
+								MessageUtils.sendErrorMessage(src, RegionText.PLAYER_IN_REGION.getValue());
+						} else
+							MessageUtils.sendErrorMessage(src, RegionText.REGION_LOCAL_ONLY.getValue());
 					} else
-						MessageUtils.sendErrorMessage(player, RegionText.PLAYER_IN_REGION.getValue());
+						MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_FOUND.getValue());
 				} else
-					MessageUtils.sendErrorMessage(player, RegionText.ROLE_NOT_FOUND.getValue());
-				
-			} else {
-				MessageUtils.sendErrorMessage(player, getCommandUsage());
-			}
+					MessageUtils.sendErrorMessage(src, RegionText.PLAYER_IN_REGION.getValue());
+			} else
+				MessageUtils.sendErrorMessage(src, RegionText.ROLE_NOT_FOUND.getValue());
+			
+		} else {
+			MessageUtils.sendErrorMessage(src, getCommandUsage());
 		}
 
 		return CommandResult.empty();

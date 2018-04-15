@@ -85,6 +85,7 @@ public class EventRegionSelect {
 							MessageUtils.sendHotbarMessage(player,
 									RegionText.SECOND_POINT_SET.getValue() + " " + location.toString());
 						}
+						RegionUtils.setRegionScoreboard(player, region);
 						RegionUtils.setPendingRegion(player, region);
 					}
 					else
