@@ -31,7 +31,6 @@ public class RegionNameElement extends PatternMatchingCommandElement{
 		for (Region region : UniverseGuard.ALL_REGIONS) {
 			regions.add(region.getName());
 		}
-		
 		if(source instanceof Player) {
 			Player player = (Player)source;
 			if(!PermissionUtils.hasPermission(player, RegionPermission.ALL) && (PermissionUtils.hasPermission(player, RegionPermission.CREATE) || PermissionUtils.hasPermission(player, RegionPermission.EDIT) ||
@@ -42,7 +41,6 @@ public class RegionNameElement extends PatternMatchingCommandElement{
 				}
 			}
 		}
-		
 		return regions;
 	}
 
@@ -50,4 +48,7 @@ public class RegionNameElement extends PatternMatchingCommandElement{
 	protected Object getValue(String choice) throws IllegalArgumentException {
 		return choice;
 	}
+	
+
+
 }

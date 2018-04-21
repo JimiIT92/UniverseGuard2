@@ -12,6 +12,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
@@ -29,14 +30,17 @@ public class RegionInfoExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (args.hasAny("name")) {
-			Region region = RegionUtils.load(args.<String>getOne("name").get());
-			if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
-				RegionUtils.printRegion(src, region);
-			} else
-				MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_FOUND.getValue());
-		} else {
-			MessageUtils.sendErrorMessage(src, getCommandUsage());
+		if (src instanceof Player) {
+			Player player = (Player) src;
+			if (args.hasAny("name")) {
+				Region region = RegionUtils.load(args.<String>getOne("name").get());
+				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
+					RegionUtils.printRegion(player, region);
+				} else
+					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
+			} else {
+				MessageUtils.sendErrorMessage(player, getCommandUsage());
+			}
 		}
 
 		return CommandResult.empty();

@@ -16,11 +16,8 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
-import com.universeguard.region.enums.RegionPermission;
-import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -33,32 +30,25 @@ public class RegionSaveExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if(RegionUtils.hasPendingRegion(src)) {
-			Region region = RegionUtils.getPendingRegion(src);
-			if(region.isLocal()) {
-				LocalRegion localRegion = (LocalRegion) region;
-				if(localRegion.getFirstPoint() == null || localRegion.getSecondPoint() == null) {
-					MessageUtils.sendErrorMessage(src, RegionText.REGION_SELECT_POINTS.getValue());
-					return CommandResult.empty();
+		if(src instanceof Player) {
+			Player player = (Player)src;
+			if(RegionUtils.hasPendingRegion(player)) {
+				Region region = RegionUtils.getPendingRegion(player);
+				if(region.isLocal()) {
+					LocalRegion localRegion = (LocalRegion) region;
+					if(localRegion.getFirstPoint() == null || localRegion.getSecondPoint() == null) {
+						MessageUtils.sendErrorMessage(player, RegionText.REGION_SELECT_POINTS.getValue());
+						return CommandResult.empty();
+					}
 				}
-				if(src instanceof Player) {
-					Player player = (Player)src;
-					if(PermissionUtils.hasPermission(player, RegionPermission.CREATE) || PermissionUtils.hasPermission(player, RegionPermission.EDIT))
-						((LocalRegion)region).addMember(player, RegionRole.OWNER);	
-				}
-			}
-			if(RegionUtils.save(region)) {
-				if(src instanceof Player) {
-					Player player = (Player)src;
-					if(player.getScoreboard().getObjective("Region").isPresent())
-						player.getScoreboard().removeObjective(player.getScoreboard().getObjective("Region").get());
-				}
-				RegionUtils.setPendingRegion(src, null);
-				MessageUtils.sendSuccessMessage(src, RegionText.REGION_SAVED.getValue());
+				if(RegionUtils.save(region)) {
+					RegionUtils.setPendingRegion(player, null);
+					MessageUtils.sendSuccessMessage(player, RegionText.REGION_SAVED.getValue());
+				} else
+					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_SAVED.getValue());
 			} else
-				MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_SAVED.getValue());
-		} else
-			MessageUtils.sendErrorMessage(src, RegionText.NO_PENDING_REGION.getValue());
+				MessageUtils.sendErrorMessage(player, RegionText.NO_PENDING_REGION.getValue());
+		}
 		return CommandResult.empty();
 	}
 

@@ -32,35 +32,36 @@ public class RegionExpandExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if(args.hasAny("direction")) {
-			if(RegionUtils.hasPendingRegion(src)) {
-				EnumDirection direction = args.<EnumDirection>getOne("direction").get();
-				if(direction != null) {
-					Region region = RegionUtils.getPendingRegion(src);
-					if(region.isLocal()) {
-						LocalRegion localRegion = (LocalRegion) region;
-						if(localRegion.getFirstPoint() != null && localRegion.getSecondPoint() != null) {
-							boolean hasBlocks = args.hasAny("blocks");
-							int blocks = 0;
-							if(hasBlocks)
-								blocks = args.<Integer>getOne("blocks").get();
-							RegionLocationUtils.expandPoint(localRegion, direction, hasBlocks, blocks);
-							MessageUtils.sendSuccessMessage(src, RegionText.REGION_EXPANDED.getValue());
-							if(src instanceof Player)
-								RegionUtils.setRegionScoreboard((Player)src, localRegion);
-							RegionUtils.updatePendingRegion(src, localRegion);	
-						} else
-							MessageUtils.sendErrorMessage(src, RegionText.REGION_NO_POINT.getValue());
+		if (src instanceof Player) {
+			Player player = (Player) src;
+			if(args.hasAny("direction")) {
+				if(RegionUtils.hasPendingRegion(player)) {
+					EnumDirection direction = args.<EnumDirection>getOne("direction").get();
+					if(direction != null) {
+						Region region = RegionUtils.getPendingRegion(player);
+						if(region.isLocal()) {
+							LocalRegion localRegion = (LocalRegion) region;
+							if(localRegion.getFirstPoint() != null && localRegion.getSecondPoint() != null) {
+								boolean hasBlocks = args.hasAny("blocks");
+								int blocks = 0;
+								if(hasBlocks)
+									blocks = args.<Integer>getOne("blocks").get();
+								RegionLocationUtils.expandPoint(localRegion, direction, hasBlocks, blocks);
+								MessageUtils.sendSuccessMessage(player, RegionText.REGION_EXPANDED.getValue());
+								RegionUtils.updatePendingRegion(player, localRegion);	
+							} else
+								MessageUtils.sendErrorMessage(player, RegionText.REGION_NO_POINT.getValue());
+						}
+						else
+							MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
 					}
 					else
-						MessageUtils.sendErrorMessage(src, RegionText.REGION_LOCAL_ONLY.getValue());
-				}
-				else
-					MessageUtils.sendErrorMessage(src, RegionText.REGION_DIRECTION_NOT_VALID.getValue());
+						MessageUtils.sendErrorMessage(player, RegionText.REGION_DIRECTION_NOT_VALID.getValue());
+				} else
+					MessageUtils.sendErrorMessage(player, RegionText.NO_PENDING_REGION.getValue());				
 			} else
-				MessageUtils.sendErrorMessage(src, RegionText.NO_PENDING_REGION.getValue());				
-		} else
-			MessageUtils.sendErrorMessage(src, getCommandUsage());
+				MessageUtils.sendErrorMessage(player, getCommandUsage());
+		}
 
 		return CommandResult.empty();
 	}

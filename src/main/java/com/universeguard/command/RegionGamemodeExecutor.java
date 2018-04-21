@@ -12,6 +12,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
@@ -30,23 +31,26 @@ public class RegionGamemodeExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (RegionUtils.hasPendingRegion(src)) {
-			if (args.hasAny("gamemode")) {
-				GameMode gameMode = args.<GameMode>getOne("gamemode").get();
-				if (gameMode != GameModes.NOT_SET) {
-					Region region = RegionUtils.getPendingRegion(src);
-					region.setGamemode(gameMode.getId());
-					MessageUtils.sendSuccessMessage(src, RegionText.REGION_GAMEMODE_UPDATED.getValue());
-					RegionUtils.updatePendingRegion(src, region);
+		if (src instanceof Player) {
+			Player player = (Player) src;
+			if (RegionUtils.hasPendingRegion(player)) {
+				if (args.hasAny("gamemode")) {
+					GameMode gameMode = args.<GameMode>getOne("gamemode").get();
+					if (gameMode != GameModes.NOT_SET) {
+						Region region = RegionUtils.getPendingRegion(player);
+						region.setGamemode(gameMode.getId());
+						MessageUtils.sendSuccessMessage(player, RegionText.REGION_GAMEMODE_UPDATED.getValue());
+						RegionUtils.updatePendingRegion(player, region);
+					} else {
+						MessageUtils.sendErrorMessage(player, RegionText.REGION_GAMEMODE_NOT_VALID.getValue());
+					}
 				} else {
-					MessageUtils.sendErrorMessage(src, RegionText.REGION_GAMEMODE_NOT_VALID.getValue());
+					MessageUtils.sendErrorMessage(player, getCommandUsage());
 				}
-			} else {
-				MessageUtils.sendErrorMessage(src, getCommandUsage());
-			}
 
-		} else
-			MessageUtils.sendErrorMessage(src, RegionText.NO_PENDING_REGION.getValue());
+			} else
+				MessageUtils.sendErrorMessage(player, RegionText.NO_PENDING_REGION.getValue());
+		}
 
 		return CommandResult.empty();
 	}

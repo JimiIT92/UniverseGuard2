@@ -12,6 +12,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.utils.RegionUtils;
 
@@ -25,16 +26,19 @@ public class RegionHelpExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		int page = 1;
-		boolean flags = false;
-		if(args.hasAny("page"))
-			page = args.<Integer>getOne("page").get();
-		if(args.hasAny("flags"))
-			flags = args.<Boolean>getOne("flags").get();
-		if(flags) {
-			RegionUtils.printHelpPage(src, page);
-		} else {
-			RegionUtils.printFlagHelpPage(src, page);
+		if (src instanceof Player) {
+			Player player = (Player) src;
+			int page = 1;
+			boolean flags = false;
+			if(args.hasAny("page"))
+				page = args.<Integer>getOne("page").get();
+			if(args.hasAny("flags"))
+				flags = args.<Boolean>getOne("flags").get();
+			if(flags) {
+				RegionUtils.printHelpPage(player, page);
+			} else {
+				RegionUtils.printFlagHelpPage(player, page);
+			}
 		}
 
 		return CommandResult.empty();

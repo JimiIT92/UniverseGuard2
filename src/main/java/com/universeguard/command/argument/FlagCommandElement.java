@@ -43,6 +43,7 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 
 	@Override
 	protected Iterable<String> getChoices(CommandSource source) {
+		//Based on the subFlag variable will return a different list.
 		ArrayList<String> flags = new ArrayList<String>();
 		if(this.subFlag != null) {
 			switch(subFlag) {
@@ -87,4 +88,7 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 	protected Object getValue(String choice) throws IllegalArgumentException {
 		return choice;
 	}
+	
+
+
 }
