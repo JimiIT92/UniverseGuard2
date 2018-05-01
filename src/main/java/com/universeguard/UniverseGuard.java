@@ -54,6 +54,7 @@ import com.universeguard.command.RegionPriorityExecutor;
 import com.universeguard.command.RegionReloadExecutor;
 import com.universeguard.command.RegionRemoveExecutor;
 import com.universeguard.command.RegionSaveExecutor;
+import com.universeguard.command.RegionSetExecutor;
 import com.universeguard.command.RegionSetSpawnExecutor;
 import com.universeguard.command.RegionSetTeleportExecutor;
 import com.universeguard.command.RegionSpawnExecutor;
@@ -62,6 +63,7 @@ import com.universeguard.command.argument.BooleanElement;
 import com.universeguard.command.argument.CommandNameElement;
 import com.universeguard.command.argument.FlagCommandElement;
 import com.universeguard.command.argument.RegionNameElement;
+import com.universeguard.command.argument.RegionPointCommandElement;
 import com.universeguard.command.argument.SubflagCommandElement;
 import com.universeguard.event.EventListener;
 import com.universeguard.event.EventRegionSelect;
@@ -338,6 +340,7 @@ public class UniverseGuard {
 		CommandSpec regionCopy = CommandUtils.buildCommandSpec("Copy a region into a new one", new RegionCopyExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")), GenericArguments.remainingJoinedStrings(Text.of("newRegion")));
 		CommandSpec regionAt = CommandUtils.buildCommandSpec("Tells wich region are at the give location", new RegionAtExecutor(), GenericArguments.location(Text.of("location")));
 		CommandSpec regionCreate = CommandUtils.buildCommandSpec("Create a region at thge specified location", new RegionCreateExecutor(), RegionPermission.CREATE.getValue(), GenericArguments.integer(Text.of("x1")), GenericArguments.integer(Text.of("y1")), GenericArguments.integer(Text.of("z1")), GenericArguments.integer(Text.of("x2")), GenericArguments.integer(Text.of("y2")), GenericArguments.integer(Text.of("z2")), GenericArguments.catalogedElement(Text.of("dimension"), DimensionType.class), GenericArguments.string(Text.of("world")), GenericArguments.remainingJoinedStrings(Text.of("name")));
+		CommandSpec regionSet = CommandUtils.buildCommandSpec("Set a point of a pending region", new RegionSetExecutor(), RegionPermission.CREATE.getValue(), new RegionPointCommandElement(Text.of("point")), GenericArguments.integer(Text.of("x")), GenericArguments.integer(Text.of("y")), GenericArguments.integer(Text.of("z")));
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -407,6 +410,7 @@ public class UniverseGuard {
 				.child(regionCopy, "copy")
 				.child(regionAt, "at")
 				.child(regionCreate, "create")
+				.child(regionSet, "set")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

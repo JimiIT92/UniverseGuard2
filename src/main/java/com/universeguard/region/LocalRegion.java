@@ -270,7 +270,7 @@ public class LocalRegion extends Region {
 	 * @return The Region World Object
 	 */
 	public World getWorld() {
-		return Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).isPresent() ? Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).get() : null;
+		return this.FIRST_POINT != null && Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).isPresent() ? Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).get() : null;
 	}
 
 }
