@@ -12,7 +12,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
@@ -30,30 +29,26 @@ public class RegionCopyExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (src instanceof Player) {
-			Player player = (Player) src;
-			if (args.hasAny("name") && args.hasAny("newRegion")) {
-				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null) {
-					if(region.isLocal()) {
-						String newRegion = args.<String>getOne("newRegion").get();
-						if(RegionUtils.load(newRegion) == null) {
-							if(RegionUtils.save(RegionUtils.copy((LocalRegion)region, newRegion))) {
-								MessageUtils.sendSuccessMessage(player, RegionText.REGION_COPIED.getValue());	
-							} else
-								MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_COPIED.getValue());
-						}
-						else
-							MessageUtils.sendErrorMessage(player, RegionText.REGION_NAME_NOT_VALID.getValue());
-					} else
-						MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
+		if (args.hasAny("name") && args.hasAny("newRegion")) {
+			Region region = RegionUtils.load(args.<String>getOne("name").get());
+			if (region != null) {
+				if(region.isLocal()) {
+					String newRegion = args.<String>getOne("newRegion").get();
+					if(RegionUtils.load(newRegion) == null) {
+						if(RegionUtils.save(RegionUtils.copy((LocalRegion)region, newRegion))) {
+							MessageUtils.sendSuccessMessage(src, RegionText.REGION_COPIED.getValue());	
+						} else
+							MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_COPIED.getValue());
+					}
+					else
+						MessageUtils.sendErrorMessage(src, RegionText.REGION_NAME_NOT_VALID.getValue());
 				} else
-					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
-			} else {
-				MessageUtils.sendErrorMessage(player, getCommandUsage());
-			}
+					MessageUtils.sendErrorMessage(src, RegionText.REGION_LOCAL_ONLY.getValue());
+			} else
+				MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_FOUND.getValue());
+		} else {
+			MessageUtils.sendErrorMessage(src, getCommandUsage());
 		}
-
 		return CommandResult.empty();
 	}
 

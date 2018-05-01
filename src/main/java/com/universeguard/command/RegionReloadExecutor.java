@@ -12,7 +12,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.UniverseGuard;
 import com.universeguard.region.enums.RegionText;
@@ -29,12 +28,9 @@ public class RegionReloadExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if(src instanceof Player) {
-			Player player = (Player)src;
-			UniverseGuard.ALL_REGIONS.clear();
-			UniverseGuard.ALL_REGIONS = RegionUtils.getAllRegions();
-			MessageUtils.sendSuccessMessage(player, RegionText.REGION_RELOAD.getValue());
-		}
+		UniverseGuard.ALL_REGIONS.clear();
+		UniverseGuard.ALL_REGIONS = RegionUtils.getAllRegions();
+		MessageUtils.sendSuccessMessage(src, RegionText.REGION_RELOAD.getValue());
 		return CommandResult.empty();
 	}
 
