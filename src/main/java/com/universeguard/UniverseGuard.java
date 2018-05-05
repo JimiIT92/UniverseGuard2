@@ -160,7 +160,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Author
 	 */
-	public static final String AUTHOR = "Minehendrix";
+	public static final String AUTHOR = "JimiIT92, Brycey92, eheimer";
 	/**
 	 * The Hunger Flag Timer update frequency (in seconds)
 	 */
