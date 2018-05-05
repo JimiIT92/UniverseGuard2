@@ -60,8 +60,8 @@ public class EventRegionSelect {
 			if (player.getItemInHand(hand).isPresent()) {
 				ItemStack itemStack = player.getItemInHand(hand).get();
 				if (InventoryUtils.isSelector(itemStack)) {
+					event.setCancelled(true);
 					if(PermissionUtils.hasAllPermissions(player)) {
-						event.setCancelled(true);
 						BlockSnapshot block = event.getTargetBlock();
 						BlockType blockType = block.getState().getType();
 						RegionLocation location = null;
@@ -88,7 +88,7 @@ public class EventRegionSelect {
 						RegionUtils.setRegionScoreboard(player, region);
 						RegionUtils.setPendingRegion(player, region);
 					}
-					else
+					else 
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_ITEM.getValue());
 				}
 			}

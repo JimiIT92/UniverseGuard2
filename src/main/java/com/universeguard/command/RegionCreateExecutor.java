@@ -12,15 +12,12 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.DimensionType;
 
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.components.RegionLocation;
-import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 
 /**
@@ -33,13 +30,6 @@ public class RegionCreateExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if(src instanceof Player) {
-			Player player = (Player)src;
-			if(!PermissionUtils.hasAllPermissions(player) || !PermissionUtils.hasPermission(player, RegionPermission.CREATE)) {
-				MessageUtils.sendErrorMessage(player, RegionText.NO_PERMISSION_COMMAND.getValue());
-				return CommandResult.empty();
-			}
-		}
 		if(args.hasAny("x1") && args.hasAny("y1") && args.hasAny("z1") && args.hasAny("x2") && args.hasAny("y2") && args.hasAny("z2") && args.hasAny("name") && args.hasAny("dimension")) {
 			DimensionType dimension = args.<DimensionType>getOne("dimension").get();
 			String world = args.<String>getOne("world").get();

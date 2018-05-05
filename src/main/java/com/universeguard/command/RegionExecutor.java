@@ -14,7 +14,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 
-import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.InventoryUtils;
 import com.universeguard.utils.MessageUtils;
@@ -32,7 +31,7 @@ public class RegionExecutor implements CommandExecutor {
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		if(src instanceof Player) {
 			Player player = (Player)src;
-			if(PermissionUtils.hasAllPermissions(player) || PermissionUtils.hasPermission(player, RegionPermission.CREATE)) {
+			if(PermissionUtils.hasAllPermissions(player)) {
 				if(InventoryUtils.addItemStackToHotbar(player, InventoryUtils.getSelector()))
 					MessageUtils.sendHotbarSuccessMessage(player, RegionText.REGION_SELECTOR_ADDED.getValue());
 				return CommandResult.success();
