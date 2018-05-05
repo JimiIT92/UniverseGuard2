@@ -176,7 +176,8 @@ public enum RegionText {
 	NO_PENDING_REGION("You don't have any pending region!"),
 	NO_PERMISSION_ITEM("You do not have permission to use this item!"),
 	NO_PERMISSION_REGION("You don't have permission to do that!"),
-	NO_PERMISSION_COMMAND("You do not have permission to use this command!");
+	NO_PERMISSION_COMMAND("You do not have permission to use this command!"),
+	TEXT_WRONG_SELECTOR_ITEM("Incorrect item id set for Region Selector. Will use: ");
 	
 	private String VALUE;
 	private RegionText(String value) {

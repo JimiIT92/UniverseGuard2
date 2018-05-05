@@ -198,7 +198,7 @@ public class LocalRegion extends Region {
 	public void addMember(Player player, RegionRole role) {
 		this.MEMBERS.add(new RegionMember(player, role));
 	}
-
+	
 	/**
 	 * Add a Player with the specified Role to the Region by giving it's UUID and username
 	 * @param player The player's UUID
@@ -208,7 +208,7 @@ public class LocalRegion extends Region {
 	public void addMemberByUUIDAndUsername(UUID player, String username, RegionRole role) {
 		this.MEMBERS.add(new RegionMember(player, username, role));
 	}
-	
+
 	/**
 	 * Remove a member from the Region
 	 * @param player The player
@@ -270,7 +270,7 @@ public class LocalRegion extends Region {
 	 * @return The Region World Object
 	 */
 	public World getWorld() {
-		return Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).isPresent() ? Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).get() : null;
+		return this.FIRST_POINT != null && Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).isPresent() ? Sponge.getServer().getWorld(this.FIRST_POINT.getWorld()).get() : null;
 	}
 
 }

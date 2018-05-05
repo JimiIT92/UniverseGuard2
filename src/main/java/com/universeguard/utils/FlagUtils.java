@@ -8,20 +8,25 @@
 package com.universeguard.utils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.text.format.TextColors;
 
 import com.universeguard.UniverseGuard;
 import com.universeguard.region.enums.EnumRegionExplosion;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.EnumRegionInteract;
 import com.universeguard.region.enums.EnumRegionVehicle;
+import com.universeguard.region.enums.RegionText;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -64,13 +69,15 @@ public class FlagUtils {
 			configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
 		if(configNode.getNode("players", "unique_regions").isVirtual())
 			configNode.getNode("players", "unique_regions").setValue(UniverseGuard.UNIQUE_REGIONS).setComment("Sets if players can be in more Regions");
+		if(configNode.getNode("selector", "item").isVirtual())
+			configNode.getNode("selector", "item").setValue(UniverseGuard.SELECTOR_ITEM.getId());
 	}
 	
 	/**
 	 * Get the flags
 	 * @param configNode
 	 */
-	public static void getValues(CommentedConfigurationNode configNode) {
+	public static void getValues(Game game, CommentedConfigurationNode configNode) {
 		for(EnumRegionFlag flag : EnumRegionFlag.values()) {
 			flag.setValue(configNode.getNode("flags", flag.getName()).getBoolean());
 		}
@@ -89,6 +96,14 @@ public class FlagUtils {
 		UniverseGuard.GAMEMODE_TIMER = configNode.getNode("timers", "gamemode").getInt();
 		UniverseGuard.ENTER_FLAG_TIMER = configNode.getNode("timers", "enter_flag").getInt();
 		UniverseGuard.UNIQUE_REGIONS = configNode.getNode("players", "unique_regions").getBoolean();
+		if(!configNode.getNode("selector", "item").isVirtual()) {
+			String id = configNode.getNode("selector", "item").getString();
+			Optional<ItemType> type = game.getRegistry().getType(ItemType.class, id);
+			if(type.isPresent())
+				UniverseGuard.SELECTOR_ITEM = type.get();
+			else
+				LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_SELECTOR_ITEM.getValue() + UniverseGuard.SELECTOR_ITEM.getId());
+		}
 	}
 	
 	/**
@@ -272,6 +287,18 @@ public class FlagUtils {
 		return type.equals(EntityTypes.TNT_MINECART) || type.equals(EntityTypes.PRIMED_TNT)
 				|| type.equals(EntityTypes.CREEPER) || type.equals(EntityTypes.ENDER_CRYSTAL) ||
 				type.equals(EntityTypes.FIREBALL) || type.equals(EntityTypes.ENDER_DRAGON);
+	}
+	
+	/**
+	 * Check if a BlockType is a Crop
+	 * @param type The BlockType
+	 * @return true if the BlockType is a Crop, false otherwise
+	 */
+	public static boolean isCrop(BlockType type) {
+		return type.equals(BlockTypes.WHEAT) || type.equals(BlockTypes.BEETROOTS) 
+				|| type.equals(BlockTypes.MELON_STEM) || type.equals(BlockTypes.PUMPKIN_STEM)
+				|| type.equals(BlockTypes.CARROTS) || type.equals(BlockTypes.NETHER_WART) 
+				|| type.equals(BlockTypes.FARMLAND);
 	}
 	
 	/**

@@ -12,7 +12,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.format.TextColors;
 
 import com.universeguard.region.Region;
@@ -31,26 +30,23 @@ public class RegionFlagInfoExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if (src instanceof Player) {
-			Player player = (Player) src;
-			if (args.hasAny("flag") && args.hasAny("name")) {
-				Region region = RegionUtils.load(args.<String>getOne("name").get());
-				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
-					EnumRegionFlag flag = args.<EnumRegionFlag>getOne("flag").get();
-					if(flag != null) {
-						if(region.getFlag(EnumRegionFlag.HIDE_FLAGS))
-							MessageUtils.sendMessage(player, RegionText.FLAG_HIDDEN.getValue(), TextColors.RED);
-						else {
-							boolean value = region.getFlag(flag);
-							MessageUtils.sendMessage(player, String.valueOf(value), value ? TextColors.GREEN : TextColors.RED);	
-						}
-					} else
-						MessageUtils.sendErrorMessage(player, RegionText.REGION_FLAG_NOT_VALID.getValue());
+		if (args.hasAny("flag") && args.hasAny("name")) {
+			Region region = RegionUtils.load(args.<String>getOne("name").get());
+			if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
+				EnumRegionFlag flag = args.<EnumRegionFlag>getOne("flag").get();
+				if(flag != null) {
+					if(region.getFlag(EnumRegionFlag.HIDE_FLAGS))
+						MessageUtils.sendMessage(src, RegionText.FLAG_HIDDEN.getValue(), TextColors.RED);
+					else {
+						boolean value = region.getFlag(flag);
+						MessageUtils.sendMessage(src, String.valueOf(value), value ? TextColors.GREEN : TextColors.RED);	
+					}
 				} else
-					MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
-			} else {
-				MessageUtils.sendErrorMessage(player, getCommandUsage());
-			}
+					MessageUtils.sendErrorMessage(src, RegionText.REGION_FLAG_NOT_VALID.getValue());
+			} else
+				MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_FOUND.getValue());
+		} else {
+			MessageUtils.sendErrorMessage(src, getCommandUsage());
 		}
 
 		return CommandResult.empty();

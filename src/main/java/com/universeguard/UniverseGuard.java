@@ -22,10 +22,13 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Lists;
@@ -34,6 +37,7 @@ import com.universeguard.command.RegionAddExecutor;
 import com.universeguard.command.RegionAtExecutor;
 import com.universeguard.command.RegionCommandExecutor;
 import com.universeguard.command.RegionCopyExecutor;
+import com.universeguard.command.RegionCreateExecutor;
 import com.universeguard.command.RegionDeleteExecutor;
 import com.universeguard.command.RegionEditExecutor;
 import com.universeguard.command.RegionExecutor;
@@ -52,6 +56,7 @@ import com.universeguard.command.RegionPriorityExecutor;
 import com.universeguard.command.RegionReloadExecutor;
 import com.universeguard.command.RegionRemoveExecutor;
 import com.universeguard.command.RegionSaveExecutor;
+import com.universeguard.command.RegionSetExecutor;
 import com.universeguard.command.RegionSetSpawnExecutor;
 import com.universeguard.command.RegionSetTeleportExecutor;
 import com.universeguard.command.RegionSpawnExecutor;
@@ -60,6 +65,7 @@ import com.universeguard.command.argument.BooleanElement;
 import com.universeguard.command.argument.CommandNameElement;
 import com.universeguard.command.argument.FlagCommandElement;
 import com.universeguard.command.argument.RegionNameElement;
+import com.universeguard.command.argument.RegionPointCommandElement;
 import com.universeguard.command.argument.SubflagCommandElement;
 import com.universeguard.event.EventListener;
 import com.universeguard.event.EventRegionSelect;
@@ -153,7 +159,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Author
 	 */
-	public static final String AUTHOR = "Minehendrix";
+	public static final String AUTHOR = "JimiIT92, Brycey92, eheimer";
 	/**
 	 * The Hunger Flag Timer update frequency (in seconds)
 	 */
@@ -211,6 +217,12 @@ public class UniverseGuard {
 	public static ArrayList<Region> ALL_REGIONS;
 	
 	/**
+	 * The item set to be used as a Region Selector.
+	 * Default value is "minecraft:stick"
+	 */
+	public static ItemType SELECTOR_ITEM = ItemTypes.STICK;
+	
+	/**
 	 * onInit Method. Called on Plugin Load
 	 * @param event
 	 */
@@ -229,6 +241,7 @@ public class UniverseGuard {
 		this.registerCommands();
 		// Register the events
 		this.registerEvents();
+		
 		LogUtils.print(RegionText.LOADED.getValue());
 	}
 	/**
@@ -284,7 +297,7 @@ public class UniverseGuard {
 			// Set permissions
 			PermissionUtils.getValues(CONFIG_NODE);
 			// Set flags
-			FlagUtils.getValues(CONFIG_NODE);
+			FlagUtils.getValues(GAME, CONFIG_NODE);
 			// Set translations
 			TranslationUtils.getValues(CONFIG_NODE);
 			LogUtils.print(RegionText.LOADED_CONFIGURATION.getValue());
@@ -334,6 +347,8 @@ public class UniverseGuard {
 		CommandSpec regionGreeting = CommandUtils.buildCommandSpec("Set the greeting message of a region", new RegionGreetingExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("message")));
 		CommandSpec regionCopy = CommandUtils.buildCommandSpec("Copy a region into a new one", new RegionCopyExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")), GenericArguments.remainingJoinedStrings(Text.of("newRegion")));
 		CommandSpec regionAt = CommandUtils.buildCommandSpec("Tells wich region are at the give location", new RegionAtExecutor(), GenericArguments.location(Text.of("location")));
+		CommandSpec regionCreate = CommandUtils.buildCommandSpec("Create a region at thge specified location", new RegionCreateExecutor(), RegionPermission.ALL.getValue(), GenericArguments.integer(Text.of("x1")), GenericArguments.integer(Text.of("y1")), GenericArguments.integer(Text.of("z1")), GenericArguments.integer(Text.of("x2")), GenericArguments.integer(Text.of("y2")), GenericArguments.integer(Text.of("z2")), GenericArguments.catalogedElement(Text.of("dimension"), DimensionType.class), GenericArguments.string(Text.of("world")), GenericArguments.remainingJoinedStrings(Text.of("name")));
+		CommandSpec regionSet = CommandUtils.buildCommandSpec("Set a point of a pending region", new RegionSetExecutor(), RegionPermission.ALL.getValue(), new RegionPointCommandElement(Text.of("point")), GenericArguments.integer(Text.of("x")), GenericArguments.integer(Text.of("y")), GenericArguments.integer(Text.of("z")));
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -402,6 +417,8 @@ public class UniverseGuard {
 				.child(regionGreeting, "greeting")
 				.child(regionCopy, "copy")
 				.child(regionAt, "at")
+				.child(regionCreate, "create")
+				.child(regionSet, "set")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
@@ -453,6 +470,7 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagExitListener());
 		EventUtils.registerEvent(new FlagFarewellListener());
 		EventUtils.registerEvent(new FlagGreetingListener());
+		//EventUtils.registerEvent(new FlagFieldsListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())

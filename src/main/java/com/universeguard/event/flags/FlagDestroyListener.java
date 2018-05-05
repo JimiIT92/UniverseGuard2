@@ -20,7 +20,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -40,7 +40,7 @@ import com.universeguard.utils.RegionUtils;
 public class FlagDestroyListener {
 
 	@Listener
-	public void onEntityDestroyed(InteractEntityEvent.Primary event, @Root Player player) {
+	public void onEntityDestroyed(InteractEntityEvent.Primary event, @First Player player) {
 		Entity targetEntity = event.getTargetEntity();
 		EntityType type = targetEntity.getType();
 		if(FlagUtils.isBlockEntity(type) || !(targetEntity instanceof Living))
@@ -48,17 +48,17 @@ public class FlagDestroyListener {
 	}
 	
 	@Listener
-	public void onBucketFill(InteractItemEvent.Secondary.MainHand event, @Root Player player) {
+	public void onBucketFill(InteractItemEvent.Secondary.MainHand event, @First Player player) {
 		this.handleBucketFill(event, player);
 	}
 	
 	@Listener
-	public void onBucketFill(InteractItemEvent.Secondary.OffHand event, @Root Player player) {
+	public void onBucketFill(InteractItemEvent.Secondary.OffHand event, @First Player player) {
 		this.handleBucketFill(event, player);
 	}
 	
 	@Listener
-	public void onBucketFill(InteractBlockEvent.Secondary event, @Root Player player) {
+	public void onBucketFill(InteractBlockEvent.Secondary event, @First Player player) {
 		BlockType block = event.getTargetBlock().getState().getType();
 		if(block.equals(BlockTypes.WATER) || block.equals(BlockTypes.FLOWING_WATER) ||
 				block.equals(BlockTypes.LAVA) || block.equals(BlockTypes.FLOWING_LAVA)) {
@@ -83,7 +83,7 @@ public class FlagDestroyListener {
 	}
 	
 	@Listener
-	public void onEntityCollide(CollideEntityEvent.Impact event, @Root Player player) {
+	public void onEntityCollide(CollideEntityEvent.Impact event, @First Player player) {
 		if(!event.getEntities().isEmpty()) {
 			Entity targetEntity = event.getEntities().get(0);
 			EntityType type = targetEntity.getType();
@@ -93,7 +93,7 @@ public class FlagDestroyListener {
 	}
 	
 	@Listener
-	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event, @Root Player player) {
+	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event, @First Player player) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
 			if (block.getLocation().isPresent()) {
@@ -102,7 +102,7 @@ public class FlagDestroyListener {
 			}
 		}
 	}
-	
+
 	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
 		return RegionUtils.handleEvent(event, EnumRegionFlag.DESTROY, location, player, RegionEventType.LOCAL);
 	}

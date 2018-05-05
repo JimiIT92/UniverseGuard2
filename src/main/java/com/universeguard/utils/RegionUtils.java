@@ -21,9 +21,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.scoreboard.critieria.Criteria;
+import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
+import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -67,7 +72,7 @@ import com.universeguard.region.enums.RegionType;
 public class RegionUtils {
 
 	// Pending Regions
-	private static HashMap<Player, Region> PENDINGS = new HashMap<Player, Region>();
+	private static HashMap<CommandSource, Region> PENDINGS = new HashMap<CommandSource, Region>();
 
 	/**
 	 * Save a Region to a JSON file
@@ -89,13 +94,13 @@ public class RegionUtils {
 			fileWriter = new FileWriter(file);
 			fileWriter.write(gson.toJson(region));
 			Region cachedRegion = null;
-			for(Region cached : UniverseGuard.ALL_REGIONS) {
-				if(cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
+			for (Region cached : UniverseGuard.ALL_REGIONS) {
+				if (cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
 					cachedRegion = cached;
 					break;
 				}
 			}
-			if(cachedRegion != null) {
+			if (cachedRegion != null) {
 				UniverseGuard.ALL_REGIONS.remove(cachedRegion);
 			}
 			UniverseGuard.ALL_REGIONS.add(region);
@@ -131,7 +136,7 @@ public class RegionUtils {
 		newRegion.setSpawnLocation(region.getSpawnLocation());
 		newRegion.setFarewellMessage(region.getFarewellMessage());
 		newRegion.setGreetingMessage(region.getGreetingMessage());
-		if(!UniverseGuard.UNIQUE_REGIONS) {
+		if (!UniverseGuard.UNIQUE_REGIONS) {
 			newRegion.setMembers(region.getMembers());
 		}
 		newRegion.setFlags(region.getFlags());
@@ -142,7 +147,7 @@ public class RegionUtils {
 		newRegion.setCommands(region.getCommands());
 		return newRegion;
 	}
-	
+
 	/**
 	 * Remove a Region from the regions folder
 	 * 
@@ -164,7 +169,7 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Remove a Region from the regions folder 
+	 * Remove a Region from the regions folder
 	 * 
 	 * @param region
 	 *            The Region
@@ -182,7 +187,7 @@ public class RegionUtils {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Save a Regions index file
 	 */
@@ -193,12 +198,12 @@ public class RegionUtils {
 			File directory = new File(getConfigFolder());
 			if (!directory.exists())
 				directory.mkdirs();
-			File file = new File(getConfigFolder() + "/"+ "index.json");
+			File file = new File(getConfigFolder() + "/" + "index.json");
 			if (!file.exists())
 				file.createNewFile();
 			fileWriter = new FileWriter(file);
 			HashMap<String, UUID> regions = new HashMap<String, UUID>();
-			for(Region region : UniverseGuard.ALL_REGIONS)
+			for (Region region : UniverseGuard.ALL_REGIONS)
 				regions.put(region.getName(), region.getId());
 			fileWriter.write(gson.toJson(regions));
 		} catch (IOException e) {
@@ -215,7 +220,7 @@ public class RegionUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get a Region from name
 	 * 
@@ -230,7 +235,7 @@ public class RegionUtils {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get a Region from ID
 	 * 
@@ -259,9 +264,9 @@ public class RegionUtils {
 					((LocalRegion) region).getSecondPoint());
 			newRegion.setMembers(((LocalRegion) region).getMembers());
 			newRegion.setPriority(((LocalRegion) region).getPriority());
-			if(((LocalRegion) region).getSpawnLocation() != null)
+			if (((LocalRegion) region).getSpawnLocation() != null)
 				newRegion.setSpawnLocation(((LocalRegion) region).getSpawnLocation());
-			if(((LocalRegion) region).getTeleportLocation() != null)
+			if (((LocalRegion) region).getTeleportLocation() != null)
 				newRegion.setTeleportLocation(((LocalRegion) region).getTeleportLocation());
 			newRegion.setFlags(region.getFlags());
 			newRegion.setCommands(region.getCommands());
@@ -285,8 +290,8 @@ public class RegionUtils {
 			newRegion.updateFlags();
 			removeOld = save(newRegion);
 		}
-		if(removeOld) {
-			if(region.getId() == null)
+		if (removeOld) {
+			if (region.getId() == null)
 				removeByName(region);
 			else
 				remove(region);
@@ -515,6 +520,22 @@ public class RegionUtils {
 			PENDINGS.put(player, region);
 		}
 	}
+	
+	/**
+	 * Set the pending Region for a CommandSource
+	 * 
+	 * @param source
+	 *            The command source
+	 * @param region
+	 *            The Region
+	 */
+	public static void setPendingRegion(CommandSource source, Region region) {
+		if (region == null)
+			PENDINGS.remove(source);
+		else if (!PENDINGS.containsKey(source)) {
+			PENDINGS.put(source, region);
+		}
+	}
 
 	/**
 	 * Get the pending region for a player
@@ -525,6 +546,17 @@ public class RegionUtils {
 	 */
 	public static Region getPendingRegion(Player player) {
 		return PENDINGS.get(player);
+	}
+	
+	/**
+	 * Get the pending region for a CommandSource
+	 * 
+	 * @param source
+	 *            The command source
+	 * @return The pending Region of the command source if exists, null otherwise
+	 */
+	public static Region getPendingRegion(CommandSource source) {
+		return PENDINGS.get(source);
 	}
 
 	/**
@@ -539,6 +571,22 @@ public class RegionUtils {
 		setPendingRegion(player, null);
 		setPendingRegion(player, region);
 	}
+	
+	/**
+	 * Update the pending region of a CommandSource
+	 * 
+	 * @param source
+	 *            The command source
+	 * @param region
+	 *            The pending Region
+	 */
+	public static void updatePendingRegion(CommandSource source, Region region) {
+		setPendingRegion(source, null);
+		setPendingRegion(source, region);
+		if(source instanceof Player && region.isLocal()) {
+			RegionUtils.setRegionScoreboard((Player)source, (LocalRegion)region);
+		}
+	}
 
 	/**
 	 * Check if a player has a pending Region
@@ -550,6 +598,17 @@ public class RegionUtils {
 	public static boolean hasPendingRegion(Player player) {
 		return getPendingRegion(player) != null;
 	}
+	
+	/**
+	 * Check if a CommandSource has a pending Region
+	 * 
+	 * @param source
+	 *            The command source
+	 * @return true if the command source has a pending Region, false otherwise
+	 */
+	public static boolean hasPendingRegion(CommandSource source) {
+		return getPendingRegion(source) != null;
+	}
 
 	/**
 	 * Shows the list of all Regions to a player
@@ -560,11 +619,27 @@ public class RegionUtils {
 	public static void printRegionsList(Player player) {
 		StringBuilder regions = new StringBuilder();
 		for (Region region : UniverseGuard.ALL_REGIONS) {
-			if(!region.getFlag(EnumRegionFlag.HIDE_REGION))
+			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
 				regions.append(region.getName() + ", ");
 		}
 		MessageUtils.sendMessage(player, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
 		MessageUtils.sendMessage(player, regions.substring(0, regions.length() - 2), TextColors.YELLOW);
+	}
+	
+	/**
+	 * Shows the list of all Regions to a CommandSource
+	 * 
+	 * @param source
+	 *            The command source
+	 */
+	public static void printRegionsList(CommandSource source) {
+		StringBuilder regions = new StringBuilder();
+		for (Region region : UniverseGuard.ALL_REGIONS) {
+			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
+				regions.append(region.getName() + ", ");
+		}
+		MessageUtils.sendMessage(source, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
+		MessageUtils.sendMessage(source, regions.substring(0, regions.length() - 2), TextColors.YELLOW);
 	}
 
 	/**
@@ -579,150 +654,152 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Shows the region informations to a player
+	 * Shows the region informations to a CommandSource
 	 * 
-	 * @param player
-	 *            The player
+	 * @param source
+	 *            The command source
 	 * @param region
 	 *            The Region
 	 */
-	public static void printRegion(Player player, Region region) {
-		MessageUtils.sendMessage(player, RegionText.REGION_INFO.getValue() + ": " + region.getName(), TextColors.GOLD);
-		MessageUtils.sendMessage(player, RegionText.TYPE.getValue() + ": " + region.getType().toString(),
+	public static void printRegion(CommandSource source, Region region) {
+		MessageUtils.sendMessage(source, RegionText.REGION_INFO.getValue() + ": " + region.getName(), TextColors.GOLD);
+		MessageUtils.sendMessage(source, RegionText.TYPE.getValue() + ": " + region.getType().toString(),
 				TextColors.YELLOW);
 		if (region.isLocal()) {
 			LocalRegion localRegion = (LocalRegion) region;
-			MessageUtils.sendMessage(player,
+			MessageUtils.sendMessage(source,
 					RegionText.PRIORITY.getValue() + ": " + String.valueOf(localRegion.getPriority()),
 					TextColors.YELLOW);
-			if(!localRegion.getFarewellMessage().isEmpty())
-				MessageUtils.sendMessage(player,
-						RegionText.FAREWELL_MESSAGE.getValue() + ": " + localRegion.getFarewellMessage(), TextColors.RED);
-			if(!localRegion.getGreetingMessage().isEmpty())
-				MessageUtils.sendMessage(player,
-						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(), TextColors.GREEN);
+			if (!localRegion.getFarewellMessage().isEmpty())
+				MessageUtils.sendMessage(source,
+						RegionText.FAREWELL_MESSAGE.getValue() + ": " + localRegion.getFarewellMessage(),
+						TextColors.RED);
+			if (!localRegion.getGreetingMessage().isEmpty())
+				MessageUtils.sendMessage(source,
+						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(),
+						TextColors.GREEN);
 			if (!localRegion.getFlag(EnumRegionFlag.HIDE_LOCATIONS)) {
-				MessageUtils.sendMessage(player,
+				MessageUtils.sendMessage(source,
 						RegionText.FROM.getValue() + ": " + localRegion.getFirstPoint().toString(), TextColors.AQUA);
-				MessageUtils.sendMessage(player,
+				MessageUtils.sendMessage(source,
 						RegionText.TO.getValue() + ": " + localRegion.getSecondPoint().toString(), TextColors.AQUA);
-				MessageUtils.sendMessage(player,
+				MessageUtils.sendMessage(source,
 						RegionText.TELEPORT.getValue() + ": " + localRegion.getTeleportLocation().toString(),
 						TextColors.AQUA);
-				MessageUtils.sendMessage(player,
+				MessageUtils.sendMessage(source,
 						RegionText.SPAWN.getValue() + ": " + localRegion.getSpawnLocation().toString(),
 						TextColors.AQUA);
 			}
 			if (!localRegion.getFlag(EnumRegionFlag.HIDE_MEMBERS)) {
-				MessageUtils.sendMessage(player, RegionText.MEMBERS.getValue(), TextColors.YELLOW);
+				MessageUtils.sendMessage(source, RegionText.MEMBERS.getValue(), TextColors.YELLOW);
 				ArrayList<Text> members = new ArrayList<Text>();
 				for (int i = 0; i < localRegion.getMembers().size(); i++) {
 					RegionMember member = localRegion.getMembers().get(i);
 					members.add(Text.of(
-							member.getUUID().equals(player.getUniqueId()) ? TextColors.AQUA
+							source instanceof Player && member.getUUID().equals(((Player)source).getUniqueId()) ? TextColors.AQUA
 									: isOnline(member.getUUID()) ? TextColors.GREEN : TextColors.RED,
 							member.getUsername(), i < localRegion.getMembers().size() - 1 ? ", " : ""));
 				}
-				player.sendMessage(Text.of(members.toArray()));
+				source.sendMessage(Text.of(members.toArray()));
 			}
 		}
 		if (!region.getFlag(EnumRegionFlag.HIDE_FLAGS)) {
-			MessageUtils.sendMessage(player, RegionText.FLAGS.getValue(), TextColors.YELLOW);
+			MessageUtils.sendMessage(source, RegionText.FLAGS.getValue(), TextColors.YELLOW);
 			ArrayList<Text> flags = new ArrayList<Text>();
 			for (int i = 0; i < region.getFlags().size(); i++) {
 				RegionFlag flag = region.getFlags().get(i);
 				flags.add(Text.of(flag.getValue() ? TextColors.GREEN : TextColors.RED, flag.getName(),
 						i < region.getFlags().size() - 1 ? ", " : ""));
 			}
-			player.sendMessage(Text.of(flags.toArray()));
-			MessageUtils.sendMessage(player, RegionText.INTERACTS.getValue(), TextColors.YELLOW);
+			source.sendMessage(Text.of(flags.toArray()));
+			MessageUtils.sendMessage(source, RegionText.INTERACTS.getValue(), TextColors.YELLOW);
 			ArrayList<Text> interacts = new ArrayList<Text>();
 			for (int i = 0; i < region.getInteracts().size(); i++) {
 				RegionInteract interact = region.getInteracts().get(i);
 				interacts.add(Text.of(interact.isEnabled() ? TextColors.GREEN : TextColors.RED, interact.getBlock(),
 						i < region.getInteracts().size() - 1 ? ", " : ""));
 			}
-			player.sendMessage(Text.of(interacts.toArray()));
-			MessageUtils.sendMessage(player, RegionText.EXPLOSIONS_DAMAGE.getValue(), TextColors.YELLOW);
+			source.sendMessage(Text.of(interacts.toArray()));
+			MessageUtils.sendMessage(source, RegionText.EXPLOSIONS_DAMAGE.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDamage = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
 				RegionExplosion explosion = region.getExplosions().get(i);
 				explosionsDamage.add(Text.of(explosion.getDamage() ? TextColors.GREEN : TextColors.RED,
 						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
 			}
-			player.sendMessage(Text.of(explosionsDamage.toArray()));
-			MessageUtils.sendMessage(player, RegionText.EXPLOSIONS_DESTROY.getValue(), TextColors.YELLOW);
+			source.sendMessage(Text.of(explosionsDamage.toArray()));
+			MessageUtils.sendMessage(source, RegionText.EXPLOSIONS_DESTROY.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
 				RegionExplosion explosion = region.getExplosions().get(i);
 				explosionsDestroy.add(Text.of(explosion.getDestroy() ? TextColors.GREEN : TextColors.RED,
 						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
 			}
-			player.sendMessage(Text.of(explosionsDestroy.toArray()));
+			source.sendMessage(Text.of(explosionsDestroy.toArray()));
 
-			MessageUtils.sendMessage(player, RegionText.VEHICLES_PLACE.getValue(), TextColors.YELLOW);
+			MessageUtils.sendMessage(source, RegionText.VEHICLES_PLACE.getValue(), TextColors.YELLOW);
 			ArrayList<Text> vehiclesPlace = new ArrayList<Text>();
 			for (int i = 0; i < region.getVehicles().size(); i++) {
 				RegionVehicle vehicle = region.getVehicles().get(i);
 				vehiclesPlace.add(Text.of(vehicle.getPlace() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
 						i < region.getVehicles().size() - 1 ? ", " : ""));
 			}
-			player.sendMessage(Text.of(vehiclesPlace.toArray()));
+			source.sendMessage(Text.of(vehiclesPlace.toArray()));
 
-			MessageUtils.sendMessage(player, RegionText.VEHICLES_DESTROY.getValue(), TextColors.YELLOW);
+			MessageUtils.sendMessage(source, RegionText.VEHICLES_DESTROY.getValue(), TextColors.YELLOW);
 			ArrayList<Text> vehiclesDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getVehicles().size(); i++) {
 				RegionVehicle vehicle = region.getVehicles().get(i);
 				vehiclesDestroy.add(Text.of(vehicle.getDestroy() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
 						i < region.getVehicles().size() - 1 ? ", " : ""));
 			}
-			player.sendMessage(Text.of(vehiclesDestroy.toArray()));
+			source.sendMessage(Text.of(vehiclesDestroy.toArray()));
 
 			if (region.getMobs().size() > 0) {
-				MessageUtils.sendMessage(player, RegionText.MOBS_SPAWN.getValue(), TextColors.YELLOW);
+				MessageUtils.sendMessage(source, RegionText.MOBS_SPAWN.getValue(), TextColors.YELLOW);
 				ArrayList<Text> mobsSpawn = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
 					mobsSpawn.add(Text.of(mob.getSpawn() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
 							i < region.getMobs().size() - 1 ? ", " : ""));
 				}
-				player.sendMessage(Text.of(mobsSpawn.toArray()));
+				source.sendMessage(Text.of(mobsSpawn.toArray()));
 
-				MessageUtils.sendMessage(player, RegionText.MOBS_PVE.getValue(), TextColors.YELLOW);
+				MessageUtils.sendMessage(source, RegionText.MOBS_PVE.getValue(), TextColors.YELLOW);
 				ArrayList<Text> mobsPve = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
 					mobsPve.add(Text.of(mob.getPve() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
 							i < region.getMobs().size() - 1 ? ", " : ""));
 				}
-				player.sendMessage(Text.of(mobsPve.toArray()));
+				source.sendMessage(Text.of(mobsPve.toArray()));
 
-				MessageUtils.sendMessage(player, RegionText.MOBS_DAMAGE.getValue(), TextColors.YELLOW);
+				MessageUtils.sendMessage(source, RegionText.MOBS_DAMAGE.getValue(), TextColors.YELLOW);
 				ArrayList<Text> mobsDamage = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
 					mobsDamage.add(Text.of(mob.getDamage() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
 							i < region.getMobs().size() - 1 ? ", " : ""));
 				}
-				player.sendMessage(Text.of(mobsDamage.toArray()));
+				source.sendMessage(Text.of(mobsDamage.toArray()));
 
-				MessageUtils.sendMessage(player, RegionText.MOBS_DROP.getValue(), TextColors.YELLOW);
+				MessageUtils.sendMessage(source, RegionText.MOBS_DROP.getValue(), TextColors.YELLOW);
 				ArrayList<Text> mobsDrop = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
 					mobsDrop.add(Text.of(mob.getDrop() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
 							i < region.getMobs().size() - 1 ? ", " : ""));
 				}
-				player.sendMessage(Text.of(mobsDrop.toArray()));
+				source.sendMessage(Text.of(mobsDrop.toArray()));
 
-				MessageUtils.sendMessage(player, RegionText.COMMANDS.getValue(), TextColors.YELLOW);
+				MessageUtils.sendMessage(source, RegionText.COMMANDS.getValue(), TextColors.YELLOW);
 				ArrayList<Text> commands = new ArrayList<Text>();
 				for (int i = 0; i < region.getCommands().size(); i++) {
 					RegionCommand command = region.getCommands().get(i);
 					commands.add(Text.of(command.isEnabled() ? TextColors.GREEN : TextColors.RED, command.getCommand(),
 							i < region.getCommands().size() - 1 ? ", " : ""));
 				}
-				player.sendMessage(Text.of(commands.toArray()));
+				source.sendMessage(Text.of(commands.toArray()));
 			}
 
 		}
@@ -739,8 +816,8 @@ public class RegionUtils {
 		}
 
 		Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-		if(userStorage.isPresent() && userStorage.get().get(uuid).isPresent()) {
-			if(userStorage.get().get(uuid).get().getPlayer().isPresent())
+		if (userStorage.isPresent() && userStorage.get().get(uuid).isPresent()) {
+			if (userStorage.get().get(uuid).get().getPlayer().isPresent())
 				return userStorage.get().get(uuid).get().getPlayer().get();
 			return null;
 		}
@@ -764,7 +841,7 @@ public class RegionUtils {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get the member of a Region by UUID
 	 * 
@@ -782,7 +859,7 @@ public class RegionUtils {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Check if a player is a member of a Region
 	 * 
@@ -793,7 +870,10 @@ public class RegionUtils {
 	 * @return true if the player is a member of that Region, false otherwise
 	 */
 	public static boolean isMemberByUUID(Region region, UUID player) {
-		return isMember(region, getPlayer(player));
+		if (region.isLocal()) {
+			return getMember((LocalRegion) region, player) != null;
+		}
+		return false;
 	}
 
 	/**
@@ -856,7 +936,7 @@ public class RegionUtils {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Check if a player has a Region given it's UUID
 	 * 
@@ -873,71 +953,71 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Shows the Help page header for a player
+	 * Shows the Help page header for a CommandSource
 	 * 
-	 * @param player
-	 *            The player
+	 * @param source
+	 *            The command source
 	 * @param page
 	 *            The page to display
 	 */
-	public static void printHelpHeader(Player player, int page) {
-		MessageUtils.sendMessage(player, RegionText.HELP.getValue() + "(" + String.valueOf(page) + "/5)",
+	public static void printHelpHeader(CommandSource source, int page) {
+		MessageUtils.sendMessage(source, RegionText.HELP.getValue() + "(" + String.valueOf(page) + "/5)",
 				TextColors.GOLD);
 	}
 
 	/**
-	 * Shows the FlagHelp page header for a player
+	 * Shows the FlagHelp page header for a CommandSource
 	 * 
-	 * @param player
-	 *            The player
+	 * @param source
+	 *            The command source
 	 * @param page
 	 *            The page to display
 	 */
-	public static void printFlagHelpHeader(Player player, int page) {
-		MessageUtils.sendMessage(player, RegionText.FLAG_HELP.getValue() + "(" + String.valueOf(page) + "/10)",
+	public static void printFlagHelpHeader(CommandSource source, int page) {
+		MessageUtils.sendMessage(source, RegionText.FLAG_HELP.getValue() + "(" + String.valueOf(page) + "/10)",
 				TextColors.GOLD);
 	}
 
 	/**
-	 * Shows the command help text for a player
+	 * Shows the command help text for a CommandSource
 	 * 
 	 * @param player
-	 *            The player
+	 *            The source
 	 * @param command
 	 *            The command
 	 * @param text
 	 *            The help text
 	 */
-	public static void printHelpFor(Player player, String command, RegionText text) {
-		MessageUtils.sendMessage(player, "/rg " + command + " - " + text.getValue(), TextColors.YELLOW);
+	public static void printHelpFor(CommandSource source, String command, RegionText text) {
+		MessageUtils.sendMessage(source, "/rg " + command + " - " + text.getValue(), TextColors.YELLOW);
 	}
 
 	/**
-	 * Shows the flag help text for a player
+	 * Shows the flag help text for a C
 	 * 
-	 * @param player
+	 * @param source
 	 *            The player
 	 * @param flag
 	 *            The flag
 	 * @param text
 	 *            The help text
 	 */
-	public static void printFlagHelpFor(Player player, EnumRegionFlag flag, RegionText text) {
-		printFlagHelpFor(player, flag.getName(), text);
+	public static void printFlagHelpFor(CommandSource source, EnumRegionFlag flag, RegionText text) {
+		printFlagHelpFor(source, flag.getName(), text);
 	}
 
 	/**
-	 * Shows the flag help text for a player
+	 * Shows the flag help text for a CommandSource
 	 * 
-	 * @param player
-	 *            The player
+	 * @param source
+	 *            The command source
 	 * @param flag
 	 *            The flag
 	 * @param text
 	 *            The help text
 	 */
-	public static void printFlagHelpFor(Player player, String flag, RegionText text) {
-		MessageUtils.sendMessage(player, flag + " - " + text.getValue(), TextColors.YELLOW);
+	public static void printFlagHelpFor(CommandSource source, String flag, RegionText text) {
+		MessageUtils.sendMessage(source, flag + " - " + text.getValue(), TextColors.YELLOW);
 	}
 
 	/**
@@ -982,7 +1062,7 @@ public class RegionUtils {
 		LocalRegion localRegion = getLocalRegion(location);
 		return localRegion != null ? localRegion : getGlobalRegion(location);
 	}
-	
+
 	/**
 	 * Get all Regions at a location
 	 * 
@@ -1029,7 +1109,7 @@ public class RegionUtils {
 		}
 		return regions;
 	}
-	
+
 	/**
 	 * Get a GlobalRegion at a location
 	 * 
@@ -1087,12 +1167,10 @@ public class RegionUtils {
 				if (type.equals(RegionEventType.LOCAL)) {
 					if (region.isLocal())
 						cancel = cancel && !RegionUtils.hasPermission(player, region);
-					else
-						if(PermissionUtils.hasPermission(player, RegionPermission.REGION))
-							cancel = false;
-				} else
-					if(PermissionUtils.hasPermission(player, RegionPermission.REGION))
+					else if (PermissionUtils.hasPermission(player, RegionPermission.REGION))
 						cancel = false;
+				} else if (PermissionUtils.hasPermission(player, RegionPermission.REGION))
+					cancel = false;
 			}
 			if (cancel) {
 				if (event != null)
@@ -1130,137 +1208,136 @@ public class RegionUtils {
 	}
 
 	/**
-	 * Shows a help page for a player
+	 * Shows a help page for a CommandSource
 	 * 
-	 * @param player
-	 *            The player
+	 * @param source
+	 *            The command source
 	 * @param page
 	 *            The page
 	 */
-	public static void printHelpPage(Player player, int page) {
-		printHelpHeader(player, page);
+	public static void printHelpPage(CommandSource source, int page) {
+		printHelpHeader(source, page);
 		switch (page) {
 		case 1:
 		default:
-			printHelpFor(player, "", RegionText.REGION_HELP_RG);
-			printHelpFor(player, "save", RegionText.REGION_HELP_SAVE);
-			printHelpFor(player, "info [region]", RegionText.REGION_HELP_INFO);
-			printHelpFor(player, "delete [region]", RegionText.REGION_HELP_DELETE);
-			printHelpFor(player, "name [name]", RegionText.REGION_HELP_NAME);
+			printHelpFor(source, "", RegionText.REGION_HELP_RG);
+			printHelpFor(source, "save", RegionText.REGION_HELP_SAVE);
+			printHelpFor(source, "info [region]", RegionText.REGION_HELP_INFO);
+			printHelpFor(source, "delete [region]", RegionText.REGION_HELP_DELETE);
+			printHelpFor(source, "name [name]", RegionText.REGION_HELP_NAME);
 			break;
 		case 2:
-			printHelpFor(player, "list", RegionText.REGION_HELP_LIST);
-			printHelpFor(player, "gamemode [gamemode]", RegionText.REGION_HELP_GAMEMODE);
-			printHelpFor(player, "edit [region]", RegionText.REGION_HELP_EDIT);
-			printHelpFor(player, "flag [subflag] [flag] [value]", RegionText.REGION_HELP_FLAG);
-			printHelpFor(player, "add [role] [player] (region)", RegionText.REGION_HELP_ADD);
+			printHelpFor(source, "list", RegionText.REGION_HELP_LIST);
+			printHelpFor(source, "gamemode [gamemode]", RegionText.REGION_HELP_GAMEMODE);
+			printHelpFor(source, "edit [region]", RegionText.REGION_HELP_EDIT);
+			printHelpFor(source, "flag [subflag] [flag] [value]", RegionText.REGION_HELP_FLAG);
+			printHelpFor(source, "add [role] [player] (region)", RegionText.REGION_HELP_ADD);
 			break;
 		case 3:
-			printHelpFor(player, "remove [player] (region)", RegionText.REGION_HELP_REMOVE);
-			printHelpFor(player, "setteleport [x] [y] [z]", RegionText.REGION_HELP_SET_TELEPORT);
-			printHelpFor(player, "setspawn [x] [y] [z]", RegionText.REGION_HELP_SET_SPAWN);
-			printHelpFor(player, "teleport [region]", RegionText.REGION_HELP_TELEPORT);
-			printHelpFor(player, "spawn [region]", RegionText.REGION_HELP_SPAWN);
+			printHelpFor(source, "remove [player] (region)", RegionText.REGION_HELP_REMOVE);
+			printHelpFor(source, "setteleport [x] [y] [z]", RegionText.REGION_HELP_SET_TELEPORT);
+			printHelpFor(source, "setspawn [x] [y] [z]", RegionText.REGION_HELP_SET_SPAWN);
+			printHelpFor(source, "teleport [region]", RegionText.REGION_HELP_TELEPORT);
+			printHelpFor(source, "spawn [region]", RegionText.REGION_HELP_SPAWN);
 			break;
 		case 4:
-			printHelpFor(player, "priority [priority]", RegionText.REGION_HELP_PRIORITY);
-			printHelpFor(player, "command [command]", RegionText.REGION_HELP_COMMAND);
-			printHelpFor(player, "expand [direction] (blocks)", RegionText.REGION_HELP_EXPAND);
-			printHelpFor(player, "here", RegionText.REGION_HELP_HERE);
-			printHelpFor(player, "reload", RegionText.REGION_HELP_RELOAD);
+			printHelpFor(source, "priority [priority]", RegionText.REGION_HELP_PRIORITY);
+			printHelpFor(source, "command [command]", RegionText.REGION_HELP_COMMAND);
+			printHelpFor(source, "expand [direction] (blocks)", RegionText.REGION_HELP_EXPAND);
+			printHelpFor(source, "here", RegionText.REGION_HELP_HERE);
+			printHelpFor(source, "reload", RegionText.REGION_HELP_RELOAD);
 			break;
 		case 5:
-			printHelpFor(player, "farewell", RegionText.REGION_HELP_FAREWELL);
-			printHelpFor(player, "greeting", RegionText.REGION_HELP_GREETING);
-			printHelpFor(player, "help (flag) (page)", RegionText.REGION_HELP_HELP);
+			printHelpFor(source, "farewell", RegionText.REGION_HELP_FAREWELL);
+			printHelpFor(source, "greeting", RegionText.REGION_HELP_GREETING);
+			printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 			break;
 		}
 	}
 
 	/**
-	 * Shows a flag help page for a player
+	 * Shows a flag help page for a CommandSource
 	 * 
-	 * @param player
-	 *            The player
+	 * @param source
+	 *            The command source
 	 * @param page
 	 *            The page
 	 */
-	public static void printFlagHelpPage(Player player, int page) {
-		printFlagHelpHeader(player, page);
+	public static void printFlagHelpPage(CommandSource source, int page) {
+		printFlagHelpHeader(source, page);
 		switch (page) {
 		case 1:
 		default:
-			printFlagHelpFor(player, EnumRegionFlag.PLACE, RegionText.REGION_FLAG_HELP_PLACE);
-			printFlagHelpFor(player, EnumRegionFlag.DESTROY, RegionText.REGION_FLAG_HELP_DESTROY);
-			printFlagHelpFor(player, EnumRegionFlag.PVP, RegionText.REGION_FLAG_HELP_PVP);
-			printFlagHelpFor(player, EnumRegionFlag.EXP_DROP, RegionText.REGION_FLAG_HELP_EXP_DROP);
-			printFlagHelpFor(player, EnumRegionFlag.ITEM_DROP, RegionText.REGION_FLAG_HELP_ITEM_DROP);
+			printFlagHelpFor(source, EnumRegionFlag.PLACE, RegionText.REGION_FLAG_HELP_PLACE);
+			printFlagHelpFor(source, EnumRegionFlag.DESTROY, RegionText.REGION_FLAG_HELP_DESTROY);
+			printFlagHelpFor(source, EnumRegionFlag.PVP, RegionText.REGION_FLAG_HELP_PVP);
+			printFlagHelpFor(source, EnumRegionFlag.EXP_DROP, RegionText.REGION_FLAG_HELP_EXP_DROP);
+			printFlagHelpFor(source, EnumRegionFlag.ITEM_DROP, RegionText.REGION_FLAG_HELP_ITEM_DROP);
 			break;
 		case 2:
-			printFlagHelpFor(player, EnumRegionFlag.ENDERPEARL, RegionText.REGION_FLAG_HELP_ENDERPEARL);
-			printFlagHelpFor(player, EnumRegionFlag.SLEEP, RegionText.REGION_FLAG_HELP_SLEEP);
-			printFlagHelpFor(player, EnumRegionFlag.LIGHTER, RegionText.REGION_FLAG_HELP_LIGHTER);
-			printFlagHelpFor(player, EnumRegionFlag.CHESTS, RegionText.REGION_FLAG_HELP_CHESTS);
-			printFlagHelpFor(player, EnumRegionFlag.TRAPPED_CHESTS, RegionText.REGION_FLAG_HELP_TRAPPED_CHESTS);
+			printFlagHelpFor(source, EnumRegionFlag.ENDERPEARL, RegionText.REGION_FLAG_HELP_ENDERPEARL);
+			printFlagHelpFor(source, EnumRegionFlag.SLEEP, RegionText.REGION_FLAG_HELP_SLEEP);
+			printFlagHelpFor(source, EnumRegionFlag.LIGHTER, RegionText.REGION_FLAG_HELP_LIGHTER);
+			printFlagHelpFor(source, EnumRegionFlag.CHESTS, RegionText.REGION_FLAG_HELP_CHESTS);
+			printFlagHelpFor(source, EnumRegionFlag.TRAPPED_CHESTS, RegionText.REGION_FLAG_HELP_TRAPPED_CHESTS);
 			break;
 		case 3:
-			printFlagHelpFor(player, EnumRegionFlag.WATER_FLOW, RegionText.REGION_FLAG_HELP_WATER_FLOW);
-			printFlagHelpFor(player, EnumRegionFlag.LAVA_FLOW, RegionText.REGION_FLAG_HELP_LAVA_FLOW);
-			printFlagHelpFor(player, EnumRegionFlag.LEAF_DECAY, RegionText.REGION_FLAG_HELP_LEAF_DECAY);
-			printFlagHelpFor(player, EnumRegionFlag.FIRE_SPREAD, RegionText.REGION_FLAG_HELP_FIRE_SPREAD);
-			printFlagHelpFor(player, EnumRegionFlag.POTION_SPLASH, RegionText.REGION_FLAG_HELP_POTION_SPLASH);
+			printFlagHelpFor(source, EnumRegionFlag.WATER_FLOW, RegionText.REGION_FLAG_HELP_WATER_FLOW);
+			printFlagHelpFor(source, EnumRegionFlag.LAVA_FLOW, RegionText.REGION_FLAG_HELP_LAVA_FLOW);
+			printFlagHelpFor(source, EnumRegionFlag.LEAF_DECAY, RegionText.REGION_FLAG_HELP_LEAF_DECAY);
+			printFlagHelpFor(source, EnumRegionFlag.FIRE_SPREAD, RegionText.REGION_FLAG_HELP_FIRE_SPREAD);
+			printFlagHelpFor(source, EnumRegionFlag.POTION_SPLASH, RegionText.REGION_FLAG_HELP_POTION_SPLASH);
 			break;
 		case 4:
-			printFlagHelpFor(player, EnumRegionFlag.FALL_DAMAGE, RegionText.REGION_FLAG_HELP_FALL_DAMAGE);
-			printFlagHelpFor(player, EnumRegionFlag.CAN_TP, RegionText.REGION_FLAG_HELP_CAN_TP);
-			printFlagHelpFor(player, EnumRegionFlag.CAN_SPAWN, RegionText.REGION_FLAG_HELP_CAN_SPAWN);
-			printFlagHelpFor(player, EnumRegionFlag.HUNGER, RegionText.REGION_FLAG_HELP_HUNGER);
-			printFlagHelpFor(player, EnumRegionFlag.ENDER_CHESTS, RegionText.REGION_FLAG_HELP_ENDER_CHESTS);
+			printFlagHelpFor(source, EnumRegionFlag.FALL_DAMAGE, RegionText.REGION_FLAG_HELP_FALL_DAMAGE);
+			printFlagHelpFor(source, EnumRegionFlag.CAN_TP, RegionText.REGION_FLAG_HELP_CAN_TP);
+			printFlagHelpFor(source, EnumRegionFlag.CAN_SPAWN, RegionText.REGION_FLAG_HELP_CAN_SPAWN);
+			printFlagHelpFor(source, EnumRegionFlag.HUNGER, RegionText.REGION_FLAG_HELP_HUNGER);
+			printFlagHelpFor(source, EnumRegionFlag.ENDER_CHESTS, RegionText.REGION_FLAG_HELP_ENDER_CHESTS);
 			break;
 		case 5:
-			printFlagHelpFor(player, EnumRegionFlag.WALL_DAMAGE, RegionText.REGION_FLAG_HELP_WALL_DAMAGE);
-			printFlagHelpFor(player, EnumRegionFlag.DROWN, RegionText.REGION_FLAG_HELP_DROWN);
-			printFlagHelpFor(player, EnumRegionFlag.INVINCIBLE, RegionText.REGION_FLAG_HELP_INVINCIBLE);
-			printFlagHelpFor(player, EnumRegionFlag.CACTUS_DAMAGE, RegionText.REGION_FLAG_HELP_CACTUS_DAMAGE);
-			printFlagHelpFor(player, EnumRegionFlag.FIRE_DAMAGE, RegionText.REGION_FLAG_HELP_FIRE_DAMAGE);
+			printFlagHelpFor(source, EnumRegionFlag.WALL_DAMAGE, RegionText.REGION_FLAG_HELP_WALL_DAMAGE);
+			printFlagHelpFor(source, EnumRegionFlag.DROWN, RegionText.REGION_FLAG_HELP_DROWN);
+			printFlagHelpFor(source, EnumRegionFlag.INVINCIBLE, RegionText.REGION_FLAG_HELP_INVINCIBLE);
+			printFlagHelpFor(source, EnumRegionFlag.CACTUS_DAMAGE, RegionText.REGION_FLAG_HELP_CACTUS_DAMAGE);
+			printFlagHelpFor(source, EnumRegionFlag.FIRE_DAMAGE, RegionText.REGION_FLAG_HELP_FIRE_DAMAGE);
 			break;
 		case 6:
-			printFlagHelpFor(player, EnumRegionFlag.HIDE_LOCATIONS, RegionText.REGION_FLAG_HELP_HIDE_LOCATIONS);
-			printFlagHelpFor(player, EnumRegionFlag.HIDE_FLAGS, RegionText.REGION_FLAG_HELP_HIDE_FLAGS);
-			printFlagHelpFor(player, EnumRegionFlag.HIDE_MEMBERS, RegionText.REGION_FLAG_HELP_HIDE_MEMBERS);
-			printFlagHelpFor(player, EnumRegionFlag.SEND_CHAT, RegionText.REGION_FLAG_HELP_SEND_CHAT);
-			printFlagHelpFor(player, EnumRegionFlag.ENDERMAN_GRIEF, RegionText.REGION_FLAG_HELP_ENDERMAN_GRIEF);
+			printFlagHelpFor(source, EnumRegionFlag.HIDE_LOCATIONS, RegionText.REGION_FLAG_HELP_HIDE_LOCATIONS);
+			printFlagHelpFor(source, EnumRegionFlag.HIDE_FLAGS, RegionText.REGION_FLAG_HELP_HIDE_FLAGS);
+			printFlagHelpFor(source, EnumRegionFlag.HIDE_MEMBERS, RegionText.REGION_FLAG_HELP_HIDE_MEMBERS);
+			printFlagHelpFor(source, EnumRegionFlag.SEND_CHAT, RegionText.REGION_FLAG_HELP_SEND_CHAT);
+			printFlagHelpFor(source, EnumRegionFlag.ENDERMAN_GRIEF, RegionText.REGION_FLAG_HELP_ENDERMAN_GRIEF);
 			break;
 		case 7:
-			printFlagHelpFor(player, EnumRegionFlag.ENDER_DRAGON_BLOCK_DAMAGE,
+			printFlagHelpFor(source, EnumRegionFlag.ENDER_DRAGON_BLOCK_DAMAGE,
 					RegionText.REGION_FLAG_HELP_ENDER_DRAGON_BLOCK_DAMAGE);
-			printFlagHelpFor(player, EnumRegionFlag.ENDER_DRAGON_BLOCK_DAMAGE,
+			printFlagHelpFor(source, EnumRegionFlag.ENDER_DRAGON_BLOCK_DAMAGE,
 					RegionText.REGION_FLAG_HELP_ENDER_DRAGON_BLOCK_DAMAGE);
-			printFlagHelpFor(player, "interact", RegionText.REGION_FLAG_HELP_INTERACT);
-			printFlagHelpFor(player, "vehiceplace", RegionText.REGION_FLAG_HELP_VEHICLE_PLACE);
-			printFlagHelpFor(player, "vehicedestroy", RegionText.REGION_FLAG_HELP_VEHICLE_DESTROY);
+			printFlagHelpFor(source, "interact", RegionText.REGION_FLAG_HELP_INTERACT);
+			printFlagHelpFor(source, "vehiceplace", RegionText.REGION_FLAG_HELP_VEHICLE_PLACE);
+			printFlagHelpFor(source, "vehicedestroy", RegionText.REGION_FLAG_HELP_VEHICLE_DESTROY);
 			break;
 		case 8:
-			printFlagHelpFor(player, "explosiondamage", RegionText.REGION_FLAG_HELP_EXPLOSION_DAMAGE);
-			printFlagHelpFor(player, "explosiondestroy", RegionText.REGION_FLAG_HELP_EXPLOSION_DESTROY);
-			printFlagHelpFor(player, "mobspawn", RegionText.REGION_FLAG_HELP_MOB_SPAWN);
-			printFlagHelpFor(player, "mobdamage", RegionText.REGION_FLAG_HELP_MOB_DAMAGE);
-			printFlagHelpFor(player, "mobpve", RegionText.REGION_FLAG_HELP_MOB_PVE);
+			printFlagHelpFor(source, "explosiondamage", RegionText.REGION_FLAG_HELP_EXPLOSION_DAMAGE);
+			printFlagHelpFor(source, "explosiondestroy", RegionText.REGION_FLAG_HELP_EXPLOSION_DESTROY);
+			printFlagHelpFor(source, "mobspawn", RegionText.REGION_FLAG_HELP_MOB_SPAWN);
+			printFlagHelpFor(source, "mobdamage", RegionText.REGION_FLAG_HELP_MOB_DAMAGE);
+			printFlagHelpFor(source, "mobpve", RegionText.REGION_FLAG_HELP_MOB_PVE);
 			break;
 		case 9:
-			printFlagHelpFor(player, EnumRegionFlag.ITEM_PICKUP, RegionText.REGION_FLAG_HELP_ITEM_PICKUP);
-			printFlagHelpFor(player, EnumRegionFlag.OTHER_LIQUIDS_FLOW, RegionText.REGION_FLAG_HELP_OTHER_LIQUIDS_FLOW);
-			printFlagHelpFor(player, EnumRegionFlag.HIDE_REGION, RegionText.REGION_FLAG_HELP_HIDE_REGION);
-			printFlagHelpFor(player, EnumRegionFlag.ICE_MELT, RegionText.REGION_FLAG_HELP_ICE_MELT);
-			printFlagHelpFor(player, EnumRegionFlag.VINES_GROWTH, RegionText.REGION_FLAG_HELP_VINES_GROWTH);
+			printFlagHelpFor(source, EnumRegionFlag.ITEM_PICKUP, RegionText.REGION_FLAG_HELP_ITEM_PICKUP);
+			printFlagHelpFor(source, EnumRegionFlag.OTHER_LIQUIDS_FLOW, RegionText.REGION_FLAG_HELP_OTHER_LIQUIDS_FLOW);
+			printFlagHelpFor(source, EnumRegionFlag.HIDE_REGION, RegionText.REGION_FLAG_HELP_HIDE_REGION);
+			printFlagHelpFor(source, EnumRegionFlag.ICE_MELT, RegionText.REGION_FLAG_HELP_ICE_MELT);
+			printFlagHelpFor(source, EnumRegionFlag.VINES_GROWTH, RegionText.REGION_FLAG_HELP_VINES_GROWTH);
 			break;
 		case 10:
-			printFlagHelpFor(player, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
-			printFlagHelpFor(player, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
+			printFlagHelpFor(source, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
+			printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
 			break;
 		}
 	}
-	
 
 	/**
 	 * Get a player from it's username. Used to get datas about offline players that has been
@@ -1282,6 +1359,23 @@ public class RegionUtils {
 
 		return null;
 	}
+	
+	public static void setRegionScoreboard(Player player, LocalRegion region) {
+		Scoreboard scoreboard = Scoreboard.builder().build();
+        Objective objective = Objective.builder().name("Region").displayName(Text.of(TextColors.GOLD, "Region")).criterion(Criteria.DUMMY).build();
+        scoreboard.addObjective(objective);
+        scoreboard.updateDisplaySlot(objective, DisplaySlots.SIDEBAR);
+        
+        objective.getOrCreateScore(Text.of("Type: " + region.getType().name())).setScore(10);
+        if(region.getName() != null && !region.getName().isEmpty())
+        	objective.getOrCreateScore(Text.of("Name: " + region.getName())).setScore(5);
+        if(region.getFirstPoint() != null)
+        	objective.getOrCreateScore(Text.of("From: " + region.getFirstPoint().toString())).setScore(1);
+        if(region.getSecondPoint() != null)
+        	objective.getOrCreateScore(Text.of("To: " + region.getSecondPoint().toString())).setScore(0);
+        
+        player.setScoreboard(scoreboard);
+	}
 
 	/**
 	 * Get the JSON file of a Region
@@ -1302,7 +1396,7 @@ public class RegionUtils {
 		return new File((region.getType() == RegionType.LOCAL ? getRegionFolder() : getGlobalRegionFolder()) + "/"
 				+ region.getId().toString() + ".json");
 	}
-	
+
 	/**
 	 * Get the JSON file of a Region based on it's name
 	 * 

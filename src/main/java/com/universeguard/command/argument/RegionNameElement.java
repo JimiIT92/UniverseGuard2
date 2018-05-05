@@ -26,6 +26,7 @@ public class RegionNameElement extends PatternMatchingCommandElement{
 		for (Region region : UniverseGuard.ALL_REGIONS) {
 			regions.add(region.getName());
 		}
+		
 		return regions;
 	}
 
@@ -33,7 +34,4 @@ public class RegionNameElement extends PatternMatchingCommandElement{
 	protected Object getValue(String choice) throws IllegalArgumentException {
 		return choice;
 	}
-	
-
-
 }

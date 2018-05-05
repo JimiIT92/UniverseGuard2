@@ -14,7 +14,6 @@ import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.Enchantments;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
@@ -22,6 +21,8 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+
+import com.universeguard.UniverseGuard;
 
 /**
  * 
@@ -36,7 +37,7 @@ public class InventoryUtils {
 	 * @return The Region Selector ItemStack
 	 */
 	public static ItemStack getSelector() {
-		ItemStack selector = getItemStack(ItemTypes.STICK);
+		ItemStack selector = getItemStack(UniverseGuard.SELECTOR_ITEM);
 		selector.offer(Keys.DISPLAY_NAME, Text.of(TextColors.LIGHT_PURPLE, "Region Selector"));
 		selector.offer(Keys.ITEM_ENCHANTMENTS, Arrays.asList(new ItemEnchantment(Enchantments.INFINITY, 1)));
 		selector.offer(Keys.UNBREAKABLE, true);
@@ -54,7 +55,7 @@ public class InventoryUtils {
 		if(itemStack.get(Keys.DISPLAY_NAME).isPresent()) {
 			Text text = itemStack.get(Keys.DISPLAY_NAME).get();
 			Text selectorText = selector.get(Keys.DISPLAY_NAME).get();
-			return text.equals(selectorText);
+			return text.equals(selectorText) && selector.getItem().equals(itemStack.getItem());
 		}
 		return false;
 	}

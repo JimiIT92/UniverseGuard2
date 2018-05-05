@@ -12,7 +12,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionText;
@@ -29,27 +28,24 @@ public class RegionEditExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if(src instanceof Player) {
-			Player player = (Player) src;
-			if(!RegionUtils.hasPendingRegion(player)) {
-				if(args.hasAny("name")) {
-					Region region = RegionUtils.load(args.<String>getOne("name").get());
-					if(region != null) {
-						MessageUtils.sendSuccessMessage(player, RegionText.PENDING_REGION_UPDATED.getValue());
-						if(region.isGlobal())
-							MessageUtils.sendErrorMessage(player, RegionText.EDITING_GLOBAL.getValue());
-						MessageUtils.sendSuccessMessage(player, RegionText.EDITING.getValue() + ": " + region.getName());
-						RegionUtils.updatePendingRegion(player, region);
-					}
-					else
-						MessageUtils.sendErrorMessage(player, RegionText.REGION_NOT_FOUND.getValue());
+		if(!RegionUtils.hasPendingRegion(src)) {
+			if(args.hasAny("name")) {
+				Region region = RegionUtils.load(args.<String>getOne("name").get());
+				if(region != null) {
+					MessageUtils.sendSuccessMessage(src, RegionText.PENDING_REGION_UPDATED.getValue());
+					if(region.isGlobal())
+						MessageUtils.sendErrorMessage(src, RegionText.EDITING_GLOBAL.getValue());
+					MessageUtils.sendSuccessMessage(src, RegionText.EDITING.getValue() + ": " + region.getName());
+					RegionUtils.updatePendingRegion(src, region);
 				}
-				else {
-					MessageUtils.sendErrorMessage(player, getCommandUsage());
-				}
-			} else
-				MessageUtils.sendErrorMessage(player, RegionText.PENDING_REGION.getValue());
-		}
+				else
+					MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_FOUND.getValue());
+			}
+			else {
+				MessageUtils.sendErrorMessage(src, getCommandUsage());
+			}
+		} else
+			MessageUtils.sendErrorMessage(src, RegionText.PENDING_REGION.getValue());
 		
 		return CommandResult.empty();
 	}

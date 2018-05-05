@@ -12,7 +12,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
@@ -30,30 +29,27 @@ public class RegionFarewellExecutor implements CommandExecutor {
 
 	@Override
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-		if(src instanceof Player) {
-			Player player = (Player) src;
-			if(RegionUtils.hasPendingRegion(player)) {
-				if(args.hasAny("message")) {
-					String message = args.<String>getOne("message").get();
-					if(message.trim().isEmpty())
-						MessageUtils.sendErrorMessage(player, RegionText.MESSAGE_EMPTY.getValue());
-					else {
-						Region region = RegionUtils.getPendingRegion(player);
-						if(region.isLocal()) {
-							((LocalRegion)region).setFarewellMessage(message);
-							MessageUtils.sendSuccessMessage(player, RegionText.REGION_FAREWELL_MESSAGE_UPDATED.getValue());
-							RegionUtils.updatePendingRegion(player, region);
-						} else
-							MessageUtils.sendErrorMessage(player, RegionText.REGION_LOCAL_ONLY.getValue());
-					}
-				}
+		if(RegionUtils.hasPendingRegion(src)) {
+			if(args.hasAny("message")) {
+				String message = args.<String>getOne("message").get();
+				if(message.trim().isEmpty())
+					MessageUtils.sendErrorMessage(src, RegionText.MESSAGE_EMPTY.getValue());
 				else {
-					MessageUtils.sendErrorMessage(player, getCommandUsage());
+					Region region = RegionUtils.getPendingRegion(src);
+					if(region.isLocal()) {
+						((LocalRegion)region).setFarewellMessage(message);
+						MessageUtils.sendSuccessMessage(src, RegionText.REGION_FAREWELL_MESSAGE_UPDATED.getValue());
+						RegionUtils.updatePendingRegion(src, region);
+					} else
+						MessageUtils.sendErrorMessage(src, RegionText.REGION_LOCAL_ONLY.getValue());
 				}
-				
-			} else
-				MessageUtils.sendErrorMessage(player, RegionText.NO_PENDING_REGION.getValue());
-		}
+			}
+			else {
+				MessageUtils.sendErrorMessage(src, getCommandUsage());
+			}
+			
+		} else
+			MessageUtils.sendErrorMessage(src, RegionText.NO_PENDING_REGION.getValue());
 		
 		return CommandResult.empty();
 	}
