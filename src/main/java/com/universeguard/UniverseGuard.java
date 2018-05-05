@@ -85,7 +85,6 @@ import com.universeguard.event.flags.FlagExplosionDamageListener;
 import com.universeguard.event.flags.FlagExplosionDestroyListener;
 import com.universeguard.event.flags.FlagFallDamageListener;
 import com.universeguard.event.flags.FlagFarewellListener;
-import com.universeguard.event.flags.FlagFieldsListener;
 import com.universeguard.event.flags.FlagFireDamageListener;
 import com.universeguard.event.flags.FlagFireSpreadListener;
 import com.universeguard.event.flags.FlagGamemodeListener;
