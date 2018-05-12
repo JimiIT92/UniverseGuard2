@@ -1,11 +1,5 @@
-apply plugin: 'java'
-
-repositories {
-    mavenCentral()
-    maven {
-        name = 'sponge'
-        url = 'https://repo.spongepowered.org/maven'
-    }
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
 }
 
 group = 'com.universeguard'
