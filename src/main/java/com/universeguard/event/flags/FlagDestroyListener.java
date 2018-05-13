@@ -10,6 +10,7 @@ package com.universeguard.event.flags;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
@@ -43,8 +44,11 @@ public class FlagDestroyListener {
 	public void onEntityDestroyed(InteractEntityEvent.Primary event, @First Player player) {
 		Entity targetEntity = event.getTargetEntity();
 		EntityType type = targetEntity.getType();
-		if(FlagUtils.isBlockEntity(type) || !(targetEntity instanceof Living))
-			this.handleEvent(event, targetEntity.getLocation(), player);
+		if(FlagUtils.isBlockEntity(type) || targetEntity instanceof TileEntity) {
+			if(this.handleEvent(event, targetEntity.getLocation(), player)) {
+			    player.getWorld().spawnEntity(targetEntity);
+            }
+		}
 	}
 	
 	@Listener
