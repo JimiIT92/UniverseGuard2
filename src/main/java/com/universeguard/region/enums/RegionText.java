@@ -159,6 +159,7 @@ public enum RegionText {
 	REGION_FLAG_HELP_EXIT("Sets if players can go outside of this region"),
 	REGION_FLAG_HELP_ENTER("Sets if players can get inside this region"),
 	REGION_FLAG_HELP_SEND_CHAT("Sets if players can send chat messages while in the region"),
+    REGION_FLAG_HELP_TRAMPLE("Sets if trampling on fields will break them in this region"),
 	REGION_FLAG_HELP_HIDE_LOCATIONS("Sets if region locations will not be displayed using the /rg info command"),
 	REGION_FLAG_HELP_HIDE_MEMBERS("Sets if region members will not be displayed using the /rg info command"),
 	REGION_FLAG_HELP_HIDE_FLAGS("Sets if region flags will not be displayed using the /rg info or the /rg flaginfo command"),
