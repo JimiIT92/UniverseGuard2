@@ -50,7 +50,8 @@ public enum EnumRegionFlag {
 	EXIT("exit", true),
 	ENTER("enter", true),
 	VINES_GROWTH("vinesgrowth", true),
-	SEND_CHAT("sendchat", true);
+	SEND_CHAT("sendchat", true),
+    TRAMPLE("trample", true);
 	
 	private String NAME;
 	private boolean VALUE;
