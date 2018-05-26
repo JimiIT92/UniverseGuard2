@@ -8,6 +8,7 @@
 package com.universeguard.event.flags;
 
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -70,7 +71,7 @@ public class FlagPlaceListener {
 	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @Root Player player) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
-			if (block.getLocation().isPresent()) {
+			if (block.getLocation().isPresent() && !block.getState().getType().equals(BlockTypes.FIRE)) {
 				Location<World> location = block.getLocation().get();
 				this.handleEvent(event, location, player);
 			}
