@@ -71,6 +71,14 @@ public class FlagUtils {
 			configNode.getNode("players", "unique_regions").setValue(UniverseGuard.UNIQUE_REGIONS).setComment("Sets if players can be in more Regions");
 		if(configNode.getNode("selector", "item").isVirtual())
 			configNode.getNode("selector", "item").setValue(UniverseGuard.SELECTOR_ITEM.getId());
+        if(configNode.getNode("regions", "limit_regions_size").isVirtual())
+            configNode.getNode("regions", "limit_regions_size").setValue(UniverseGuard.LIMIT_REGIONS_SIZE).setComment("Sets if Regions must have a max size");
+        if(configNode.getNode("regions", "max_region_size").isVirtual())
+            configNode.getNode("regions", "max_region_size").setValue(UniverseGuard.MAX_REGION_SIZE).setComment("The max size a Region can be. This represents the distance between the first and the second point.");
+        if(configNode.getNode("players", "limit_player_regions").isVirtual())
+            configNode.getNode("players", "limit_player_regions").setValue(UniverseGuard.LIMIT_PLAYER_REGIONS).setComment("Sets if players can be in a max amount of Regions");
+        if(configNode.getNode("players", "max_regions").isVirtual())
+            configNode.getNode("players", "max_regions").setValue(UniverseGuard.MAX_REGIONS).setComment("The max number of Regions a player ca be member or owner");
 	}
 	
 	/**
@@ -96,7 +104,23 @@ public class FlagUtils {
 		UniverseGuard.GAMEMODE_TIMER = configNode.getNode("timers", "gamemode").getInt();
 		UniverseGuard.ENTER_FLAG_TIMER = configNode.getNode("timers", "enter_flag").getInt();
 		UniverseGuard.UNIQUE_REGIONS = configNode.getNode("players", "unique_regions").getBoolean();
-		if(!configNode.getNode("selector", "item").isVirtual()) {
+		UniverseGuard.LIMIT_REGIONS_SIZE = configNode.getNode("regions", "limit_regions_size").getBoolean();
+        UniverseGuard.LIMIT_PLAYER_REGIONS = configNode.getNode("players", "limit_player_regions").getBoolean();
+        if(!configNode.getNode("regions", "max_region_size").isVirtual()) {
+            int maxRegionSize = configNode.getNode("regions", "max_region_size").getInt();
+            if(maxRegionSize > 0)
+                UniverseGuard.MAX_REGION_SIZE = maxRegionSize;
+            else
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGION_SIZE.getValue() + String.valueOf(UniverseGuard.MAX_REGION_SIZE));
+        }
+        if(!configNode.getNode("players", "max_regions").isVirtual()) {
+            int maxRegions = configNode.getNode("players", "max_regions").getInt();
+            if(maxRegions > 0)
+                UniverseGuard.MAX_REGIONS = maxRegions;
+            else
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
+        }
+        if(!configNode.getNode("selector", "item").isVirtual()) {
 			String id = configNode.getNode("selector", "item").getString();
 			Optional<ItemType> type = game.getRegistry().getType(ItemType.class, id);
 			if(type.isPresent())

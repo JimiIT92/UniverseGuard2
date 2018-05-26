@@ -9,6 +9,7 @@ package com.universeguard.command;
 
 import java.util.UUID;
 
+import com.universeguard.utils.PermissionUtils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -55,6 +56,10 @@ public class RegionAddExecutor implements CommandExecutor {
 						if(region.isLocal()) {
 							localRegion = (LocalRegion) region;
 							if(!RegionUtils.isMemberByUUID(localRegion, member)) {
+							    if(!UniverseGuard.UNIQUE_REGIONS && UniverseGuard.LIMIT_PLAYER_REGIONS && RegionUtils.getPlayerRegions(member).size() >= UniverseGuard.MAX_REGIONS) {
+							        MessageUtils.sendErrorMessage(src, RegionText.PLAYERS_MAX_REGIONS.getValue());
+							        return CommandResult.empty();
+                                }
 								localRegion.addMemberByUUIDAndUsername(member, username, role);
 								if(RegionUtils.save(localRegion)) {
 									MessageUtils.sendSuccessMessage(src, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + username);

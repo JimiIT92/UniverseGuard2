@@ -7,6 +7,7 @@
  */
 package com.universeguard.utils;
 
+import com.universeguard.UniverseGuard;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -50,7 +51,18 @@ public class RegionLocationUtils {
 	public static RegionLocation fromLocation(Player player, Location<World> location) {
 		return new RegionLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), getDimension(player), getWorld(player));
 	}
-	
+
+	public static boolean isMaxSize(LocalRegion region) {
+	    if(UniverseGuard.LIMIT_REGIONS_SIZE) {
+	        int distanceX = Math.abs(region.getFirstPoint().getX() - region.getSecondPoint().getX());
+            int distanceY = Math.abs(region.getFirstPoint().getY() - region.getSecondPoint().getY());
+            int distanceZ = Math.abs(region.getFirstPoint().getZ() - region.getSecondPoint().getZ());
+            int maxsize = UniverseGuard.MAX_REGION_SIZE;
+            return distanceX > maxsize || distanceY > maxsize || distanceZ > maxsize;
+        }
+	    return false;
+    }
+
 	/**
 	 * Reset the first or the second point of a Local Region based on the given direction
 	 * @param region The Region

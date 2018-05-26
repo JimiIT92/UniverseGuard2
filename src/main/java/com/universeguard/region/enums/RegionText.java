@@ -65,6 +65,8 @@ public enum RegionText {
 	REGION_NOT_REMOVED("Exception removing region. See log for details"),
 	REGION_NOT_FOUND("Region not found!"),
 	REGION_RELOAD("Regions reloaded!"),
+    REGION_MAX_SIZE("The Region is too big!"),
+    PLAYERS_MAX_REGIONS("That player can't be added into more Regions!"),
 	PENDING_REGION("You already have a pending region!"),
 	PENDING_REGION_UPDATED("Pending region updated!"),
 	REGION_GAMEMODE_UPDATED("Region gamemode updated!"),
@@ -160,6 +162,7 @@ public enum RegionText {
 	REGION_FLAG_HELP_ENTER("Sets if players can get inside this region"),
 	REGION_FLAG_HELP_SEND_CHAT("Sets if players can send chat messages while in the region"),
     REGION_FLAG_HELP_TRAMPLE("Sets if trampling on fields will break them in this region"),
+    REGION_FLAG_HELP_SHULKER_BOXES("Sets if non-members are allowed to open shulker boxes in the region"),
 	REGION_FLAG_HELP_HIDE_LOCATIONS("Sets if region locations will not be displayed using the /rg info command"),
 	REGION_FLAG_HELP_HIDE_MEMBERS("Sets if region members will not be displayed using the /rg info command"),
 	REGION_FLAG_HELP_HIDE_FLAGS("Sets if region flags will not be displayed using the /rg info or the /rg flaginfo command"),
@@ -178,7 +181,9 @@ public enum RegionText {
 	NO_PERMISSION_ITEM("You do not have permission to use this item!"),
 	NO_PERMISSION_REGION("You don't have permission to do that!"),
 	NO_PERMISSION_COMMAND("You do not have permission to use this command!"),
-	TEXT_WRONG_SELECTOR_ITEM("Incorrect item id set for Region Selector. Will use: ");
+	TEXT_WRONG_SELECTOR_ITEM("Incorrect item id set for Region Selector. Will use: "),
+    TEXT_WRONG_MAX_REGIONS("Incorrect value set for max regions. Will use: "),
+    TEXT_WRONG_MAX_REGION_SIZE("Incorrect value set for max Region size. Will use: ");
 	
 	private String VALUE;
 	private RegionText(String value) {

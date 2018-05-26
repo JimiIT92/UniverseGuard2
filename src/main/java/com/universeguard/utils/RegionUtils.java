@@ -1336,6 +1336,7 @@ public class RegionUtils {
 			printFlagHelpFor(source, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
 			printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
             printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_TRAMPLE);
+            printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_SHULKER_BOXES);
 			break;
 		}
 	}
@@ -1377,6 +1378,15 @@ public class RegionUtils {
         
         player.setScoreboard(scoreboard);
 	}
+
+	public static ArrayList<Region> getPlayerRegions(UUID player) {
+	    ArrayList<Region> playerRegions = new ArrayList<Region>();
+	    for(Region region : UniverseGuard.ALL_REGIONS) {
+	        if(isMemberByUUID(region, player))
+	            playerRegions.add(region);
+        }
+	    return playerRegions;
+    }
 
 	/**
 	 * Get the JSON file of a Region

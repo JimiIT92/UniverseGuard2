@@ -7,6 +7,9 @@
  */
 package com.universeguard.command;
 
+import com.universeguard.UniverseGuard;
+import com.universeguard.region.components.RegionLocation;
+import com.universeguard.utils.RegionLocationUtils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -38,6 +41,10 @@ public class RegionSaveExecutor implements CommandExecutor {
 					MessageUtils.sendErrorMessage(src, RegionText.REGION_SELECT_POINTS.getValue());
 					return CommandResult.empty();
 				}
+				if(RegionLocationUtils.isMaxSize(localRegion)) {
+                    MessageUtils.sendErrorMessage(src, RegionText.REGION_MAX_SIZE.getValue());
+				    return CommandResult.empty();
+                }
 			}
 			if(RegionUtils.save(region)) {
 				if(src instanceof Player) {

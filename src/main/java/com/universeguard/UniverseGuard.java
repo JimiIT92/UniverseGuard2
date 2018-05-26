@@ -99,7 +99,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.9";
+	public static final String VERSION = "2.10";
 	/**
 	 * Plugin ID
 	 */
@@ -132,6 +132,24 @@ public class UniverseGuard {
 	 * Sets if players can be in more Regions
 	 */
 	public static boolean UNIQUE_REGIONS = true;
+    /**
+     * Sets if Regions must have a max size
+     */
+    public static boolean LIMIT_REGIONS_SIZE = false;
+    /**
+     * The max size a Region can be. This represents
+     * the distance between the first and the second point.
+     */
+    public static int MAX_REGION_SIZE = 100;
+    /**
+     * Sets if players can be in a max amount of Regions
+     * Works only if UNIQUE_REGIONS is set to false
+     */
+    public static boolean LIMIT_PLAYER_REGIONS = false;
+    /**
+     * The max number of Regions a player ca be member or owner
+     */
+	public static int MAX_REGIONS = 10;
 	/**
 	 * Region Version Number
 	 */
@@ -427,6 +445,7 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagFarewellListener());
 		EventUtils.registerEvent(new FlagGreetingListener());
         EventUtils.registerEvent(new FlagTrampleListener());
+        EventUtils.registerEvent(new FlagShulkerBoxesListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())
