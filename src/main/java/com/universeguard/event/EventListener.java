@@ -12,6 +12,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.CollideBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
@@ -44,7 +45,7 @@ public class EventListener {
 				!(event instanceof ChangeBlockEvent.Post) && !(event instanceof ChangeBlockEvent.Decay)
 				&& !(event instanceof SpawnEntityEvent.ChunkLoad) && !(event instanceof ChangeBlockEvent.Modify)
 				&& !(event instanceof ChangeBlockEvent.Place) && !(event instanceof SpawnEntityEvent.Spawner)
-				&& !(event instanceof NotifyNeighborBlockEvent))
+				&& !(event instanceof NotifyNeighborBlockEvent) && !(event instanceof ChangeDataHolderEvent.ValueChange))
 			LogUtils.print(TextColors.GREEN, event.getClass().getSimpleName());
 	}
 }

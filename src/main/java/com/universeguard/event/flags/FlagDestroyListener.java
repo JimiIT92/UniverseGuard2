@@ -7,9 +7,11 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -19,12 +21,15 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -73,7 +78,7 @@ public class FlagDestroyListener {
 			}
 		}
 	}
-	
+
 	private void handleBucketFill(InteractItemEvent.Secondary event, Player player) {
 		ItemType item = event.getItemStack().getType();
 		if(item.equals(ItemTypes.BUCKET) || item.equals(ItemTypes.WATER_BUCKET) || item.equals(ItemTypes.LAVA_BUCKET)) {
@@ -107,7 +112,7 @@ public class FlagDestroyListener {
 		}
 	}
 
-	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
+    private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
 		return RegionUtils.handleEvent(event, EnumRegionFlag.DESTROY, location, player, RegionEventType.LOCAL);
 	}
 }

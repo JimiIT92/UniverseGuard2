@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.universeguard.region.components.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -44,14 +45,6 @@ import com.universeguard.UniverseGuard;
 import com.universeguard.region.GlobalRegion;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
-import com.universeguard.region.components.RegionCommand;
-import com.universeguard.region.components.RegionExplosion;
-import com.universeguard.region.components.RegionFlag;
-import com.universeguard.region.components.RegionInteract;
-import com.universeguard.region.components.RegionLocation;
-import com.universeguard.region.components.RegionMember;
-import com.universeguard.region.components.RegionMob;
-import com.universeguard.region.components.RegionVehicle;
 import com.universeguard.region.enums.EnumRegionExplosion;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.EnumRegionInteract;
@@ -239,7 +232,7 @@ public class RegionUtils {
 	/**
 	 * Get a Region from ID
 	 * 
-	 * @param name
+	 * @param id
 	 *            The ID of the region
 	 * @return The Region with that name if exists, null otherwise
 	 */
@@ -702,6 +695,14 @@ public class RegionUtils {
 				}
 				source.sendMessage(Text.of(members.toArray()));
 			}
+
+            MessageUtils.sendMessage(source, RegionText.EFFECTS.getValue(), TextColors.YELLOW);
+            ArrayList<Text> effects = new ArrayList<Text>();
+            for (int i = 0; i < localRegion.getEffects().size(); i++) {
+                RegionEffect effect = ((LocalRegion) region).getEffects().get(i);
+                effects.add(Text.of(TextColors.GREEN, effect.getEffect().getTranslation().get(), " ", effect.getLevel() + 1, String.valueOf(i < localRegion.getEffects().size() - 1 ? ", " : "")));
+            }
+            source.sendMessage(Text.of(effects.toArray()));
 		}
 		if (!region.getFlag(EnumRegionFlag.HIDE_FLAGS)) {
 			MessageUtils.sendMessage(source, RegionText.FLAGS.getValue(), TextColors.YELLOW);
@@ -792,14 +793,7 @@ public class RegionUtils {
 				}
 				source.sendMessage(Text.of(mobsDrop.toArray()));
 
-				MessageUtils.sendMessage(source, RegionText.COMMANDS.getValue(), TextColors.YELLOW);
-				ArrayList<Text> commands = new ArrayList<Text>();
-				for (int i = 0; i < region.getCommands().size(); i++) {
-					RegionCommand command = region.getCommands().get(i);
-					commands.add(Text.of(command.isEnabled() ? TextColors.GREEN : TextColors.RED, command.getCommand(),
-							i < region.getCommands().size() - 1 ? ", " : ""));
-				}
-				source.sendMessage(Text.of(commands.toArray()));
+
 			}
 
 		}
@@ -981,7 +975,7 @@ public class RegionUtils {
 	/**
 	 * Shows the command help text for a CommandSource
 	 * 
-	 * @param player
+	 * @param source
 	 *            The source
 	 * @param command
 	 *            The command
@@ -1151,8 +1145,6 @@ public class RegionUtils {
 	 *            The flag
 	 * @param region
 	 *            The Region
-	 * @param location
-	 *            The location
 	 * @param player
 	 *            The player
 	 * @param type
@@ -1250,6 +1242,8 @@ public class RegionUtils {
 		case 5:
 			printHelpFor(source, "farewell", RegionText.REGION_HELP_FAREWELL);
 			printHelpFor(source, "greeting", RegionText.REGION_HELP_GREETING);
+            printHelpFor(source, "effectadd [effect] [amplifier]", RegionText.REGION_HELP_EFFECT_ADD);
+            printHelpFor(source, "effectremove [effect]", RegionText.REGION_HELP_EFFECT_REMOVE);
 			printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 			break;
 		}
@@ -1335,8 +1329,9 @@ public class RegionUtils {
 		case 10:
 			printFlagHelpFor(source, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
 			printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
-            printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_TRAMPLE);
-            printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_SHULKER_BOXES);
+            printFlagHelpFor(source, EnumRegionFlag.TRAMPLE, RegionText.REGION_FLAG_HELP_TRAMPLE);
+            printFlagHelpFor(source, EnumRegionFlag.SHULKER_BOXES, RegionText.REGION_FLAG_HELP_SHULKER_BOXES);
+            printFlagHelpFor(source, EnumRegionFlag.PISTONS, RegionText.REGION_FLAG_HELP_PISTONS);
 			break;
 		}
 	}

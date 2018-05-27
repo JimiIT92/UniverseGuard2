@@ -13,12 +13,16 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.universeguard.command.*;
+import com.universeguard.command.argument.*;
+import com.universeguard.event.FlagEffectListener;
 import com.universeguard.event.flags.*;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -34,40 +38,6 @@ import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import com.universeguard.command.RegionAddExecutor;
-import com.universeguard.command.RegionAtExecutor;
-import com.universeguard.command.RegionCommandExecutor;
-import com.universeguard.command.RegionCopyExecutor;
-import com.universeguard.command.RegionCreateExecutor;
-import com.universeguard.command.RegionDeleteExecutor;
-import com.universeguard.command.RegionEditExecutor;
-import com.universeguard.command.RegionExecutor;
-import com.universeguard.command.RegionExpandExecutor;
-import com.universeguard.command.RegionFarewellExecutor;
-import com.universeguard.command.RegionFlagExecutor;
-import com.universeguard.command.RegionFlagInfoExecutor;
-import com.universeguard.command.RegionGamemodeExecutor;
-import com.universeguard.command.RegionGreetingExecutor;
-import com.universeguard.command.RegionHelpExecutor;
-import com.universeguard.command.RegionHereExecutor;
-import com.universeguard.command.RegionInfoExecutor;
-import com.universeguard.command.RegionListExecutor;
-import com.universeguard.command.RegionNameExecutor;
-import com.universeguard.command.RegionPriorityExecutor;
-import com.universeguard.command.RegionReloadExecutor;
-import com.universeguard.command.RegionRemoveExecutor;
-import com.universeguard.command.RegionSaveExecutor;
-import com.universeguard.command.RegionSetExecutor;
-import com.universeguard.command.RegionSetSpawnExecutor;
-import com.universeguard.command.RegionSetTeleportExecutor;
-import com.universeguard.command.RegionSpawnExecutor;
-import com.universeguard.command.RegionTeleportExecutor;
-import com.universeguard.command.argument.BooleanElement;
-import com.universeguard.command.argument.CommandNameElement;
-import com.universeguard.command.argument.FlagCommandElement;
-import com.universeguard.command.argument.RegionNameElement;
-import com.universeguard.command.argument.RegionPointCommandElement;
-import com.universeguard.command.argument.SubflagCommandElement;
 import com.universeguard.event.EventListener;
 import com.universeguard.event.EventRegionSelect;
 import com.universeguard.region.GlobalRegion;
@@ -99,7 +69,11 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.10";
+	public static final String VERSION = "2.11";
+    /**
+     * Region Version Number
+     */
+    public static final float REGION_VERSION = Float.valueOf(VERSION);
 	/**
 	 * Plugin ID
 	 */
@@ -124,10 +98,14 @@ public class UniverseGuard {
 	 * The Gamemode Flag Timer update frequency (in seconds)
 	 */
 	public static int GAMEMODE_TIMER = 5;
-	/**
-	 * The Enter Flag Timer update frequency (in milliseconds)
-	 */
-	public static int ENTER_FLAG_TIMER = 100;
+    /**
+     * The Enter Flag Timer update frequency (in milliseconds)
+     */
+    public static int ENTER_FLAG_TIMER = 100;
+    /**
+     * The Effect Timer update frequency (in milliseconds)
+     */
+    public static int EFFECT_TIMER = 100;
 	/**
 	 * Sets if players can be in more Regions
 	 */
@@ -150,10 +128,14 @@ public class UniverseGuard {
      * The max number of Regions a player ca be member or owner
      */
 	public static int MAX_REGIONS = 10;
-	/**
-	 * Region Version Number
-	 */
-	public static final float REGION_VERSION = Float.valueOf(VERSION);
+    /**
+     * If Regions can be purchased
+     */
+	public static boolean PURCHASABLE_REGIONS = false;
+    /**
+     * If Regions can have potion effects
+     */
+	public static boolean USE_EFFECTS = false;
 	/**
 	 * Static Instance of the Plugin
 	 */
@@ -323,7 +305,9 @@ public class UniverseGuard {
 		CommandSpec regionAt = CommandUtils.buildCommandSpec("Tells wich region are at the give location", new RegionAtExecutor(), GenericArguments.location(Text.of("location")));
 		CommandSpec regionCreate = CommandUtils.buildCommandSpec("Create a region at thge specified location", new RegionCreateExecutor(), RegionPermission.ALL.getValue(), GenericArguments.integer(Text.of("x1")), GenericArguments.integer(Text.of("y1")), GenericArguments.integer(Text.of("z1")), GenericArguments.integer(Text.of("x2")), GenericArguments.integer(Text.of("y2")), GenericArguments.integer(Text.of("z2")), GenericArguments.catalogedElement(Text.of("dimension"), DimensionType.class), GenericArguments.string(Text.of("world")), GenericArguments.remainingJoinedStrings(Text.of("name")));
 		CommandSpec regionSet = CommandUtils.buildCommandSpec("Set a point of a pending region", new RegionSetExecutor(), RegionPermission.ALL.getValue(), new RegionPointCommandElement(Text.of("point")), GenericArguments.integer(Text.of("x")), GenericArguments.integer(Text.of("y")), GenericArguments.integer(Text.of("z")));
-		
+        CommandSpec regionAddEffect = CommandUtils.buildCommandSpec("Add a potion effect to a Region", new RegionAddEffectExecutor(), RegionPermission.ALL.getValue(), GenericArguments.catalogedElement(Text.of("effect"), PotionEffectType.class), GenericArguments.integer(Text.of("level")));
+        CommandSpec regionRemoveEffect = CommandUtils.buildCommandSpec("Remove a potion effect to a Region", new RegionRemoveEffectExecutor(), RegionPermission.ALL.getValue(), GenericArguments.catalogedElement(Text.of("effect"), PotionEffectType.class));
+
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
 				.arguments(GenericArguments.enumValue(Text.of("flag"), EnumRegionFlag.class), new RegionNameElement(Text.of("name")))
@@ -393,6 +377,8 @@ public class UniverseGuard {
 				.child(regionAt, "at")
 				.child(regionCreate, "create")
 				.child(regionSet, "set")
+                .child(regionAddEffect, "effectadd")
+                .child(regionRemoveEffect, "effectremove")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
@@ -446,6 +432,7 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagGreetingListener());
         EventUtils.registerEvent(new FlagTrampleListener());
         EventUtils.registerEvent(new FlagShulkerBoxesListener());
+        EventUtils.registerEvent(new FlagPistonsListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())
@@ -464,7 +451,14 @@ public class UniverseGuard {
 			.interval(UniverseGuard.ENTER_FLAG_TIMER, TimeUnit.MILLISECONDS)
 			.name("Enter Flag Timer Task")
 			.submit(UniverseGuard.INSTANCE);
-		
+		if(USE_EFFECTS) {
+            Task.builder()
+                    .execute(new FlagEffectListener())
+                    .interval(UniverseGuard.EFFECT_TIMER, TimeUnit.MILLISECONDS)
+                    .name("Effect Flag Timer Task")
+                    .submit(UniverseGuard.INSTANCE);
+        }
+
 		// Debug utility. Used internally
 		boolean debug = false;
 		if(debug)

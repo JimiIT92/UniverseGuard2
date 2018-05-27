@@ -8,10 +8,15 @@
 package com.universeguard.region;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
+import com.universeguard.region.components.RegionEffect;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.world.World;
 
 import com.universeguard.region.components.RegionLocation;
@@ -59,6 +64,10 @@ public class LocalRegion extends Region {
 	 * Region Greeting message
 	 */
 	private String GREETING_MESSAGE;
+    /**
+     * The effects a player will get into this Region
+     */
+	private ArrayList<RegionEffect> EFFECTS;
 	/**
 	 * LocalRegion Constructor
 	 * @param name The Region name
@@ -83,6 +92,7 @@ public class LocalRegion extends Region {
 		this.MEMBERS = new ArrayList<RegionMember>();
 		this.FAREWELL_MESSAGE = "";
 		this.GREETING_MESSAGE = "";
+		this.EFFECTS = new ArrayList<RegionEffect>();
 	}
 	
 	/**
@@ -264,7 +274,40 @@ public class LocalRegion extends Region {
 	public String getGreetingMessage() {
 		return this.GREETING_MESSAGE;
 	}
-	
+
+	public void setEffects(ArrayList<RegionEffect> effects) {
+	    this.EFFECTS = effects;
+    }
+
+    public ArrayList<RegionEffect> getEffects() {
+	    return this.EFFECTS;
+    }
+
+    public void addEffect(PotionEffectType potion, int level) {
+	    boolean found = false;
+	    for(RegionEffect effect : this.EFFECTS) {
+	        if(effect.getEffect().equals(potion)) {
+                effect.setLevel(level);
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+            this.EFFECTS.add(new RegionEffect(potion, level));
+    }
+
+    public void removeEffect(PotionEffectType potion) {
+        RegionEffect effectToRemove = null;
+	    for (RegionEffect effect : this.EFFECTS) {
+            if(effect.getEffect().equals(potion)) {
+                effectToRemove = effect;
+                break;
+            }
+        }
+        if(effectToRemove != null) {
+	        this.EFFECTS.remove(effectToRemove);
+        }
+    }
 	/**
 	 * Get the World object for the Region
 	 * @return The Region World Object

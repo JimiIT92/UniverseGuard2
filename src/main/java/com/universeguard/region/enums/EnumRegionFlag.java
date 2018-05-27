@@ -52,7 +52,8 @@ public enum EnumRegionFlag {
 	VINES_GROWTH("vinesgrowth", true),
 	SEND_CHAT("sendchat", true),
     TRAMPLE("trample", true),
-    SHULKER_BOXES("shulkerboxes", true);
+    SHULKER_BOXES("shulkerboxes", true),
+    PISTONS("pistons", true);
 	
 	private String NAME;
 	private boolean VALUE;

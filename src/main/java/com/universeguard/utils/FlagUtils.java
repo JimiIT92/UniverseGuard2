@@ -65,8 +65,12 @@ public class FlagUtils {
 			configNode.getNode("timers", "hunger").setValue(UniverseGuard.HUNGER_TIMER).setComment("The update frequency (in seconds) of the hunger flag timer");
 		if(configNode.getNode("timers", "gamemode").isVirtual())
 			configNode.getNode("timers", "gamemode").setValue(UniverseGuard.GAMEMODE_TIMER).setComment("The update frequency (in seconds) of the gamemode flag timer");
-		if(configNode.getNode("timers", "enter_flag").isVirtual())
-			configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
+        if(configNode.getNode("timers", "enter_flag").isVirtual())
+            configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
+        if(configNode.getNode("timers", "use_effects").isVirtual())
+            configNode.getNode("timers", "use_effects").setValue(UniverseGuard.USE_EFFECTS).setComment("If Regions can have potion effects");
+        if(configNode.getNode("timers", "effect").isVirtual())
+            configNode.getNode("timers", "effect").setValue(UniverseGuard.EFFECT_TIMER).setComment("The update frequency (in milliseconds) of the effect timer");
 		if(configNode.getNode("players", "unique_regions").isVirtual())
 			configNode.getNode("players", "unique_regions").setValue(UniverseGuard.UNIQUE_REGIONS).setComment("Sets if players can be in more Regions");
 		if(configNode.getNode("selector", "item").isVirtual())
@@ -79,6 +83,8 @@ public class FlagUtils {
             configNode.getNode("players", "limit_player_regions").setValue(UniverseGuard.LIMIT_PLAYER_REGIONS).setComment("Sets if players can be in a max amount of Regions");
         if(configNode.getNode("players", "max_regions").isVirtual())
             configNode.getNode("players", "max_regions").setValue(UniverseGuard.MAX_REGIONS).setComment("The max number of Regions a player ca be member or owner");
+        if(configNode.getNode("regions", "purchasable_regions").isVirtual())
+            configNode.getNode("regions", "purchasable_regions").setValue(UniverseGuard.PURCHASABLE_REGIONS).setComment("Sets if Regions can be purchased");
 	}
 	
 	/**
@@ -103,7 +109,10 @@ public class FlagUtils {
 		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "hunger").getInt();
 		UniverseGuard.GAMEMODE_TIMER = configNode.getNode("timers", "gamemode").getInt();
 		UniverseGuard.ENTER_FLAG_TIMER = configNode.getNode("timers", "enter_flag").getInt();
+        UniverseGuard.USE_EFFECTS = configNode.getNode("timers", "use_effects").getBoolean();
+        UniverseGuard.EFFECT_TIMER = configNode.getNode("timers", "effect").getInt();
 		UniverseGuard.UNIQUE_REGIONS = configNode.getNode("players", "unique_regions").getBoolean();
+        UniverseGuard.PURCHASABLE_REGIONS = configNode.getNode("regions", "purchasable_regions").getBoolean();
 		UniverseGuard.LIMIT_REGIONS_SIZE = configNode.getNode("regions", "limit_regions_size").getBoolean();
         UniverseGuard.LIMIT_PLAYER_REGIONS = configNode.getNode("players", "limit_player_regions").getBoolean();
         if(!configNode.getNode("regions", "max_region_size").isVirtual()) {
@@ -158,7 +167,7 @@ public class FlagUtils {
 	
 	/**
 	 * Get a interact from block
-	 * @param name The block of the interact
+	 * @param block The block of the interact
 	 * @return The interact with the given block if exists, null othewrise
 	 */
 	public static EnumRegionInteract getInteract(BlockType block) {
@@ -193,7 +202,7 @@ public class FlagUtils {
 	
 	/**
 	 * Get a vehicle from entity
-	 * @param name The entity of the vehicle
+	 * @param entity The entity of the vehicle
 	 * @return The vehicle with the given entity if exists, null othewrise
 	 */
 	public static EnumRegionVehicle getVehicle(EntityType entity) {
@@ -210,7 +219,7 @@ public class FlagUtils {
 	
 	/**
 	 * Get a interact from entity
-	 * @param name The entity of the interact
+	 * @param entity The entity of the interact
 	 * @return The interact with the given entity if exists, null othewrise
 	 */
 	public static EnumRegionInteract getInteract(EntityType entity) {
@@ -250,7 +259,7 @@ public class FlagUtils {
 	
 	/**
 	 * Get an explosion from entity
-	 * @param name The name of the explosion
+	 * @param type The name of the explosion
 	 * @return The explosion with the given name if exists, null othewrise
 	 */
 	public static EnumRegionExplosion getExplosion(EntityType type) {
@@ -348,7 +357,6 @@ public class FlagUtils {
 	
 	/**
 	 * Get the mob id from name
-	 * @param name The name of the mob
 	 * @return The mob id for a mob with that name if exists, null otherwise
 	 */
 	public static List<String> getAllMobIds() {
