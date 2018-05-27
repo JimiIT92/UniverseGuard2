@@ -1335,7 +1335,7 @@ public class RegionUtils {
 		case 10:
 			printFlagHelpFor(source, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
 			printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
-            printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_TRAMPLE);
+            printFlagHelpFor(source, EnumRegionFlag.TRAMPLE, RegionText.REGION_FLAG_HELP_TRAMPLE);
 			break;
 		}
 	}
