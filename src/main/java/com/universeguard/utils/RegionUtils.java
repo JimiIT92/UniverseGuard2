@@ -149,7 +149,10 @@ public class RegionUtils {
 	 * @return true if the Region has been removed correctly, false otherwise
 	 */
 	public static boolean remove(Region region) {
-		File directory = region.isLocal() ? getRegionFolder() : getGlobalRegionFolder();
+	    if(region.isLocal()) {
+            ((LocalRegion)region).getMembers().clear();
+        }
+	    File directory = region.isLocal() ? getRegionFolder() : getGlobalRegionFolder();
 		if (!directory.exists())
 			return false;
 		File file = getFile(region);
@@ -671,6 +674,11 @@ public class RegionUtils {
 				MessageUtils.sendMessage(source,
 						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(),
 						TextColors.GREEN);
+			if(localRegion.getValue() != null) {
+                MessageUtils.sendMessage(source,
+                        RegionText.REGION_VALUE.getValue() + ": " + localRegion.getValue().getItem() + " (" + localRegion.getValue().getQuantity() + ")",
+                        TextColors.GREEN);
+            }
 			if (!localRegion.getFlag(EnumRegionFlag.HIDE_LOCATIONS)) {
 				MessageUtils.sendMessage(source,
 						RegionText.FROM.getValue() + ": " + localRegion.getFirstPoint().toString(), TextColors.AQUA);
@@ -1244,8 +1252,14 @@ public class RegionUtils {
 			printHelpFor(source, "greeting", RegionText.REGION_HELP_GREETING);
             printHelpFor(source, "effectadd [effect] [amplifier]", RegionText.REGION_HELP_EFFECT_ADD);
             printHelpFor(source, "effectremove [effect]", RegionText.REGION_HELP_EFFECT_REMOVE);
-			printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
+			printHelpFor(source, "setvalue [region] [item] [quantity]", RegionText.REGION_HELP_SET_VALUE);
 			break;
+        case 6:
+            printHelpFor(source, "removevalue [region]", RegionText.REGION_HELP_REMOVE_VALUE);
+            printHelpFor(source, "buy [region]", RegionText.REGION_HELP_BUY);
+            printHelpFor(source, "sell [region]", RegionText.REGION_HELP_SELL);
+            printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
+            break;
 		}
 	}
 

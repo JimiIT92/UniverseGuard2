@@ -53,6 +53,8 @@ public class RegionRemoveExecutor implements CommandExecutor {
 						localRegion = (LocalRegion) region;
 						if (RegionUtils.isMemberByUUID(localRegion, member)) {
 							localRegion.removeMemberByUUID(member);
+							if(localRegion.getMembers().size() == 0)
+							    localRegion.setSold(false);
 							if (RegionUtils.save(localRegion)) {
 								MessageUtils.sendSuccessMessage(src,RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + username);
 								if(RegionUtils.isOnline(member)) {

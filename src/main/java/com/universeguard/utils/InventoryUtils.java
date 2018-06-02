@@ -69,7 +69,11 @@ public class InventoryUtils {
 	public static boolean addItemStackToInventory(Player player, ItemStack itemStack) {
 		return player.getInventory().offer(itemStack).getType().equals(InventoryTransactionResult.Type.SUCCESS);
 	}
-	
+
+    public static boolean addItemsToInventory(Player player, ItemType itemType, int quantity) {
+        return addItemStackToInventory(player, ItemStack.of(itemType, quantity));
+    }
+
 	/**
 	 * Add an ItemStack to a player's hotbar
 	 * @param player The Player
@@ -85,6 +89,16 @@ public class InventoryUtils {
 		}
 		return false;
 	}
+
+	public static boolean removeFromInventory(Player player, ItemStack itemStack) {
+        Inventory items = player.getInventory().query(QueryOperationTypes.ITEM_TYPE.of(itemStack.getType()));
+        if (items.peek(itemStack.getQuantity()).isPresent()) {
+            items.poll(itemStack.getQuantity());
+            return true;
+        } else {
+            return false;
+        }
+    }
 	
 	/**
 	 * Create an ItemStack from an ItemType

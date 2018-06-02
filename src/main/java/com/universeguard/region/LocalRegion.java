@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.universeguard.UniverseGuard;
 import com.universeguard.region.components.RegionEffect;
+import com.universeguard.region.components.RegionValue;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
@@ -68,6 +70,14 @@ public class LocalRegion extends Region {
      * The effects a player will get into this Region
      */
 	private ArrayList<RegionEffect> EFFECTS;
+    /**
+     * If this Region has been sold
+     */
+	private boolean SOLD;
+    /**
+     * The value needed to buy this Region
+     */
+	private RegionValue VALUE;
 	/**
 	 * LocalRegion Constructor
 	 * @param name The Region name
@@ -93,6 +103,7 @@ public class LocalRegion extends Region {
 		this.FAREWELL_MESSAGE = "";
 		this.GREETING_MESSAGE = "";
 		this.EFFECTS = new ArrayList<RegionEffect>();
+		this.SOLD = false;
 	}
 	
 	/**
@@ -308,7 +319,24 @@ public class LocalRegion extends Region {
 	        this.EFFECTS.remove(effectToRemove);
         }
     }
-	/**
+
+    public void setSold(boolean sold) {
+	    this.SOLD = sold;
+    }
+
+    public boolean getSold() {
+        return this.SOLD;
+    }
+
+    public void setValue(RegionValue value) {
+	    this.VALUE = value;
+    }
+
+    public RegionValue getValue() {
+	    return this.VALUE;
+    }
+
+    /**
 	 * Get the World object for the Region
 	 * @return The Region World Object
 	 */
