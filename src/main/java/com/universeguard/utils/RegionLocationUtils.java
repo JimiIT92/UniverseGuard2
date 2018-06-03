@@ -88,24 +88,28 @@ public class RegionLocationUtils {
 				region.setSecondPoint(new RegionLocation(secondPoint.getX(), hasBlocks ? secondPoint.getY() - blocks : 0, secondPoint.getZ(), secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case LEFT:
+        case WEST:
 			if(firstPoint.getX() <= secondPoint.getX())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX() - blocks, firstPoint.getY(), firstPoint.getZ(), firstPoint.getDimension(), firstPoint.getWorld()));
 			else
 				region.setSecondPoint(new RegionLocation(secondPoint.getX() - blocks, secondPoint.getY(), secondPoint.getZ(), secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case RIGHT:
+        case EAST:
 			if(firstPoint.getX() >= secondPoint.getX())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX() + blocks, firstPoint.getY(), firstPoint.getZ(), firstPoint.getDimension(), firstPoint.getWorld()));
 			else
 				region.setSecondPoint(new RegionLocation(secondPoint.getX() + blocks, secondPoint.getY(), secondPoint.getZ(), secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case FRONT:
+        case SOUTH:
 			if(firstPoint.getZ() >= secondPoint.getZ())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ() + blocks, firstPoint.getDimension(), firstPoint.getWorld()));
 			else
 				region.setSecondPoint(new RegionLocation(secondPoint.getX(), secondPoint.getY(), secondPoint.getZ() + blocks, secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case BACK:
+        case NORTH:
 			if(firstPoint.getZ() <= secondPoint.getZ())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ() - blocks, firstPoint.getDimension(), firstPoint.getWorld()));
 			else
