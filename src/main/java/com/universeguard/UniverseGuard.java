@@ -17,8 +17,10 @@ import com.universeguard.command.*;
 import com.universeguard.command.argument.*;
 import com.universeguard.event.FlagEffectListener;
 import com.universeguard.event.flags.*;
+import com.universeguard.region.enums.*;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.DefaultConfig;
@@ -42,11 +44,6 @@ import com.universeguard.event.EventListener;
 import com.universeguard.event.EventRegionSelect;
 import com.universeguard.region.GlobalRegion;
 import com.universeguard.region.Region;
-import com.universeguard.region.enums.EnumDirection;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionPermission;
-import com.universeguard.region.enums.RegionRole;
-import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.CommandUtils;
 import com.universeguard.utils.EventUtils;
 import com.universeguard.utils.FlagUtils;
@@ -311,6 +308,8 @@ public class UniverseGuard {
         CommandSpec regionRemoveValue = CommandUtils.buildCommandSpec("Remove a value from a Region", new RegionRemoveValueExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("region")));
         CommandSpec regionBuy = CommandUtils.buildCommandSpec("Buy a Region", new RegionBuyExecutor(), new RegionToBuyNameElement(Text.of("region")));
         CommandSpec regionSell = CommandUtils.buildCommandSpec("Sells a Region", new RegionSellExecutor(), new RegionToSellNameElement(Text.of("region")));
+        CommandSpec regionExcludeBlock = CommandUtils.buildCommandSpec("Exclude a block from being handled by the place or the destroy flag", new RegionExcludeBlockExecutor(), RegionPermission.ALL.getValue(),  GenericArguments.catalogedElement(Text.of("block"), BlockType.class),  GenericArguments.enumValue(Text.of("type"), EnumRegionBlock.class));
+        CommandSpec regionIncludeBlock = CommandUtils.buildCommandSpec("Include a block from being handled by the place or the destroy flag", new RegionIncludeBlockExecutor(), RegionPermission.ALL.getValue(),  GenericArguments.catalogedElement(Text.of("block"), BlockType.class),  GenericArguments.enumValue(Text.of("type"), EnumRegionBlock.class));
 
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -387,6 +386,8 @@ public class UniverseGuard {
                 .child(regionRemoveValue, "removevalue")
                 .child(regionBuy, "buy")
                 .child(regionSell, "sell")
+                .child(regionExcludeBlock, "excludeblock")
+                .child(regionIncludeBlock, "includeblock")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

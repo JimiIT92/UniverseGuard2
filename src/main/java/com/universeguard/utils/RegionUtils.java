@@ -1258,6 +1258,8 @@ public class RegionUtils {
             printHelpFor(source, "removevalue [region]", RegionText.REGION_HELP_REMOVE_VALUE);
             printHelpFor(source, "buy [region]", RegionText.REGION_HELP_BUY);
             printHelpFor(source, "sell [region]", RegionText.REGION_HELP_SELL);
+            printHelpFor(source, "excludeblock [block] [type]", RegionText.REGION_HELP_EXCLUDE_BLOCK);
+            printHelpFor(source, "includeblock [block] [type]", RegionText.REGION_HELP_INCLUDE_BLOCK);
             printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
             break;
 		}

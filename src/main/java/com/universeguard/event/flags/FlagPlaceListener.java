@@ -7,8 +7,11 @@
  */
 package com.universeguard.event.flags;
 
-import com.universeguard.utils.LogUtils;
+import com.universeguard.region.Region;
+import com.universeguard.region.enums.RegionText;
+import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.Entity;
@@ -32,9 +35,6 @@ import org.spongepowered.api.world.World;
 
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
-import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.InventoryUtils;
-import com.universeguard.utils.RegionUtils;
 
 /**
  * Handler for the place flag
@@ -67,14 +67,22 @@ public class FlagPlaceListener {
 				}
 		}
 	}
-	
+
 	@Listener
 	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @Root Player player) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
-			if (block.getLocation().isPresent() && !block.getState().getType().equals(BlockTypes.FIRE)) {
-				Location<World> location = block.getLocation().get();
-				this.handleEvent(event, location, player);
+			BlockType type = block.getState().getType();
+			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FIRE)) {
+				Region region = RegionUtils.getRegion(block.getLocation().get());
+				if(region != null && FlagUtils.isExcludedFromPlace(region, type)) {
+				    if(region.getFlag(EnumRegionFlag.PLACE)) {
+                        event.setCancelled(true);
+                        MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+                    }
+                } else {
+                    this.handleEvent(event, block.getLocation().get(), player);
+                }
 			}
 		}
 	}

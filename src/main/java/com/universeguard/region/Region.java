@@ -10,20 +10,12 @@ package com.universeguard.region;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.universeguard.region.components.*;
+import com.universeguard.region.enums.*;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 import com.universeguard.UniverseGuard;
-import com.universeguard.region.components.RegionCommand;
-import com.universeguard.region.components.RegionExplosion;
-import com.universeguard.region.components.RegionFlag;
-import com.universeguard.region.components.RegionInteract;
-import com.universeguard.region.components.RegionMob;
-import com.universeguard.region.components.RegionVehicle;
-import com.universeguard.region.enums.EnumRegionExplosion;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.region.enums.RegionType;
 import com.universeguard.utils.FlagUtils;
 
 /**
@@ -77,6 +69,10 @@ public class Region {
 	 * Region Commands
 	 */
 	private ArrayList<RegionCommand> COMMANDS;
+    /**
+     * The list of blocks excluded from place and destroy flags
+     */
+    private RegionExcludedBlocks EXCLUDED_BLOCKS;
 	
 	/**
 	 * Region Constructor
@@ -107,6 +103,7 @@ public class Region {
 		this.NAME = name;
 		this.GAMEMODE = gamemode;
 		this.COMMANDS = new ArrayList<RegionCommand>();
+		this.EXCLUDED_BLOCKS = new RegionExcludedBlocks();
 		this.initFlags();
 	}
 	
@@ -787,7 +784,7 @@ public class Region {
 	public void setMobs(ArrayList<RegionMob> mobs) {
 		this.MOBS = mobs;
 	}
-	
+
 	/**
 	 * Set the Region Version
 	 * @param version The Region Version
@@ -795,7 +792,45 @@ public class Region {
 	public void setVersion(float version) {
 		this.VERSION = version;
 	}
-	
+
+	public void setExcludedBlocks(RegionExcludedBlocks blocks) {
+	    this.EXCLUDED_BLOCKS = blocks;
+    }
+
+    public RegionExcludedBlocks getExcludedBlocks() {
+        return this.EXCLUDED_BLOCKS;
+    }
+
+	public void excludeBlock(BlockType block, EnumRegionBlock type) {
+	    switch(type) {
+            case PLACE:
+                this.EXCLUDED_BLOCKS.addPlace(block);
+                break;
+            case DESTROY:
+                this.EXCLUDED_BLOCKS.addDestroy(block);
+                break;
+            case BOTH:
+                this.EXCLUDED_BLOCKS.addPlace(block);
+                this.EXCLUDED_BLOCKS.addDestroy(block);
+                break;
+        }
+    }
+
+    public void includeBlock(BlockType block, EnumRegionBlock type) {
+        switch(type) {
+            case PLACE:
+                this.EXCLUDED_BLOCKS.removePlace(block);
+                break;
+            case DESTROY:
+                this.EXCLUDED_BLOCKS.removeDestroy(block);
+                break;
+            case BOTH:
+                this.EXCLUDED_BLOCKS.removePlace(block);
+                this.EXCLUDED_BLOCKS.removeDestroy(block);
+                break;
+        }
+    }
+
 	/**
 	 * Get the Region Version
 	 * @return The Region Version

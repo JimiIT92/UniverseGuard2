@@ -7,7 +7,10 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.region.Region;
+import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.LogUtils;
+import com.universeguard.utils.MessageUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -104,10 +107,18 @@ public class FlagDestroyListener {
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event, @First Player player) {
 		if (!event.getTransactions().isEmpty()) {
-			BlockSnapshot block = event.getTransactions().get(0).getFinal();
+			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
+			BlockType type = block.getState().getType();
 			if (block.getLocation().isPresent()) {
-				Location<World> location = block.getLocation().get();
-				this.handleEvent(event,location, player);
+                Region region = RegionUtils.getRegion(block.getLocation().get());
+                if(region != null && FlagUtils.isExcludedFromDestroy(region, type)) {
+                    if(region.getFlag(EnumRegionFlag.DESTROY)) {
+                        event.setCancelled(true);
+                        MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+                    }
+                } else {
+                    this.handleEvent(event, block.getLocation().get(), player);
+                }
 			}
 		}
 	}

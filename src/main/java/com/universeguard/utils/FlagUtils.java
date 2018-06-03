@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.universeguard.region.Region;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -364,4 +365,12 @@ public class FlagUtils {
 			    .map(CatalogType::getId)
 			    .collect(Collectors.toList());
 	}
+
+	public static boolean isExcludedFromPlace(Region region, BlockType type) {
+	    return region.getExcludedBlocks().getPlace().contains(type.getId());
+    }
+
+    public static boolean isExcludedFromDestroy(Region region, BlockType type) {
+        return region.getExcludedBlocks().getDestroy().contains(type.getId());
+    }
 }
