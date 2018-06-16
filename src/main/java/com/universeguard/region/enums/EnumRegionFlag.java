@@ -53,7 +53,9 @@ public enum EnumRegionFlag {
 	SEND_CHAT("sendchat", true),
     TRAMPLE("trample", true),
     SHULKER_BOXES("shulkerboxes", true),
-    PISTONS("pistons", true);
+    PISTONS("pistons", true),
+    FROST_WALKER("frostwalker", true),
+    FISHING_POLE("fishingpole", true);
 	
 	private String NAME;
 	private boolean VALUE;

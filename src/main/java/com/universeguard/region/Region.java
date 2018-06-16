@@ -658,7 +658,39 @@ public class Region {
 		rm.setPve(value);
 		this.MOBS.add(rm);
 	}
-	
+
+
+    /**
+     * Get the interact value of a Mob in the Region
+     * @param mob The Mob
+     * @return The interact value of the Mob
+     */
+    public boolean getMobInteract(String mob) {
+        for(RegionMob m : this.MOBS) {
+            if(m.getMob().equalsIgnoreCase(mob))
+                return m.getInteract();
+        }
+        return true;
+    }
+
+    /**
+     * Set the interact value of a Mob for the Region
+     * @param mob The Mob
+     * @param value The value
+     */
+    public void setMobInteract(String mob, boolean value) {
+        RegionMob rm = null;
+        for(RegionMob m : this.MOBS) {
+            if(m.getMob().equalsIgnoreCase(mob)) {
+                m.setInteract(value);
+                return;
+            }
+        }
+        rm = new RegionMob(mob);
+        rm.setInteract(value);
+        this.MOBS.add(rm);
+    }
+
 	/**
 	 * Get the damage value of a Mob in the Region
 	 * @param mob The Mob

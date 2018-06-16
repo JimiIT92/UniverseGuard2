@@ -801,7 +801,14 @@ public class RegionUtils {
 				}
 				source.sendMessage(Text.of(mobsDrop.toArray()));
 
-
+                MessageUtils.sendMessage(source, RegionText.MOBS_INTERACT.getValue(), TextColors.YELLOW);
+                ArrayList<Text> mobsInteract = new ArrayList<Text>();
+                for (int i = 0; i < region.getMobs().size(); i++) {
+                    RegionMob mob = region.getMobs().get(i);
+                    mobsInteract.add(Text.of(mob.getInteract() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+                            i < region.getMobs().size() - 1 ? ", " : ""));
+                }
+                source.sendMessage(Text.of(mobsInteract.toArray()));
 			}
 
 		}
@@ -1334,6 +1341,7 @@ public class RegionUtils {
 			printFlagHelpFor(source, "mobspawn", RegionText.REGION_FLAG_HELP_MOB_SPAWN);
 			printFlagHelpFor(source, "mobdamage", RegionText.REGION_FLAG_HELP_MOB_DAMAGE);
 			printFlagHelpFor(source, "mobpve", RegionText.REGION_FLAG_HELP_MOB_PVE);
+            printFlagHelpFor(source, "mobinteract", RegionText.REGION_FLAG_HELP_MOB_INTERACT);
 			break;
 		case 9:
 			printFlagHelpFor(source, EnumRegionFlag.ITEM_PICKUP, RegionText.REGION_FLAG_HELP_ITEM_PICKUP);
@@ -1349,6 +1357,10 @@ public class RegionUtils {
             printFlagHelpFor(source, EnumRegionFlag.SHULKER_BOXES, RegionText.REGION_FLAG_HELP_SHULKER_BOXES);
             printFlagHelpFor(source, EnumRegionFlag.PISTONS, RegionText.REGION_FLAG_HELP_PISTONS);
 			break;
+        case 11:
+            printFlagHelpFor(source, EnumRegionFlag.FROST_WALKER, RegionText.REGION_FLAG_HELP_FROST_WALKER);
+            printFlagHelpFor(source, EnumRegionFlag.FISHING_POLE, RegionText.REGION_FLAG_HELP_FISHING_POLE);
+            break;
 		}
 	}
 

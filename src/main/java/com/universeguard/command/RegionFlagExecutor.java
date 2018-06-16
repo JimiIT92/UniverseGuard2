@@ -170,6 +170,23 @@ public class RegionFlagExecutor implements CommandExecutor {
 						} else
 							MessageUtils.sendErrorMessage(src, RegionText.REGION_MOB_NOT_FOUND.getValue());
 						break;
+                    case "mobinteract":
+                        if(name.equalsIgnoreCase("all")) {
+                            region.setMobInteract("all", value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        } else if(name.equalsIgnoreCase("allhostile")) {
+                            region.setMobInteract("allhostile", value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        } else if(name.equalsIgnoreCase("allpassive")) {
+                            region.setMobInteract("allpassive", value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        }
+                        else if (FlagUtils.getMobId(name) != null) {
+                            region.setMobInteract(FlagUtils.getMobId(name), value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        } else
+                            MessageUtils.sendErrorMessage(src, RegionText.REGION_MOB_NOT_FOUND.getValue());
+                        break;
 					default:
 						MessageUtils.sendErrorMessage(src, getCommandUsage());
 						break;

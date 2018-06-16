@@ -71,6 +71,7 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 			case MOBPVE:
 			case MOBDAMAGE:
 			case MOBDROP:
+            case MOBINTERACT:
 					flags.addAll(Sponge.getRegistry().getAllOf(EntityType.class).stream()
 						    .map(CatalogType::getId).collect(Collectors.toList()));
 					flags.add("all");

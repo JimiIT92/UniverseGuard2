@@ -432,6 +432,7 @@ public class UniverseGuard {
 		EventUtils.registerEvent(new FlagMobPveListener());
 		EventUtils.registerEvent(new FlagMobDamageListener());
 		EventUtils.registerEvent(new FlagMobDropListener());
+        EventUtils.registerEvent(new FlagMobInteractListener());
 		EventUtils.registerEvent(new FlagCommandListener());
 		EventUtils.registerEvent(new FlagSendChatListener());
 		EventUtils.registerEvent(new FlagIceMeltListener());
@@ -442,6 +443,8 @@ public class UniverseGuard {
         EventUtils.registerEvent(new FlagTrampleListener());
         EventUtils.registerEvent(new FlagShulkerBoxesListener());
         EventUtils.registerEvent(new FlagPistonsListener());
+        EventUtils.registerEvent(new FlagFrostWalkerListener());
+        EventUtils.registerEvent(new FlagFishingPoleListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())

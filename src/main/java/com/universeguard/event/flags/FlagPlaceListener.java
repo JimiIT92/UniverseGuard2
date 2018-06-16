@@ -35,6 +35,7 @@ import org.spongepowered.api.world.World;
 
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
+import sun.rmi.runtime.Log;
 
 /**
  * Handler for the place flag
@@ -73,8 +74,11 @@ public class FlagPlaceListener {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
 			BlockType type = block.getState().getType();
-			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FIRE)) {
-				Region region = RegionUtils.getRegion(block.getLocation().get());
+			if (block.getLocation().isPresent() &&
+                    !type.equals(BlockTypes.WATER) &&  !type.equals(BlockTypes.FLOWING_WATER) &&
+                    !type.equals(BlockTypes.FIRE) && !type.equals(BlockTypes.FROSTED_ICE)) {
+                LogUtils.print(type.getId());
+			    Region region = RegionUtils.getRegion(block.getLocation().get());
 				if(region != null && FlagUtils.isExcludedFromPlace(region, type)) {
 				    if(region.getFlag(EnumRegionFlag.PLACE)) {
                         event.setCancelled(true);
