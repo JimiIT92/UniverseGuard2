@@ -43,7 +43,7 @@ public class RegionBuyExecutor implements CommandExecutor {
                 Region region = RegionUtils.load(args.<String>getOne("region").get());
                 if (UniverseGuard.PURCHASABLE_REGIONS && region != null) {
                     LocalRegion localRegion = (LocalRegion) region;
-                    if (!UniverseGuard.UNIQUE_REGIONS && RegionUtils.getPlayerRegions(player.getUniqueId()).size() < UniverseGuard.MAX_REGIONS) {
+                    if (!UniverseGuard.UNIQUE_REGIONS && RegionUtils.getPlayerRegions(player.getUniqueId()).size() < RegionUtils.getPlayerMaxRegions(player.getUniqueId())) {
                         ItemStack regionStack = ItemStack.of(localRegion.getValue().getItem(), localRegion.getValue().getQuantity());
                         if(player.getInventory().contains(regionStack) && InventoryUtils.removeFromInventory(player, regionStack)) {
                             RegionRole role = localRegion.getMembers().size() == 0 ? RegionRole.OWNER : RegionRole.MEMBER;

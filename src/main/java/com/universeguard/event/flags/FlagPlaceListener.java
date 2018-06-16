@@ -35,7 +35,6 @@ import org.spongepowered.api.world.World;
 
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
-import sun.rmi.runtime.Log;
 
 /**
  * Handler for the place flag

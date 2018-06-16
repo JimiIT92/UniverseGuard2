@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.universeguard.region.Region;
+import com.universeguard.region.enums.*;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -23,11 +24,6 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.format.TextColors;
 
 import com.universeguard.UniverseGuard;
-import com.universeguard.region.enums.EnumRegionExplosion;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.region.enums.RegionText;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -84,6 +80,12 @@ public class FlagUtils {
             configNode.getNode("players", "limit_player_regions").setValue(UniverseGuard.LIMIT_PLAYER_REGIONS).setComment("Sets if players can be in a max amount of Regions");
         if(configNode.getNode("players", "max_regions").isVirtual())
             configNode.getNode("players", "max_regions").setValue(UniverseGuard.MAX_REGIONS).setComment("The max number of Regions a player ca be member or owner");
+        for(RegionPermission permission : RegionPermission.values()) {
+            if(configNode.getNode("max_regions", permission.getName()).isVirtual())
+                configNode.getNode("max_regions", permission.getName()).setValue(UniverseGuard.MAX_REGIONS);
+        }
+        if(configNode.getNode("max_regions", "*").isVirtual())
+            configNode.getNode("max_regions", "*").setValue(UniverseGuard.MAX_REGIONS);
         if(configNode.getNode("regions", "purchasable_regions").isVirtual())
             configNode.getNode("regions", "purchasable_regions").setValue(UniverseGuard.PURCHASABLE_REGIONS).setComment("Sets if Regions can be purchased");
 	}
@@ -127,6 +129,22 @@ public class FlagUtils {
             int maxRegions = configNode.getNode("players", "max_regions").getInt();
             if(maxRegions > 0)
                 UniverseGuard.MAX_REGIONS = maxRegions;
+            else
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
+        }
+        for(RegionPermission permission : RegionPermission.values()) {
+            if(!configNode.getNode("max_regions", permission.getName()).isVirtual()) {
+                int maxRegions = configNode.getNode("max_regions", permission.getName()).getInt();
+                if(maxRegions > 0)
+                    UniverseGuard.MAX_PERMISSION_REGIONS.put(permission.getName(), maxRegions);
+                else
+                    LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
+            }
+        }
+        if(!configNode.getNode("max_regions", "*").isVirtual()) {
+            int maxRegions = configNode.getNode("max_regions", "*").getInt();
+            if(maxRegions > 0)
+                UniverseGuard.MAX_PERMISSION_REGIONS.put("*", maxRegions);
             else
                 LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
         }

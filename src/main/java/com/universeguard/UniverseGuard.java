@@ -10,6 +10,7 @@ package com.universeguard;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -125,6 +126,8 @@ public class UniverseGuard {
      * The max number of Regions a player ca be member or owner
      */
 	public static int MAX_REGIONS = 10;
+
+    public static HashMap<String, Integer> MAX_PERMISSION_REGIONS = new HashMap<String, Integer>();
     /**
      * If Regions can be purchased
      */
@@ -168,6 +171,7 @@ public class UniverseGuard {
 	 * List of all regions, used to avoid massive reading from files
 	 */
 	public static ArrayList<Region> ALL_REGIONS;
+
 	
 	/**
 	 * The item set to be used as a Region Selector.

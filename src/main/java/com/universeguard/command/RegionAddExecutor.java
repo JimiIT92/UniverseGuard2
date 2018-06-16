@@ -56,7 +56,8 @@ public class RegionAddExecutor implements CommandExecutor {
 						if(region.isLocal()) {
 							localRegion = (LocalRegion) region;
 							if(!RegionUtils.isMemberByUUID(localRegion, member)) {
-							    if(!UniverseGuard.UNIQUE_REGIONS && UniverseGuard.LIMIT_PLAYER_REGIONS && RegionUtils.getPlayerRegions(member).size() >= UniverseGuard.MAX_REGIONS) {
+
+							    if(!UniverseGuard.UNIQUE_REGIONS && UniverseGuard.LIMIT_PLAYER_REGIONS && RegionUtils.getPlayerRegions(member).size() >= RegionUtils.getPlayerMaxRegions(member)) {
 							        MessageUtils.sendErrorMessage(src, RegionText.PLAYERS_MAX_REGIONS.getValue());
 							        return CommandResult.empty();
                                 }

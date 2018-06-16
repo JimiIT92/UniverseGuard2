@@ -1411,6 +1411,19 @@ public class RegionUtils {
 	    return playerRegions;
     }
 
+    public static int getPlayerMaxRegions(UUID uuid) {
+	    Player player = getPlayer(uuid);
+	    if(player != null) {
+	        if(player.hasPermission("*"))
+	            return UniverseGuard.MAX_PERMISSION_REGIONS.get("*");
+	        for(RegionPermission permission : RegionPermission.values()) {
+	            if(PermissionUtils.hasPermission(player, permission))
+	                return UniverseGuard.MAX_PERMISSION_REGIONS.get(permission.getName());
+            }
+        }
+	    return  UniverseGuard.MAX_REGIONS;
+    }
+
 	/**
 	 * Get the JSON file of a Region
 	 * 
@@ -1459,6 +1472,10 @@ public class RegionUtils {
 	public static File getRegionFolder() {
 		return new File(getConfigFolder() + "/regions");
 	}
+
+    public static File getTemplateFolder() {
+        return new File(getConfigFolder() + "/templates");
+    }
 
 	/**
 	 * Get the Global Regions folder
