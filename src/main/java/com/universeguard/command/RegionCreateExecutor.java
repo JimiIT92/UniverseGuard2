@@ -36,7 +36,7 @@ public class RegionCreateExecutor implements CommandExecutor {
 			String name = args.<String>getOne("name").get();
 			RegionLocation firstPoint = new RegionLocation(args.<Integer>getOne("x1").get(), args.<Integer>getOne("y1").get(), args.<Integer>getOne("z1").get(), dimension.getId(), world);
 			RegionLocation secondPoint = new RegionLocation(args.<Integer>getOne("x2").get(), args.<Integer>getOne("y2").get(), args.<Integer>getOne("z2").get(), dimension.getId(), world);
-			LocalRegion region = new LocalRegion(name, firstPoint, secondPoint);
+			LocalRegion region = new LocalRegion(name, firstPoint, secondPoint, false);
 			if(RegionUtils.save(region))
 				MessageUtils.sendSuccessMessage(src, RegionText.REGION_SAVED.getValue());
 		}

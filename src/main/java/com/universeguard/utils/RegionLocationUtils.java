@@ -49,8 +49,16 @@ public class RegionLocationUtils {
 	 * @return The RegionLocation from player and location
 	 */
 	public static RegionLocation fromLocation(Player player, Location<World> location) {
-		return new RegionLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), getDimension(player), getWorld(player));
+        return create(location.getBlockX(), location.getBlockY(), location.getBlockZ(), getDimension(player), getWorld(player));
 	}
+
+	public static RegionLocation fromCoordinates(Player player, int x, int y, int z) {
+	    return create(x, y, z, getDimension(player), getWorld(player));
+    }
+
+    public static RegionLocation create(int x, int y, int z, String dimension, String world) {
+	    return new RegionLocation(x, y, z, dimension, world);
+    }
 
 	public static boolean isMaxSize(LocalRegion region) {
 	    if(UniverseGuard.LIMIT_REGIONS_SIZE) {

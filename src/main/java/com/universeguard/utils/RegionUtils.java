@@ -123,7 +123,7 @@ public class RegionUtils {
 	 * @return true if the Region has been saved correctly, false otherwise
 	 */
 	public static LocalRegion copy(LocalRegion region, String newRegionName) {
-		LocalRegion newRegion = new LocalRegion(newRegionName, region.getFirstPoint(), region.getSecondPoint());
+		LocalRegion newRegion = new LocalRegion(newRegionName, region.getFirstPoint(), region.getSecondPoint(), region.getTemplate());
 		newRegion.setPriority(region.getPriority());
 		newRegion.setTeleportLocation(region.getTeleportLocation());
 		newRegion.setSpawnLocation(region.getSpawnLocation());
@@ -257,7 +257,7 @@ public class RegionUtils {
 		boolean removeOld = false;
 		if (region.isLocal()) {
 			LocalRegion newRegion = new LocalRegion(region.getName(), ((LocalRegion) region).getFirstPoint(),
-					((LocalRegion) region).getSecondPoint());
+					((LocalRegion) region).getSecondPoint(), region.getTemplate());
 			newRegion.setMembers(((LocalRegion) region).getMembers());
 			newRegion.setPriority(((LocalRegion) region).getPriority());
 			if (((LocalRegion) region).getSpawnLocation() != null)
@@ -275,7 +275,7 @@ public class RegionUtils {
 			newRegion.updateFlags();
 			removeOld = save(newRegion);
 		} else {
-			GlobalRegion newRegion = new GlobalRegion(region.getName());
+			GlobalRegion newRegion = new GlobalRegion(region.getName(), region.getTemplate());
 			newRegion.setFlags(region.getFlags());
 			newRegion.setGamemode(region.getGameMode());
 			newRegion.setCommands(region.getCommands());
@@ -352,7 +352,7 @@ public class RegionUtils {
 					if (type.equals(RegionType.LOCAL))
 						region = new LocalRegion(element.getKey());
 					else
-						region = new GlobalRegion(element.getKey());
+						region = new GlobalRegion(element.getKey(), false);
 
 					JsonObject flagObject = jObj.getAsJsonObject("flags");
 					for (EnumRegionFlag flag : EnumRegionFlag.values()) {
@@ -613,13 +613,7 @@ public class RegionUtils {
 	 *            The player
 	 */
 	public static void printRegionsList(Player player) {
-		StringBuilder regions = new StringBuilder();
-		for (Region region : UniverseGuard.ALL_REGIONS) {
-			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
-				regions.append(region.getName() + ", ");
-		}
-		MessageUtils.sendMessage(player, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
-		MessageUtils.sendMessage(player, regions.substring(0, regions.length() - 2), TextColors.YELLOW);
+		printRegionsList((CommandSource)player);
 	}
 	
 	/**
@@ -631,7 +625,7 @@ public class RegionUtils {
 	public static void printRegionsList(CommandSource source) {
 		StringBuilder regions = new StringBuilder();
 		for (Region region : UniverseGuard.ALL_REGIONS) {
-			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
+			if (!region.getFlag(EnumRegionFlag.HIDE_REGION) && !region.getTemplate())
 				regions.append(region.getName() + ", ");
 		}
 		MessageUtils.sendMessage(source, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
@@ -1039,6 +1033,8 @@ public class RegionUtils {
 	 * @return true if that location is in that Region, false otherwise
 	 */
 	public static boolean isInRegion(LocalRegion region, Location<World> location) {
+	    if(region.getTemplate())
+	        return false;
 		Location<World> pos1 = region.getFirstPoint().getLocation();
 		Location<World> pos2 = region.getSecondPoint().getLocation();
 		if (pos1 != null && pos2 != null) {
@@ -1069,7 +1065,7 @@ public class RegionUtils {
 	 */
 	public static Region getRegion(Location<World> location) {
 		LocalRegion localRegion = getLocalRegion(location);
-		return localRegion != null ? localRegion : getGlobalRegion(location);
+		return localRegion != null ? localRegion.getTemplate() ? null : localRegion : getGlobalRegion(location);
 	}
 
 	/**
@@ -1127,7 +1123,8 @@ public class RegionUtils {
 	 * @return The GlobalRegion at the given location
 	 */
 	public static GlobalRegion getGlobalRegion(Location<World> location) {
-		return (GlobalRegion) load(location.getExtent().getName());
+	    GlobalRegion global = (GlobalRegion) load(location.getExtent().getName());
+		return global != null ? global.getTemplate() ? null : global : null;
 	}
 
 	/**
@@ -1260,13 +1257,14 @@ public class RegionUtils {
             printHelpFor(source, "effectadd [effect] [amplifier]", RegionText.REGION_HELP_EFFECT_ADD);
             printHelpFor(source, "effectremove [effect]", RegionText.REGION_HELP_EFFECT_REMOVE);
 			printHelpFor(source, "setvalue [region] [item] [quantity]", RegionText.REGION_HELP_SET_VALUE);
+            printHelpFor(source, "removevalue [region]", RegionText.REGION_HELP_REMOVE_VALUE);
 			break;
         case 6:
-            printHelpFor(source, "removevalue [region]", RegionText.REGION_HELP_REMOVE_VALUE);
             printHelpFor(source, "buy [region]", RegionText.REGION_HELP_BUY);
             printHelpFor(source, "sell [region]", RegionText.REGION_HELP_SELL);
             printHelpFor(source, "excludeblock [block] [type]", RegionText.REGION_HELP_EXCLUDE_BLOCK);
             printHelpFor(source, "includeblock [block] [type]", RegionText.REGION_HELP_INCLUDE_BLOCK);
+            printHelpFor(source, "tempplate [value]", RegionText.REGION_HELP_TEMPLATE);
             printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
             break;
 		}

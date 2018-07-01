@@ -76,7 +76,6 @@ public class FlagPlaceListener {
 			if (block.getLocation().isPresent() &&
                     !type.equals(BlockTypes.WATER) &&  !type.equals(BlockTypes.FLOWING_WATER) &&
                     !type.equals(BlockTypes.FIRE) && !type.equals(BlockTypes.FROSTED_ICE)) {
-                LogUtils.print(type.getId());
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
 				if(region != null && FlagUtils.isExcludedFromPlace(region, type)) {
 				    if(region.getFlag(EnumRegionFlag.PLACE)) {

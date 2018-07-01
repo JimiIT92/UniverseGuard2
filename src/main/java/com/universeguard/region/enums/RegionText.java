@@ -138,6 +138,7 @@ public enum RegionText {
     REGION_HELP_REMOVE_VALUE("Remove the value from a Region"),
     REGION_HELP_BUY("Buy a Region"),
     REGION_HELP_SELL("Sells a Region"),
+    REGION_HELP_TEMPLATE("Sets or remove a pending Region from being a Template"),
     REGION_HELP_EXCLUDE_BLOCK("Exclude a block from being handled by the place or destroy flags"),
     REGION_HELP_INCLUDE_BLOCK("Include a block from being handled by the place or destroy flags"),
 	REGION_HELP_HELP("Shows this help or the flags help"),

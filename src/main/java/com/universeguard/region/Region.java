@@ -73,13 +73,15 @@ public class Region {
      * The list of blocks excluded from place and destroy flags
      */
     private RegionExcludedBlocks EXCLUDED_BLOCKS;
+
+    private boolean TEMPLATE;
 	
 	/**
 	 * Region Constructor
 	 * @param type The Region Type
 	 */
 	public Region(RegionType type) {
-		this(type, "");
+		this(type, "", false);
 	}
 	
 	/**
@@ -87,8 +89,8 @@ public class Region {
 	 * @param type The Region Type
 	 * @param name The Region name
 	 */
-	public Region(RegionType type, String name) {
-		this(type, name, GameModes.NOT_SET.getId());
+	public Region(RegionType type, String name, boolean template) {
+		this(type, name, GameModes.NOT_SET.getId(), template);
 	}
 	
 	/**
@@ -97,13 +99,14 @@ public class Region {
 	 * @param name The Region name
 	 * @param gamemode The Region GameMode
 	 */
-	public Region(RegionType type, String name, String gamemode) {
+	public Region(RegionType type, String name, String gamemode, boolean template) {
 		this.ID = UUID.randomUUID();
 		this.TYPE = type;
 		this.NAME = name;
 		this.GAMEMODE = gamemode;
 		this.COMMANDS = new ArrayList<RegionCommand>();
 		this.EXCLUDED_BLOCKS = new RegionExcludedBlocks();
+		this.TEMPLATE = template;
 		this.initFlags();
 	}
 	
@@ -861,6 +864,14 @@ public class Region {
                 this.EXCLUDED_BLOCKS.removeDestroy(block);
                 break;
         }
+    }
+
+    public void setTemplate(boolean template) {
+	    this.TEMPLATE = template;
+    }
+
+    public boolean getTemplate() {
+	    return  this.TEMPLATE;
     }
 
 	/**

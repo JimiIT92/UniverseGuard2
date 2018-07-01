@@ -83,7 +83,7 @@ public class LocalRegion extends Region {
 	 * @param name The Region name
 	 */
 	public LocalRegion(String name) {
-		this(name, null, null);
+		this(name, null, null, false);
 	}
 	
 	/**
@@ -92,8 +92,8 @@ public class LocalRegion extends Region {
 	 * @param firstPoint The first point
 	 * @param secondPoint The second point
 	 */
-	public LocalRegion(String name, RegionLocation firstPoint, RegionLocation secondPoint) {
-		super(RegionType.LOCAL, name);
+	public LocalRegion(String name, RegionLocation firstPoint, RegionLocation secondPoint, boolean template) {
+		super(RegionType.LOCAL, name, template);
 		this.FIRST_POINT= firstPoint;
 		this.SECOND_POINT = secondPoint;
 		this.PRIORITY = 0;
