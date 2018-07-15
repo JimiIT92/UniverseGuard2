@@ -58,6 +58,6 @@ public class PermissionUtils {
 	 * @return true if the player has all permissions, false otherwise
 	 */
 	public static boolean hasAllPermissions(Player player) {
-		return player.hasPermission("*") || player.hasPermission(RegionPermission.ALL.getValue());
+		return player.hasPermission("*") || player.hasPermission(RegionPermission.ALL.getValue()) || player.hasPermission("universeguard.*");
 	}
 }

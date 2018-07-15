@@ -67,7 +67,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.13";
+	public static final String VERSION = "2.14";
     /**
      * Region Version Number
      */
@@ -315,6 +315,9 @@ public class UniverseGuard {
         CommandSpec regionExcludeBlock = CommandUtils.buildCommandSpec("Exclude a block from being handled by the place or the destroy flag", new RegionExcludeBlockExecutor(), RegionPermission.ALL.getValue(),  GenericArguments.catalogedElement(Text.of("block"), BlockType.class),  GenericArguments.enumValue(Text.of("type"), EnumRegionBlock.class));
         CommandSpec regionIncludeBlock = CommandUtils.buildCommandSpec("Include a block from being handled by the place or the destroy flag", new RegionIncludeBlockExecutor(), RegionPermission.ALL.getValue(),  GenericArguments.catalogedElement(Text.of("block"), BlockType.class),  GenericArguments.enumValue(Text.of("type"), EnumRegionBlock.class));
         CommandSpec regionTemplate = CommandUtils.buildCommandSpec("Sets or remove a pending Region from being a Template", new RegionTemplateExecutor(), RegionPermission.ALL.getValue(), new BooleanElement(Text.of("template")));
+        CommandSpec regionRemoveFarewell = CommandUtils.buildCommandSpec("Removes the farewell message from a Region", new RegionRemoveFarewellExecutor(), RegionPermission.ALL.getValue());
+        CommandSpec regionRemoveGreeting = CommandUtils.buildCommandSpec("Removes the greeting message from a Region", new RegionRemoveGreetingExecutor(), RegionPermission.ALL.getValue());
+
 
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -394,6 +397,8 @@ public class UniverseGuard {
                 .child(regionExcludeBlock, "excludeblock")
                 .child(regionIncludeBlock, "includeblock")
                 .child(regionTemplate, "template")
+                .child(regionRemoveFarewell, "removefarewell")
+                .child(regionRemoveGreeting, "removegreeting")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
