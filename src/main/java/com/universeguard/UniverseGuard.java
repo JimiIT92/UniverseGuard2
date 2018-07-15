@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.universeguard.command.*;
 import com.universeguard.event.flags.*;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -34,34 +35,6 @@ import org.spongepowered.api.world.World;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import com.universeguard.command.RegionAddExecutor;
-import com.universeguard.command.RegionAtExecutor;
-import com.universeguard.command.RegionCommandExecutor;
-import com.universeguard.command.RegionCopyExecutor;
-import com.universeguard.command.RegionCreateExecutor;
-import com.universeguard.command.RegionDeleteExecutor;
-import com.universeguard.command.RegionEditExecutor;
-import com.universeguard.command.RegionExecutor;
-import com.universeguard.command.RegionExpandExecutor;
-import com.universeguard.command.RegionFarewellExecutor;
-import com.universeguard.command.RegionFlagExecutor;
-import com.universeguard.command.RegionFlagInfoExecutor;
-import com.universeguard.command.RegionGamemodeExecutor;
-import com.universeguard.command.RegionGreetingExecutor;
-import com.universeguard.command.RegionHelpExecutor;
-import com.universeguard.command.RegionHereExecutor;
-import com.universeguard.command.RegionInfoExecutor;
-import com.universeguard.command.RegionListExecutor;
-import com.universeguard.command.RegionNameExecutor;
-import com.universeguard.command.RegionPriorityExecutor;
-import com.universeguard.command.RegionReloadExecutor;
-import com.universeguard.command.RegionRemoveExecutor;
-import com.universeguard.command.RegionSaveExecutor;
-import com.universeguard.command.RegionSetExecutor;
-import com.universeguard.command.RegionSetSpawnExecutor;
-import com.universeguard.command.RegionSetTeleportExecutor;
-import com.universeguard.command.RegionSpawnExecutor;
-import com.universeguard.command.RegionTeleportExecutor;
 import com.universeguard.command.argument.BooleanElement;
 import com.universeguard.command.argument.CommandNameElement;
 import com.universeguard.command.argument.FlagCommandElement;
@@ -99,7 +72,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.11";
+	public static final String VERSION = "2.14";
 	/**
 	 * Plugin ID
 	 */
@@ -305,6 +278,8 @@ public class UniverseGuard {
 		CommandSpec regionAt = CommandUtils.buildCommandSpec("Tells wich region are at the give location", new RegionAtExecutor(), GenericArguments.location(Text.of("location")));
 		CommandSpec regionCreate = CommandUtils.buildCommandSpec("Create a region at thge specified location", new RegionCreateExecutor(), RegionPermission.ALL.getValue(), GenericArguments.integer(Text.of("x1")), GenericArguments.integer(Text.of("y1")), GenericArguments.integer(Text.of("z1")), GenericArguments.integer(Text.of("x2")), GenericArguments.integer(Text.of("y2")), GenericArguments.integer(Text.of("z2")), GenericArguments.catalogedElement(Text.of("dimension"), DimensionType.class), GenericArguments.string(Text.of("world")), GenericArguments.remainingJoinedStrings(Text.of("name")));
 		CommandSpec regionSet = CommandUtils.buildCommandSpec("Set a point of a pending region", new RegionSetExecutor(), RegionPermission.ALL.getValue(), new RegionPointCommandElement(Text.of("point")), GenericArguments.integer(Text.of("x")), GenericArguments.integer(Text.of("y")), GenericArguments.integer(Text.of("z")));
+        CommandSpec regionRemoveFarewell = CommandUtils.buildCommandSpec("Removes the farewell message from a Region", new RegionRemoveFarewellExecutor(), RegionPermission.ALL.getValue());
+        CommandSpec regionRemoveGreeting = CommandUtils.buildCommandSpec("Removes the greeting message from a Region", new RegionRemoveGreetingExecutor(), RegionPermission.ALL.getValue());
 		
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -375,6 +350,8 @@ public class UniverseGuard {
 				.child(regionAt, "at")
 				.child(regionCreate, "create")
 				.child(regionSet, "set")
+                .child(regionRemoveFarewell, "removefarewell")
+                .child(regionRemoveGreeting, "removegreeting")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

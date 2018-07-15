@@ -1250,6 +1250,8 @@ public class RegionUtils {
 		case 5:
 			printHelpFor(source, "farewell", RegionText.REGION_HELP_FAREWELL);
 			printHelpFor(source, "greeting", RegionText.REGION_HELP_GREETING);
+            printHelpFor(source, "removefarewell", RegionText.REGION_HELP_REMOVEFAREWELL);
+            printHelpFor(source, "removegreeting", RegionText.REGION_HELP_REMOVEGREETING);
 			printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
 			break;
 		}
