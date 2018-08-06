@@ -368,7 +368,7 @@ public class FlagUtils {
 					return id;
 			}
 			else
-				if(id.substring(id.indexOf(":") + 1).equalsIgnoreCase(name))
+				if(id.substring(id.indexOf(":") + 1).equalsIgnoreCase(name.toLowerCase()))
 					return id;
 		}
 		return null;

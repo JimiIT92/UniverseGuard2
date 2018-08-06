@@ -17,8 +17,6 @@ public class CommandNameElement extends PatternMatchingCommandElement{
 
 	@Override
 	protected Iterable<String> getChoices(CommandSource source) {
-		// Note, on servers with a lot of plugins, this could be a pretty
-		// huge list.  Not sure if we want to truncate?
 		return Sponge.getCommandManager().getPrimaryAliases();
 	}
 
