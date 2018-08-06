@@ -8,7 +8,9 @@
 package com.universeguard.utils;
 
 import java.util.Arrays;
+import java.util.Optional;
 
+import jdk.nashorn.internal.runtime.options.Option;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -16,6 +18,7 @@ import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
@@ -83,9 +86,29 @@ public class InventoryUtils {
 		Inventory inventory = player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class));
 		if(inventory instanceof Hotbar) {
 			Hotbar hotbar = (Hotbar)inventory;
-			if(hotbar.set(new SlotIndex(hotbar.getSelectedSlotIndex()), itemStack).getType().equals(InventoryTransactionResult.Type.FAILURE))
-				return addItemStackToInventory(player, itemStack);
-			return true;
+			Optional<Slot> selectedSlot = hotbar.getSlot(new SlotIndex(hotbar.getSelectedSlotIndex()));
+		    if(selectedSlot.isPresent()) {
+                if(selectedSlot.get().peek().isPresent()) {
+                    ItemStack selectedStack = selectedSlot.get().peek().get();
+                    if(isSelector(selectedStack) && isSelector(itemStack)) {
+                        return true;
+                    }
+                    else {
+                        for(int i = 0; i < hotbar.size() && i != hotbar.getSelectedSlotIndex(); i++) {
+                            Optional<Slot> slot = hotbar.getSlot(new SlotIndex(i));
+                            if (slot.isPresent() && !slot.get().peek().isPresent()) {
+                                hotbar.set(new SlotIndex(i), itemStack);
+                                return true;
+                            }
+                        }
+                    }
+                }
+		        else {
+                    hotbar.set(new SlotIndex(hotbar.getSelectedSlotIndex()), itemStack);
+                    return true;
+                }
+            }
+			return addItemStackToInventory(player, itemStack);
 		}
 		return false;
 	}
