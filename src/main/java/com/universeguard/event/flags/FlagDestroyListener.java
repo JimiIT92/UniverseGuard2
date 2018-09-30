@@ -18,6 +18,7 @@ import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.explosive.Explosive;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
@@ -103,7 +104,7 @@ public class FlagDestroyListener {
 				this.handleEvent(event, targetEntity.getLocation(), player);
 		}
 	}
-	
+
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event, @First Player player) {
 		if (!event.getTransactions().isEmpty()) {

@@ -10,6 +10,7 @@ package com.universeguard.event.flags;
 import java.util.Optional;
 
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.MatterProperty;
@@ -39,13 +40,19 @@ public class FlagLavaFlowListener {
 	public void onLavaFlow(ChangeBlockEvent.Pre event) {
 		if(!event.getLocations().isEmpty()) {
 			BlockSnapshot block = event.getLocations().get(0).getExtent().createSnapshot(event.getLocations().get(0).getBlockX(), event.getLocations().get(0).getBlockY(), event.getLocations().get(0).getBlockZ());
-			Location<World> location = event.getLocations().get(event.getLocations().size() - 1);
-			Optional<MatterProperty> matter = block.getState().getProperty(MatterProperty.class);
-			if(matter.isPresent() && matter.get().getValue().equals(Matter.LIQUID)) {
-				if(block.getState().getType().equals(BlockTypes.LAVA) || block.getState().getType().equals(BlockTypes.FLOWING_LAVA)) {
-					this.handleEvent(event, location, null);
-				}
-			}
+			if(block != null){
+                Location<World> location = event.getLocations().get(event.getLocations().size() - 1);
+                BlockState state = block.getState();
+                if(state != null && location != null) {
+                    Optional<MatterProperty> matter = state.getProperty(MatterProperty.class);
+                    if(matter.isPresent() && matter.get().getValue().equals(Matter.LIQUID)) {
+                        BlockType blockType = state.getType();
+                        if(blockType.equals(BlockTypes.LAVA) || blockType.equals(BlockTypes.FLOWING_LAVA)) {
+                            this.handleEvent(event, location, null);
+                        }
+                    }
+                }
+            }
 		}
 	}
 	
@@ -64,14 +71,7 @@ public class FlagLavaFlowListener {
 			this.handleEvent(event, player.getLocation(), player);
 		}
 	}
-	
-	/*@Listener
-	public void onLavaFlow(ChangeBlockEvent.Pre event, @Root LocatableBlock block) {
-		BlockType type = block.getBlockState().getType();
-		if(type.equals(BlockTypes.LAVA) || type.equals(BlockTypes.FLOWING_LAVA))
-			this.handleEvent(event, block.getLocation(), null);
-	}*/
-	
+
 	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
 		return RegionUtils.handleEvent(event, EnumRegionFlag.LAVA_FLOW, location, player, RegionEventType.GLOBAL);
 	}

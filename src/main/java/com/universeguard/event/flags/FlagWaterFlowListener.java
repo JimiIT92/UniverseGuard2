@@ -10,6 +10,7 @@ package com.universeguard.event.flags;
 import java.util.Optional;
 
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.MatterProperty;
@@ -39,14 +40,19 @@ public class FlagWaterFlowListener {
 	public void onWaterFlow(ChangeBlockEvent.Pre event) {
 		if(!event.getLocations().isEmpty()) {
 			BlockSnapshot block = event.getLocations().get(0).getExtent().createSnapshot(event.getLocations().get(0).getBlockX(), event.getLocations().get(0).getBlockY(), event.getLocations().get(0).getBlockZ());
-			Location<World> location = event.getLocations().get(event.getLocations().size() - 1);
-			Optional<MatterProperty> matter = block.getState().getProperty(MatterProperty.class);
-			if(matter.isPresent() && matter.get().getValue().equals(Matter.LIQUID)) {
-				BlockType blockType = block.getState().getType();
-				if(blockType.equals(BlockTypes.WATER) || blockType.equals(BlockTypes.FLOWING_WATER)) {
-					this.handleEvent(event, location, null);
-				}
-			}
+			if(block != null){
+                Location<World> location = event.getLocations().get(event.getLocations().size() - 1);
+                BlockState state = block.getState();
+                if(state != null && location != null){
+                    Optional<MatterProperty> matter = state.getProperty(MatterProperty.class);
+                    if(matter.isPresent() && matter.get().getValue().equals(Matter.LIQUID)) {
+                        BlockType blockType = state.getType();
+                        if(blockType.equals(BlockTypes.WATER) || blockType.equals(BlockTypes.FLOWING_WATER)) {
+                            this.handleEvent(event, location, null);
+                        }
+                    }
+                }
+            }
 		}
 	}
 	
@@ -65,14 +71,7 @@ public class FlagWaterFlowListener {
 			this.handleEvent(event, player.getLocation(), player);
 		}
 	}
-	
-	/*@Listener
-	public void onWaterFlow(ChangeBlockEvent.Pre event, @Root LocatableBlock block) {
-		BlockType type = block.getBlockState().getType();
-		if(type.equals(BlockTypes.WATER) || type.equals(BlockTypes.FLOWING_WATER))
-			this.handleEvent(event, block.getLocation(), null);
-	}*/
-	
+
 	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
 		return RegionUtils.handleEvent(event, EnumRegionFlag.WATER_FLOW, location, player, RegionEventType.GLOBAL);
 	}

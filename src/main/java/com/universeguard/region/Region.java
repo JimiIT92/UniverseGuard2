@@ -17,6 +17,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 import com.universeguard.UniverseGuard;
 import com.universeguard.utils.FlagUtils;
+import org.spongepowered.api.item.ItemType;
 
 /**
  * Region Class
@@ -73,6 +74,10 @@ public class Region {
      * The list of blocks excluded from place and destroy flags
      */
     private RegionExcludedBlocks EXCLUDED_BLOCKS;
+    /**
+     * The list of items that can't be used inside the Region
+     */
+    private ArrayList<String> DISALLOWED_ITEMS;
 
     private boolean TEMPLATE;
 	
@@ -106,6 +111,7 @@ public class Region {
 		this.GAMEMODE = gamemode;
 		this.COMMANDS = new ArrayList<RegionCommand>();
 		this.EXCLUDED_BLOCKS = new RegionExcludedBlocks();
+		this.DISALLOWED_ITEMS = new ArrayList<String>();
 		this.TEMPLATE = template;
 		this.initFlags();
 	}
@@ -863,6 +869,26 @@ public class Region {
                 this.EXCLUDED_BLOCKS.removePlace(block);
                 this.EXCLUDED_BLOCKS.removeDestroy(block);
                 break;
+        }
+    }
+
+    public void setDisallowedItems(ArrayList<String> items){
+	    this.DISALLOWED_ITEMS = items;
+    }
+
+    public ArrayList<String> getDisallowedItems(){
+	    return  this.DISALLOWED_ITEMS;
+    }
+
+    public void disallowItem(ItemType item){
+	    if(!this.DISALLOWED_ITEMS.contains(item.getId())){
+	        this.DISALLOWED_ITEMS.add(item.getId());
+        }
+    }
+
+    public void allowItem(ItemType item){
+	    if(this.DISALLOWED_ITEMS.contains(item.getId())){
+	        this.DISALLOWED_ITEMS.remove(item.getId());
         }
     }
 

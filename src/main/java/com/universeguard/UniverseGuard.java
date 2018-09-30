@@ -67,7 +67,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.15";
+	public static final String VERSION = "2.16";
     /**
      * Region Version Number
      */
@@ -317,7 +317,7 @@ public class UniverseGuard {
         CommandSpec regionTemplate = CommandUtils.buildCommandSpec("Sets or remove a pending Region from being a Template", new RegionTemplateExecutor(), RegionPermission.ALL.getValue(), new BooleanElement(Text.of("template")));
         CommandSpec regionRemoveFarewell = CommandUtils.buildCommandSpec("Removes the farewell message from a Region", new RegionRemoveFarewellExecutor(), RegionPermission.ALL.getValue());
         CommandSpec regionRemoveGreeting = CommandUtils.buildCommandSpec("Removes the greeting message from a Region", new RegionRemoveGreetingExecutor(), RegionPermission.ALL.getValue());
-
+        CommandSpec regionItemUse = CommandUtils.buildCommandSpec("Sets if you can or can't use an item inside a Region", new RegionItemUseExecutor(), RegionPermission.ALL.getValue(), new BooleanElement(Text.of("value")), GenericArguments.catalogedElement(Text.of("item"), ItemType.class));
 
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -399,6 +399,7 @@ public class UniverseGuard {
                 .child(regionTemplate, "template")
                 .child(regionRemoveFarewell, "removefarewell")
                 .child(regionRemoveGreeting, "removegreeting")
+                .child(regionItemUse, "itemuse")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
@@ -456,6 +457,7 @@ public class UniverseGuard {
         EventUtils.registerEvent(new FlagPistonsListener());
         EventUtils.registerEvent(new FlagFrostWalkerListener());
         EventUtils.registerEvent(new FlagFishingPoleListener());
+        EventUtils.registerEvent(new FlagItemUseListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())

@@ -1269,6 +1269,7 @@ public class RegionUtils {
             printHelpFor(source, "tempplate [value]", RegionText.REGION_HELP_TEMPLATE);
             printHelpFor(source, "removefarewell", RegionText.REGION_HELP_REMOVEFAREWELL);
             printHelpFor(source, "removegreeting", RegionText.REGION_HELP_REMOVEGREETING);
+            printHelpFor(source, "itemuse", RegionText.REGION_HELP_ITEMUSE);
             printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
             break;
 		}

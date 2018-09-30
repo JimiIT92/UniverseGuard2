@@ -33,7 +33,6 @@ public class FlagLighterListener {
 			this.handleEvent(event, player.getLocation(), player);
 	}
 
-	
 	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
 		return RegionUtils.handleEvent(event, EnumRegionFlag.LIGHTER, location, player, RegionEventType.LOCAL);
 	}
