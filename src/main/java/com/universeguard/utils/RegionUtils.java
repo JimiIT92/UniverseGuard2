@@ -101,7 +101,7 @@ public class RegionUtils {
 			return true;
 		} catch (IOException e) {
 			LogUtils.log(e);
-			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_EXCEPTION.getValue());
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_EXCEPTION.getValue(), "rg utils");
 			return false;
 		} finally {
 			if (fileWriter != null) {
@@ -109,7 +109,7 @@ public class RegionUtils {
 					fileWriter.close();
 				} catch (IOException e) {
 					LogUtils.log(e);
-					LogUtils.print(RegionText.REGION_WRITER_CLOSE_EXCEPTION.getValue());
+					LogUtils.print(RegionText.REGION_WRITER_CLOSE_EXCEPTION.getValue(), "rg utils");
 				}
 			}
 		}
@@ -204,14 +204,14 @@ public class RegionUtils {
 			fileWriter.write(gson.toJson(regions));
 		} catch (IOException e) {
 			LogUtils.log(e);
-			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue());
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue(), "rg utils");
 		} finally {
 			if (fileWriter != null) {
 				try {
 					fileWriter.close();
 				} catch (IOException e) {
 					LogUtils.log(e);
-					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue());
+					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue(), "rg utils");
 				}
 			}
 		}
@@ -445,14 +445,14 @@ public class RegionUtils {
 
 			} catch (FileNotFoundException e) {
 				LogUtils.log(e);
-				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue());
+				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue(), "rg utils");
 			} finally {
 				if (bufferedReader != null) {
 					try {
 						bufferedReader.close();
 					} catch (IOException e) {
 						LogUtils.log(e);
-						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue());
+						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
 					}
 				}
 			}
@@ -486,14 +486,14 @@ public class RegionUtils {
 				}
 			} catch (FileNotFoundException e) {
 				LogUtils.log(e);
-				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue());
+				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue(), "rg utils");
 			} finally {
 				if (bufferedReader != null) {
 					try {
 						bufferedReader.close();
 					} catch (IOException e) {
 						LogUtils.log(e);
-						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue());
+						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
 					}
 				}
 			}
@@ -1270,6 +1270,7 @@ public class RegionUtils {
             printHelpFor(source, "removefarewell", RegionText.REGION_HELP_REMOVEFAREWELL);
             printHelpFor(source, "removegreeting", RegionText.REGION_HELP_REMOVEGREETING);
             printHelpFor(source, "itemuse", RegionText.REGION_HELP_ITEMUSE);
+			printHelpFor(source, "globalfor", RegionText.REGION_HELP_GLOBAL_FOR);
             printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
             break;
 		}

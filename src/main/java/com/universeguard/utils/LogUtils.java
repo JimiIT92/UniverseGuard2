@@ -58,8 +58,8 @@ public class LogUtils {
 	 * Print a message to the console (written in yellow)
 	 * @param message The message
 	 */
-	public static void print(String message) {
-		print(TextColors.YELLOW, message);
+	public static void print(String message, String caller) {
+		print(TextColors.YELLOW, message, caller);
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class LogUtils {
 	 * @param color The color
 	 * @param message The message
 	 */
-	public static void print(TextColor color, String message) {
-		CONSOLE.sendMessage(Text.of(color, UniverseGuard.NAME, ": ", message));
+	public static void print(TextColor color, String message, String caller) {
+		CONSOLE.sendMessage(Text.of(color, UniverseGuard.NAME, "[", caller, "]: ", message));
 	}
 }

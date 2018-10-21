@@ -67,7 +67,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.16";
+	public static final String VERSION = "2.17";
     /**
      * Region Version Number
      */
@@ -187,7 +187,7 @@ public class UniverseGuard {
 	public void onInit(GameInitializationEvent event) {
 		// Initialize the Logger
 		LogUtils.init(LOGGER);
-		LogUtils.print(RegionText.LOADING.getValue());
+		LogUtils.print(RegionText.LOADING.getValue(), "init");
 		// Set the static instance
 		INSTANCE = this;
 		// Load the configuration
@@ -199,7 +199,7 @@ public class UniverseGuard {
 		// Register the events
 		this.registerEvents();
 		
-		LogUtils.print(RegionText.LOADED.getValue());
+		LogUtils.print(RegionText.LOADED.getValue(), "init");
 	}
 	/**
 	 * onGameStart Method. Called after the Plugin start
@@ -208,7 +208,7 @@ public class UniverseGuard {
 	@Listener
 	public void onGameStart(GameStartedServerEvent event) {
 		// Check for Global regions. If one is missing then create it
-		LogUtils.print(RegionText.CONFIGURATION_UPDATING_REGIONS.getValue());
+		LogUtils.print(RegionText.CONFIGURATION_UPDATING_REGIONS.getValue(), "init");
 		for(World w : Sponge.getServer().getWorlds()) {
 			if(RegionUtils.load(w.getName()) == null)
 				RegionUtils.save(new GlobalRegion(w.getName(), false));
@@ -217,11 +217,11 @@ public class UniverseGuard {
 		this.updateRegions();
 		// Convert the old region format to the new one (from UniverseGuard to UniverseGuard2)
 		if(RegionUtils.shouldConvertOldRegions()) {
-			LogUtils.print(RegionText.CONFIGURATION_CONVERTING_OLD_REGIONS.getValue());
+			LogUtils.print(RegionText.CONFIGURATION_CONVERTING_OLD_REGIONS.getValue(), "init");
 			RegionUtils.convertOldRegions();
-			LogUtils.print(RegionText.CONFIGURATION_OLD_REGIONS_CONVERTED.getValue());	
+			LogUtils.print(RegionText.CONFIGURATION_OLD_REGIONS_CONVERTED.getValue(), "init");
 		}
-		LogUtils.print(RegionText.CONFIGURATION_REGIONS_UPDATED.getValue());
+		LogUtils.print(RegionText.CONFIGURATION_REGIONS_UPDATED.getValue(), "init");
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class UniverseGuard {
 	 */
 	private void loadConfig() {
 		try {
-			LogUtils.print(RegionText.LOADING_CONFIGURATION.getValue());
+			LogUtils.print(RegionText.LOADING_CONFIGURATION.getValue(), "init");
 			// If there's no config file then create it
 			if (!CONFIG.exists())
 				CONFIG.createNewFile();
@@ -257,10 +257,10 @@ public class UniverseGuard {
 			FlagUtils.getValues(GAME, CONFIG_NODE);
 			// Set translations
 			TranslationUtils.getValues(CONFIG_NODE);
-			LogUtils.print(RegionText.LOADED_CONFIGURATION.getValue());
+			LogUtils.print(RegionText.LOADED_CONFIGURATION.getValue(), "init");
 		} catch (IOException e) {
 			LogUtils.log(e.getMessage());
-			LogUtils.print(TextColors.RED, RegionText.CONFIGURATION_LOADING_EXCEPTION.getValue());
+			LogUtils.print(TextColors.RED, RegionText.CONFIGURATION_LOADING_EXCEPTION.getValue(), "init");
 		}
 	}
 	/**
@@ -279,7 +279,7 @@ public class UniverseGuard {
 			CONFIG_LOADER.save(CONFIG_NODE);
 		} catch (IOException e) {
 			LogUtils.log(e.getMessage());
-			LogUtils.print(TextColors.RED, RegionText.CONFIGURATION_SAVE_EXCEPTION.getValue());
+			LogUtils.print(TextColors.RED, RegionText.CONFIGURATION_SAVE_EXCEPTION.getValue(), "init");
 		}
 	}
 	/**
@@ -358,7 +358,12 @@ public class UniverseGuard {
 				.arguments(GenericArguments.enumValue(Text.of("direction"), EnumDirection.class), GenericArguments.optional(GenericArguments.integer(Text.of("blocks"))))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
-		
+		CommandSpec regionGlobalFor = CommandSpec.builder().description(Text.of("Create a global region for a dimension"))
+					.executor(new RegionGlobalForExecutor())
+					.arguments(GenericArguments.string(Text.of("dimension")))
+					.permission(RegionPermission.ALL.getValue())
+				.build();
+
 		CommandSpec region = CommandSpec.builder().description(Text.of("Region command"))
 				.executor(new RegionExecutor())
 				.child(regionSave, "save")
@@ -400,6 +405,7 @@ public class UniverseGuard {
                 .child(regionRemoveFarewell, "removefarewell")
                 .child(regionRemoveGreeting, "removegreeting")
                 .child(regionItemUse, "itemuse")
+				.child(regionGlobalFor, "globalfor")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

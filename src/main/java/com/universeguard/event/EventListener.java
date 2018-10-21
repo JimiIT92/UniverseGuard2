@@ -46,6 +46,6 @@ public class EventListener {
 				&& !(event instanceof SpawnEntityEvent.ChunkLoad) && !(event instanceof ChangeBlockEvent.Modify)
 				&& !(event instanceof ChangeBlockEvent.Place) && !(event instanceof SpawnEntityEvent.Spawner)
 				&& !(event instanceof NotifyNeighborBlockEvent) && !(event instanceof ChangeDataHolderEvent.ValueChange))
-			LogUtils.print(TextColors.GREEN, event.getClass().getSimpleName());
+			LogUtils.print(TextColors.GREEN, event.getClass().getSimpleName(), "event listener");
 	}
 }

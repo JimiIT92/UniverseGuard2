@@ -123,14 +123,14 @@ public class FlagUtils {
             if(maxRegionSize > 0)
                 UniverseGuard.MAX_REGION_SIZE = maxRegionSize;
             else
-                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGION_SIZE.getValue() + String.valueOf(UniverseGuard.MAX_REGION_SIZE));
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGION_SIZE.getValue() + String.valueOf(UniverseGuard.MAX_REGION_SIZE), "flag utils");
         }
         if(!configNode.getNode("players", "max_regions").isVirtual()) {
             int maxRegions = configNode.getNode("players", "max_regions").getInt();
             if(maxRegions > 0)
                 UniverseGuard.MAX_REGIONS = maxRegions;
             else
-                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS), "flag utils");
         }
         for(RegionPermission permission : RegionPermission.values()) {
             if(!configNode.getNode("max_regions", permission.getName()).isVirtual()) {
@@ -138,7 +138,7 @@ public class FlagUtils {
                 if(maxRegions > 0)
                     UniverseGuard.MAX_PERMISSION_REGIONS.put(permission.getName(), maxRegions);
                 else
-                    LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
+                    LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS), "flag utils");
             }
         }
         if(!configNode.getNode("max_regions", "*").isVirtual()) {
@@ -146,7 +146,7 @@ public class FlagUtils {
             if(maxRegions > 0)
                 UniverseGuard.MAX_PERMISSION_REGIONS.put("*", maxRegions);
             else
-                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS));
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS), "flag utils");
         }
         if(!configNode.getNode("selector", "item").isVirtual()) {
 			String id = configNode.getNode("selector", "item").getString();
@@ -154,7 +154,7 @@ public class FlagUtils {
 			if(type.isPresent())
 				UniverseGuard.SELECTOR_ITEM = type.get();
 			else
-				LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_SELECTOR_ITEM.getValue() + UniverseGuard.SELECTOR_ITEM.getId());
+				LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_SELECTOR_ITEM.getValue() + UniverseGuard.SELECTOR_ITEM.getId(), "flag utils");
 		}
 	}
 	
