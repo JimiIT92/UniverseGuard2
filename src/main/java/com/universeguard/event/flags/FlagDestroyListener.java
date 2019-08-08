@@ -30,6 +30,7 @@ import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -54,12 +55,18 @@ public class FlagDestroyListener {
 		Entity targetEntity = event.getTargetEntity();
 		EntityType type = targetEntity.getType();
 		if(FlagUtils.isBlockEntity(type) || targetEntity instanceof TileEntity) {
-			if(this.handleEvent(event, targetEntity.getLocation(), player)) {
-			    player.getWorld().spawnEntity(targetEntity);
+			if(!this.handleEvent(event, targetEntity.getLocation(), player)) {
+				//LogUtils.log("SPAWN");
+			    //player.getWorld().spawnEntity(targetEntity);
             }
 		}
 	}
-	
+
+	@Listener
+	public void onEntityDestroyedItemDrop(DropItemEvent.Destruct event, @First Entity entity) {
+		LogUtils.log(entity.getType().getId());
+	}
+
 	@Listener
 	public void onBucketFill(InteractItemEvent.Secondary.MainHand event, @First Player player) {
 		this.handleBucketFill(event, player);
