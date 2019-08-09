@@ -83,13 +83,11 @@ public class FlagPlaceListener {
 	}
 
 	@Listener
-	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @Root Player player) {
+	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @First Player player) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
 			BlockType type = block.getState().getType();
-			if (block.getLocation().isPresent() &&
-                    !type.equals(BlockTypes.WATER) &&  !type.equals(BlockTypes.FLOWING_WATER) &&
-                    !type.equals(BlockTypes.FIRE) && !type.equals(BlockTypes.FROSTED_ICE)) {
+			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE)) {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
 				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && !PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
 				    if(region.getFlag(EnumRegionFlag.PLACE)) {
