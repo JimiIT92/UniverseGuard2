@@ -490,9 +490,6 @@ public class UniverseGuard {
                     .submit(UniverseGuard.INSTANCE);
         }
 
-		// Debug utility. Used internally
-		boolean debug = false;
-		if(debug)
-			EventUtils.registerEvent(new EventListener());
+		//EventUtils.registerEvent(new EventListener());
 	}
 }

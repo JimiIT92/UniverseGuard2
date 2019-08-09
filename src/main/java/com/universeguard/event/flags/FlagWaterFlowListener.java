@@ -19,9 +19,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -55,20 +59,22 @@ public class FlagWaterFlowListener {
             }
 		}
 	}
-	
+
+	@Listener
+	public void onWaterBucketUse(InteractBlockEvent.Secondary event, @First Player player) {
+		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+		if(item.isPresent() && item.get().getType().equals(ItemTypes.WATER_BUCKET)){
+			this.handleEvent(event, player.getLocation(), player);
+		}
+	}
+
 	@Listener
 	public void onWaterBucketFill(InteractItemEvent.Secondary event, @Root Player player) {
-		if(event.getItemStack().getType().equals(ItemTypes.BUCKET) && event.getInteractionPoint().isPresent()) {
+		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+		if(item.isPresent() && item.get().getType().equals(ItemTypes.BUCKET) && event.getInteractionPoint().isPresent()) {
 			BlockType block = player.getWorld().getBlock(event.getInteractionPoint().get().toInt()).getType();
 			if(block.equals(BlockTypes.WATER) || block.equals(BlockTypes.FLOWING_WATER))
 				this.handleEvent(event, player.getLocation(), player);
-		}
-	}
-	
-	@Listener
-	public void onWaterBucketUse(InteractItemEvent.Secondary event, @Root Player player) {
-		if(event.getItemStack().getType().equals(ItemTypes.WATER_BUCKET) && event.getInteractionPoint().isPresent()) {
-			this.handleEvent(event, player.getLocation(), player);
 		}
 	}
 

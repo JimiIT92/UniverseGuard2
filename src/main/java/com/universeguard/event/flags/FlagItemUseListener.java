@@ -29,6 +29,8 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Optional;
+
 /**
  * Handler for the itemuse flag
  * @author Jimi
@@ -40,18 +42,11 @@ public class FlagItemUseListener {
     public void onItemUse(InteractItemEvent.Secondary event, @First Player player) {
         Region region = RegionUtils.getRegion(player.getLocation());
         if(region != null){
-            ItemStackSnapshot stack = event.getItemStack();
-            if(stack != null){
-                if(region.getDisallowedItems().contains(stack.getType().getId())){
-                    event.setCancelled(true);
-
-                }
+            Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+            if(item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
+                event.setCancelled(true);
             }
-        }
-    }
 
-    private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
-        MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
-        return RegionUtils.handleEvent(event, EnumRegionFlag.LIGHTER, location, player, RegionEventType.LOCAL);
+        }
     }
 }
