@@ -43,11 +43,10 @@ public class FlagItemUseListener {
         Region region = RegionUtils.getRegion(player.getLocation());
         if(region != null){
             Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
-            if(item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
+            if(!PermissionUtils.hasPermission(player, RegionPermission.REGION) && item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
                 event.setCancelled(true);
                 MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
             }
-
         }
     }
 }

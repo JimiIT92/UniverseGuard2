@@ -1166,7 +1166,7 @@ public class RegionUtils {
 	private static boolean handleEvent(Cancellable event, EnumRegionFlag flag, Region region, Player player,
 			RegionEventType type) {
 		if (region != null) {
-			boolean cancel = flag.equals(EnumRegionFlag.INVINCIBLE) ? region.getFlag(flag) : !region.getFlag(flag);
+			boolean cancel = flag.equals(EnumRegionFlag.INVINCIBLE) == region.getFlag(flag);
 			if (player != null) {
 				if (type.equals(RegionEventType.LOCAL)) {
 					if (region.isLocal())

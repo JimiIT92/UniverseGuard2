@@ -8,6 +8,7 @@
 package com.universeguard.event.flags;
 
 import com.universeguard.region.Region;
+import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -25,16 +26,21 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
+
+import java.util.Optional;
 
 /**
  * Handler for the place flag
@@ -69,6 +75,14 @@ public class FlagPlaceListener {
 	}
 
 	@Listener
+	public void onBucketUse(InteractItemEvent.Secondary event, @First Player player) {
+		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+		if(item.isPresent() && item.get().getType().equals(ItemTypes.WATER_BUCKET) || item.get().getType().equals(ItemTypes.LAVA_BUCKET)){
+			this.handleEvent(event, player.getLocation(), player);
+		}
+	}
+
+	@Listener
 	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @Root Player player) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
@@ -77,7 +91,7 @@ public class FlagPlaceListener {
                     !type.equals(BlockTypes.WATER) &&  !type.equals(BlockTypes.FLOWING_WATER) &&
                     !type.equals(BlockTypes.FIRE) && !type.equals(BlockTypes.FROSTED_ICE)) {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
-				if(region != null && FlagUtils.isExcludedFromPlace(region, type)) {
+				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && !PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
 				    if(region.getFlag(EnumRegionFlag.PLACE)) {
                         event.setCancelled(true);
                         MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
