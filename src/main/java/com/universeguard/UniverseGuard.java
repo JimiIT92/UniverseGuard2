@@ -490,6 +490,6 @@ public class UniverseGuard {
                     .submit(UniverseGuard.INSTANCE);
         }
 
-		EventUtils.registerEvent(new EventListener());
+		//EventUtils.registerEvent(new EventListener());
 	}
 }
