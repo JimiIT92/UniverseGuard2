@@ -77,7 +77,7 @@ public class FlagPlaceListener {
 	@Listener
 	public void onBucketUse(InteractItemEvent.Secondary event, @First Player player) {
 		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
-		if(item.isPresent() && item.get().getType().equals(ItemTypes.WATER_BUCKET) || item.get().getType().equals(ItemTypes.LAVA_BUCKET)){
+		if(item.isPresent() && (item.get().getType().equals(ItemTypes.WATER_BUCKET) || item.get().getType().equals(ItemTypes.LAVA_BUCKET))){
 			this.handleEvent(event, player.getLocation(), player);
 		}
 	}

@@ -67,15 +67,15 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	public static final String VERSION = "2.17";
+	static final String VERSION = "2.19";
     /**
      * Region Version Number
      */
-    public static final float REGION_VERSION = Float.valueOf(VERSION);
+    public static final float REGION_VERSION = Float.parseFloat(VERSION);
 	/**
 	 * Plugin ID
 	 */
-	public static final String ID = "universeguard";
+	static final String ID = "universeguard";
 	/**
 	 * Plugin Name
 	 */
@@ -83,11 +83,11 @@ public class UniverseGuard {
 	/**
 	 * Plugin Description
 	 */
-	public static final String DESCRIPTION = "An easy to use world protection plugin for Sponge";
+	static final String DESCRIPTION = "An easy to use world protection plugin for Sponge";
 	/**
 	 * Plugin Author
 	 */
-	public static final String AUTHOR = "JimiIT92, Brycey92, eheimer";
+	static final String AUTHOR = "JimiIT92, Brycey92, eheimer";
 	/**
 	 * The Hunger Flag Timer update frequency (in seconds)
 	 */
@@ -127,7 +127,7 @@ public class UniverseGuard {
      */
 	public static int MAX_REGIONS = 10;
 
-    public static HashMap<String, Integer> MAX_PERMISSION_REGIONS = new HashMap<String, Integer>();
+    public static HashMap<String, Integer> MAX_PERMISSION_REGIONS = new HashMap<>();
     /**
      * If Regions can be purchased
      */
@@ -181,7 +181,7 @@ public class UniverseGuard {
 	
 	/**
 	 * onInit Method. Called on Plugin Load
-	 * @param event
+	 * @param event GameInitializationEvent
 	 */
 	@Listener
 	public void onInit(GameInitializationEvent event) {
@@ -203,7 +203,7 @@ public class UniverseGuard {
 	}
 	/**
 	 * onGameStart Method. Called after the Plugin start
-	 * @param event
+	 * @param event GameStartedServerEvent
 	 */
 	@Listener
 	public void onGameStart(GameStartedServerEvent event) {
@@ -228,7 +228,7 @@ public class UniverseGuard {
 	 * Update regions to the latest RegionVersion
 	 */
 	private void updateRegions() {
-		ArrayList<Region> updatedRegions = new ArrayList<Region>();
+		ArrayList<Region> updatedRegions = new ArrayList<>();
 		for(Region region : UniverseGuard.ALL_REGIONS) {
 			if(region.getVersion() != REGION_VERSION) {
 				updatedRegions.add(region);
