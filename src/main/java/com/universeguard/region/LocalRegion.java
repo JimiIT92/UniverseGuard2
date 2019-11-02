@@ -201,7 +201,15 @@ public class LocalRegion extends Region {
 	public ArrayList<RegionMember> getMembers() {
 		return this.MEMBERS;
 	}
-	
+
+	/**
+	 * Get the Region Owner
+	 * @return Region Owner
+	 */
+	public RegionMember getOwner() {
+		return this.MEMBERS.stream().filter(member -> member.getRole().equals(RegionRole.OWNER)).findFirst().get();
+	}
+
 	/**
 	 * Add a Player with the specified Role to the Region
 	 * @param player The player
