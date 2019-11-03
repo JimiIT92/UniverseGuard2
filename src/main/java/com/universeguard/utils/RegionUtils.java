@@ -13,13 +13,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.UUID;
 
+import com.google.gson.reflect.TypeToken;
 import com.universeguard.region.components.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -66,7 +64,7 @@ public class RegionUtils {
 
 	// Pending Regions
 	private static HashMap<CommandSource, Region> PENDINGS = new HashMap<CommandSource, Region>();
-
+	private static HashMap<UUID, RegionSell> SELLING_REGIONS = new HashMap<>();
 	/**
 	 * Save a Region to a JSON file
 	 * 
@@ -184,6 +182,31 @@ public class RegionUtils {
 		return false;
 	}
 
+	public static void loadSellingRegions() {
+		Gson gson = new Gson();
+		BufferedReader bufferedReader = null;
+		try {
+			File file = new File(getConfigFolder() + "/" + "selling_regions.json");
+			if(file.exists()) {
+				bufferedReader = new BufferedReader(new FileReader(file));
+				Type type = new TypeToken<Map<UUID, RegionSell>>(){}.getType();
+				SELLING_REGIONS = gson.fromJson(bufferedReader, type);
+			}
+		} catch (FileNotFoundException e) {
+			LogUtils.log(e);
+			LogUtils.print(TextColors.RED, RegionText.REGION_SELLING_LOAD_EXCEPTION.getValue(), "rg utils");
+		} finally {
+			if (bufferedReader != null) {
+				try {
+					bufferedReader.close();
+				} catch (IOException e) {
+					LogUtils.log(e);
+					LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
+				}
+			}
+		}
+	}
+
 	/**
 	 * Save a Regions index file
 	 */
@@ -213,6 +236,77 @@ public class RegionUtils {
 					LogUtils.log(e);
 					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue(), "rg utils");
 				}
+			}
+		}
+	}
+
+	/**
+	 * Save the Selling Regions file
+	 */
+	public static void saveSellingRegions() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+		FileWriter fileWriter = null;
+		try {
+			File directory = new File(getConfigFolder());
+			if (!directory.exists())
+				directory.mkdirs();
+			File file = new File(getConfigFolder() + "/" + "selling_regions.json");
+			if (!file.exists())
+				file.createNewFile();
+			fileWriter = new FileWriter(file);
+			fileWriter.write(gson.toJson(SELLING_REGIONS));
+		} catch (IOException e) {
+			LogUtils.log(e);
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue(), "rg utils");
+		} finally {
+			if (fileWriter != null) {
+				try {
+					fileWriter.close();
+				} catch (IOException e) {
+					LogUtils.log(e);
+					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue(), "rg utils");
+				}
+			}
+		}
+	}
+
+	public static void addSellingRegion(UUID owner, UUID regionId, RegionValue value) {
+		SELLING_REGIONS.putIfAbsent(regionId,new RegionSell(owner, regionId, value));
+		saveSellingRegions();
+	}
+
+	public static HashMap<UUID, RegionSell> getSellingRegions(UUID regionId) {
+		return SELLING_REGIONS;
+	}
+
+	public static RegionSell getSellingRegionForPlayer(UUID playerId) {
+		return SELLING_REGIONS.size() == 0 ? null : SELLING_REGIONS.values().stream().filter(sell -> sell.getOwner().equals(playerId) && sell.isBought()).findFirst().orElse(null);
+	}
+
+	public static void setRegionBought(UUID regionId) {
+		RegionSell sell = SELLING_REGIONS.get(regionId);
+		if(sell != null){
+			sell.setBought(true);
+			SELLING_REGIONS.put(regionId, sell);
+			Player owner = getPlayer(sell.getOwner());
+			if(owner != null && owner.isOnline()) {
+				MessageUtils.sendSuccessMessage(owner, RegionText.REGION_BOUGHT.getValue());
+				InventoryUtils.addItemsToInventory(owner, sell.getValue().getItem(), sell.getValue().getQuantity());
+				SELLING_REGIONS.remove(regionId);
+			}
+			saveSellingRegions();
+		}
+	}
+
+	public static void removeSellingRegion(UUID regionId) {
+		RegionSell region = SELLING_REGIONS.get(regionId);
+		if(region != null) {
+			Player owner = getPlayer(region.getOwner());
+			if(owner != null && owner.isOnline()) {
+				MessageUtils.sendSuccessMessage(owner, RegionText.REGION_BOUGHT.getValue());
+				InventoryUtils.addItemsToInventory(owner, region.getValue().getItem(), region.getValue().getQuantity());
+				SELLING_REGIONS.remove(regionId);
+				saveSellingRegions();
 			}
 		}
 	}
@@ -1425,7 +1519,7 @@ public class RegionUtils {
 	                return UniverseGuard.MAX_PERMISSION_REGIONS.get(permission.getName());
             }
         }
-	    return  UniverseGuard.MAX_REGIONS;
+	    return UniverseGuard.MAX_REGIONS;
     }
 
 	/**

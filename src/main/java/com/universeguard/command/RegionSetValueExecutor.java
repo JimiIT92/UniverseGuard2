@@ -62,7 +62,7 @@ public class RegionSetValueExecutor implements CommandExecutor {
 	}
 
 	private String getCommandUsage() {
-		return "/rg sell <region> <item> <quantity>";
+		return "/rg setvalue <region> <item> <quantity>";
 	}
 	
 }

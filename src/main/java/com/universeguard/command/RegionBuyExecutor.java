@@ -10,6 +10,7 @@ package com.universeguard.command;
 import com.universeguard.UniverseGuard;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
+import com.universeguard.region.components.RegionSell;
 import com.universeguard.region.components.RegionValue;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionText;
@@ -49,7 +50,9 @@ public class RegionBuyExecutor implements CommandExecutor {
                             RegionRole role = localRegion.getMembers().size() == 0 ? RegionRole.OWNER : RegionRole.MEMBER;
                             localRegion.addMember(player, role);
                             localRegion.setSold(true);
+                            RegionUtils.setRegionBought(localRegion.getId());
                             if(RegionUtils.save(localRegion)) {
+                                RegionUtils.removeSellingRegion(localRegion.getId());
                                 MessageUtils.sendSuccessMessage(src, RegionText.REGION_BUYED.getValue());
                             } else {
                                 MessageUtils.sendErrorMessage(src, RegionText.REGION_SAVE_EXCEPTION.getValue());

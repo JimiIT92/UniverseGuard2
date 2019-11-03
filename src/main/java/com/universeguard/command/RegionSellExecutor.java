@@ -41,9 +41,11 @@ public class RegionSellExecutor implements CommandExecutor {
                 Region region = RegionUtils.load(args.<String>getOne("region").get());
                 if (UniverseGuard.PURCHASABLE_REGIONS && region != null) {
                     LocalRegion localRegion = (LocalRegion) region;
+                    UUID owner = localRegion.getOwner().getUUID();
                     localRegion.getMembers().clear();
                     localRegion.setSold(false);
                     if(RegionUtils.save(localRegion)) {
+                        RegionUtils.addSellingRegion(owner, localRegion.getId(), localRegion.getValue());
                         MessageUtils.sendSuccessMessage(src, RegionText.REGION_SELLED.getValue());
                     } else
                         MessageUtils.sendErrorMessage(src, RegionText.REGION_SAVE_EXCEPTION.getValue());

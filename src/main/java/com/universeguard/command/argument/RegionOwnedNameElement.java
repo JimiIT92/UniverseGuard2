@@ -1,8 +1,9 @@
 package com.universeguard.command.argument;
 
-import com.universeguard.UniverseGuard;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
+import com.universeguard.region.enums.RegionPermission;
+import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.PatternMatchingCommandElement;
@@ -16,9 +17,9 @@ import java.util.ArrayList;
  * to build a list of region names for code completion
  */
 
-public class RegionToSellNameElement extends PatternMatchingCommandElement{
+public class RegionOwnedNameElement extends PatternMatchingCommandElement{
 
-	public RegionToSellNameElement(Text key) {
+	public RegionOwnedNameElement(Text key) {
 		super(key);
 	}
 
@@ -27,12 +28,17 @@ public class RegionToSellNameElement extends PatternMatchingCommandElement{
         ArrayList<String> regions = new ArrayList<>();
 	    if(source instanceof Player) {
 	        Player player = (Player)source;
-            for (Region region : RegionUtils.getPlayerRegions(player.getUniqueId())) {
-                if(region.isLocal()) {
-                    LocalRegion localRegion = (LocalRegion)region;
-					regions.add(localRegion.getName());
-                }
-            }
+	        if(PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
+	        	return new RegionNameElement(getKey()).getChoices(source);
+			} else {
+				for (Region region : RegionUtils.getPlayerRegions(player.getUniqueId())) {
+					if(region.isLocal()) {
+						LocalRegion localRegion = (LocalRegion)region;
+						if(localRegion.getOwner().getUUID().equals(player.getUniqueId()))
+							regions.add(localRegion.getName());
+					}
+				}
+			}
         }
 
 		return regions;

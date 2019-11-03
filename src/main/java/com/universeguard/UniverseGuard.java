@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import com.universeguard.command.*;
 import com.universeguard.command.argument.*;
+import com.universeguard.event.EventPlayerJoin;
 import com.universeguard.event.FlagEffectListener;
 import com.universeguard.event.flags.*;
 import com.universeguard.region.enums.*;
@@ -67,7 +68,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	static final String VERSION = "2.19";
+	static final String VERSION = "2.20";
     /**
      * Region Version Number
      */
@@ -194,6 +195,7 @@ public class UniverseGuard {
 		this.loadConfig();
 		// Load the regions
 		UniverseGuard.ALL_REGIONS = RegionUtils.getAllRegions();
+		RegionUtils.loadSellingRegions();
 		// Register the commands
 		this.registerCommands();
 		// Register the events
@@ -308,8 +310,8 @@ public class UniverseGuard {
 		CommandSpec regionSet = CommandUtils.buildCommandSpec("Set a point of a pending region", new RegionSetExecutor(), RegionPermission.ALL.getValue(), new RegionPointCommandElement(Text.of("point")), GenericArguments.integer(Text.of("x")), GenericArguments.integer(Text.of("y")), GenericArguments.integer(Text.of("z")));
         CommandSpec regionAddEffect = CommandUtils.buildCommandSpec("Add a potion effect to a Region", new RegionAddEffectExecutor(), RegionPermission.ALL.getValue(), GenericArguments.catalogedElement(Text.of("effect"), PotionEffectType.class), GenericArguments.integer(Text.of("level")));
         CommandSpec regionRemoveEffect = CommandUtils.buildCommandSpec("Remove a potion effect to a Region", new RegionRemoveEffectExecutor(), RegionPermission.ALL.getValue(), GenericArguments.catalogedElement(Text.of("effect"), PotionEffectType.class));
-        CommandSpec regionSetValue = CommandUtils.buildCommandSpec("Sets the value of a Region", new RegionSetValueExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("region")), GenericArguments.catalogedElement(Text.of("item"), ItemType.class), GenericArguments.integer(Text.of("quantity")));
-        CommandSpec regionRemoveValue = CommandUtils.buildCommandSpec("Remove a value from a Region", new RegionRemoveValueExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("region")));
+        CommandSpec regionSetValue = CommandUtils.buildCommandSpec("Sets the value of a Region", new RegionSetValueExecutor(), new RegionOwnedNameElement(Text.of("region")), GenericArguments.catalogedElement(Text.of("item"), ItemType.class), GenericArguments.integer(Text.of("quantity")));
+        CommandSpec regionRemoveValue = CommandUtils.buildCommandSpec("Remove a value from a Region", new RegionRemoveValueExecutor(), new RegionOwnedNameElement(Text.of("region")));
         CommandSpec regionBuy = CommandUtils.buildCommandSpec("Buy a Region", new RegionBuyExecutor(), new RegionToBuyNameElement(Text.of("region")));
         CommandSpec regionSell = CommandUtils.buildCommandSpec("Sells a Region", new RegionSellExecutor(), new RegionToSellNameElement(Text.of("region")));
         CommandSpec regionExcludeBlock = CommandUtils.buildCommandSpec("Exclude a block from being handled by the place or the destroy flag", new RegionExcludeBlockExecutor(), RegionPermission.ALL.getValue(),  GenericArguments.catalogedElement(Text.of("block"), BlockType.class),  GenericArguments.enumValue(Text.of("type"), EnumRegionBlock.class));
@@ -332,13 +334,11 @@ public class UniverseGuard {
 		CommandSpec regionAdd = CommandSpec.builder().description(Text.of("Add a player into a region"))
 				.executor(new RegionAddExecutor())
 				.arguments(GenericArguments.enumValue(Text.of("role"), RegionRole.class), GenericArguments.string(Text.of("name")), new RegionNameElement(Text.of("region")))
-				.permission(RegionPermission.ALL.getValue())
 				.build();
 		
 		CommandSpec regionRemove = CommandSpec.builder().description(Text.of("Remove a player from a region"))
 				.executor(new RegionRemoveExecutor())
 				.arguments(GenericArguments.string(Text.of("name")), new RegionNameElement(Text.of("region")))
-				.permission(RegionPermission.ALL.getValue())
 				.build();
 		
 		CommandSpec regionFlag = CommandSpec.builder().description(Text.of("Set the flag of a region"))
@@ -464,6 +464,7 @@ public class UniverseGuard {
         EventUtils.registerEvent(new FlagFrostWalkerListener());
         EventUtils.registerEvent(new FlagFishingPoleListener());
         EventUtils.registerEvent(new FlagItemUseListener());
+        EventUtils.registerEvent(new EventPlayerJoin());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())

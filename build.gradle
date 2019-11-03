@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.universeguard'
-version = '2.19'
+version = '2.20'
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0'
