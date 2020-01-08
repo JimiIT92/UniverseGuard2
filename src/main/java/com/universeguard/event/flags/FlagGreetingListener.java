@@ -44,10 +44,10 @@ public class FlagGreetingListener {
 	{
 		Location<World> to = event.getToTransform().getLocation();
 		Region regionTo = RegionUtils.getRegion(to);
-		if(regionTo.isLocal()) {
+		if(regionTo != null && regionTo.isLocal()) {
 			Location<World> from = event.getFromTransform().getLocation();
 			Region regionFrom = RegionUtils.getRegion(from);
-			if(regionFrom != null && regionTo != null && regionFrom != regionTo && regionTo.getFlag(EnumRegionFlag.ENTER) &&
+			if(regionFrom != null && regionFrom != regionTo && regionTo.getFlag(EnumRegionFlag.ENTER) &&
 					!((LocalRegion)regionTo).getGreetingMessage().isEmpty()) {
 				MessageUtils.sendHotbarSuccessMessage(player, ((LocalRegion)regionTo).getGreetingMessage());
 			}

@@ -18,6 +18,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.ItemType;
@@ -190,6 +191,7 @@ public class FlagUtils {
 	 * @return The interact with the given block if exists, null othewrise
 	 */
 	public static EnumRegionInteract getInteract(BlockType block) {
+
 		if(block.equals(BlockTypes.CRAFTING_TABLE))
 			return getInteract("craftingtable");
 		else if(block.equals(BlockTypes.ANVIL))
@@ -200,21 +202,26 @@ public class FlagUtils {
 			return getInteract("hopper");
 		else if(block.equals(BlockTypes.LEVER))
 			return getInteract("lever");
-		else if(block.equals(BlockTypes.STONE_BUTTON) || block.equals(BlockTypes.WOODEN_BUTTON))
+		else if(block.equals(BlockTypes.STONE_BUTTON) || block.equals(BlockTypes.WOODEN_BUTTON) ||
+				(block.getDefaultState().getKeys().contains(Keys.POWERED) && block.getDefaultState().getKeys().contains(Keys.DIRECTION)))
 			return getInteract("button");
 		else if(block.equals(BlockTypes.FURNACE))
 			return getInteract("furnace");
 		else if(block.equals(BlockTypes.WOODEN_DOOR) || block.equals(BlockTypes.BIRCH_DOOR) || block.equals(BlockTypes.SPRUCE_DOOR) ||
 				block.equals(BlockTypes.JUNGLE_DOOR) || block.equals(BlockTypes.ACACIA_DOOR) || block.equals(BlockTypes.DARK_OAK_DOOR) ||
-				block.equals(BlockTypes.IRON_DOOR))
+				block.equals(BlockTypes.IRON_DOOR) || block.getDefaultState().getKeys().contains(Keys.HINGE_POSITION))
 			return getInteract("door");
 		else if(block.equals(BlockTypes.FENCE_GATE) || block.equals(BlockTypes.BIRCH_FENCE_GATE) || block.equals(BlockTypes.SPRUCE_FENCE_GATE) ||
-				block.equals(BlockTypes.JUNGLE_FENCE_GATE) || block.equals(BlockTypes.ACACIA_FENCE_GATE) || block.equals(BlockTypes.DARK_OAK_FENCE_GATE))
+				block.equals(BlockTypes.JUNGLE_FENCE_GATE) || block.equals(BlockTypes.ACACIA_FENCE_GATE) || block.equals(BlockTypes.DARK_OAK_FENCE_GATE)
+				|| block.getDefaultState().getKeys().contains(Keys.IN_WALL))
 			return getInteract("fencegate");
-		else if(block.equals(BlockTypes.TRAPDOOR) || block.equals(BlockTypes.IRON_TRAPDOOR))
+		else if(block.equals(BlockTypes.TRAPDOOR) || block.equals(BlockTypes.IRON_TRAPDOOR) || block.getDefaultState().getKeys().contains(Keys.OPEN))
 			return getInteract("trapdoor");
 		else if(block.equals(BlockTypes.STANDING_SIGN) || block.equals(BlockTypes.WALL_SIGN))
 			return getInteract("sign");
+		else if(block.equals(BlockTypes.WOODEN_PRESSURE_PLATE) || block.equals(BlockTypes.STONE_PRESSURE_PLATE) || block.getDefaultState().getKeys().contains(Keys.POWERED)) {
+			return getInteract("pressureplate");
+		}
 		else
 			return null;
 	}
