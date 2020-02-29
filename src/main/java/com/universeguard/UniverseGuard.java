@@ -68,7 +68,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	static final String VERSION = "2.21";
+	static final String VERSION = "2.22";
     /**
      * Region Version Number
      */
@@ -289,6 +289,7 @@ public class UniverseGuard {
 	 */
 	private void registerCommands() {
 		CommandSpec regionSave = CommandUtils.buildCommandSpec("Save a region", new RegionSaveExecutor(), RegionPermission.ALL.getValue());
+		CommandSpec regionDiscard = CommandUtils.buildCommandSpec("Discard some region edits", new RegionDiscardExecutor(), RegionPermission.ALL.getValue());
 		CommandSpec regionName = CommandUtils.buildCommandSpec("Set the name of a region", new RegionNameExecutor(), RegionPermission.ALL.getValue(), GenericArguments.remainingJoinedStrings(Text.of("name")));
 		CommandSpec regionDelete = CommandUtils.buildCommandSpec("Delete a region", new RegionDeleteExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")));
 		CommandSpec regionEdit = CommandUtils.buildCommandSpec("Allow editing a region", new RegionEditExecutor(), RegionPermission.ALL.getValue(), new RegionNameElement(Text.of("name")));
@@ -406,6 +407,7 @@ public class UniverseGuard {
                 .child(regionRemoveGreeting, "removegreeting")
                 .child(regionItemUse, "itemuse")
 				.child(regionGlobalFor, "globalfor")
+				.child(regionDiscard, "discard")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}

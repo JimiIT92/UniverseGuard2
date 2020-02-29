@@ -205,6 +205,7 @@ public enum RegionText {
     REGION_FLAG_HELP_FROST_WALKER("Allow/disallow the placing of Frosted Ice by Frost Walker boots in the region"),
     REGION_FLAG_HELP_FISHING_POLE("Sets if non-members can use fishing poles in the region"),
 	NO_PENDING_REGION("You don't have any pending region!"),
+	REGION_DISCARDED("Region edits discarded!"),
 	NO_PERMISSION_ITEM("You do not have permission to use this item!"),
 	NO_PERMISSION_REGION("You don't have permission to do that!"),
 	NO_PERMISSION_COMMAND("You do not have permission to use this command!"),

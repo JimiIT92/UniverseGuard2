@@ -595,6 +595,53 @@ public class RegionUtils {
 		return regions;
 	}
 
+	public static Region reloadRegion(UUID id, RegionType type) {
+		Region loadedRegion = load(id);
+		Region region = null;
+		if(loadedRegion != null) {
+			File file = getFile(loadedRegion);
+			Gson gson = new Gson();
+			BufferedReader bufferedReader = null;
+			try {
+				assert loadedRegion != null;
+				bufferedReader = new BufferedReader(new FileReader(file));
+				if (type == RegionType.LOCAL) {
+					region = gson.fromJson(bufferedReader, LocalRegion.class);
+				} else {
+					region = gson.fromJson(bufferedReader, GlobalRegion.class);
+				}
+			} catch (FileNotFoundException e) {
+				LogUtils.log(e);
+				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue(), "rg utils");
+			} finally {
+				if (bufferedReader != null) {
+					try {
+						bufferedReader.close();
+					} catch (IOException e) {
+						LogUtils.log(e);
+						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
+					}
+				}
+			}
+		}
+
+		if(region != null) {
+			Region cachedRegion = null;
+			for (Region cached : UniverseGuard.ALL_REGIONS) {
+				if (cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
+					cachedRegion = cached;
+					break;
+				}
+			}
+			if (cachedRegion != null) {
+				UniverseGuard.ALL_REGIONS.remove(cachedRegion);
+			}
+			UniverseGuard.ALL_REGIONS.add(region);
+		}
+
+		return region;
+	}
+
 	/**
 	 * Set the pending Region for a player
 	 * 
