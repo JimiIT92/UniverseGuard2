@@ -30,6 +30,8 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -852,32 +854,32 @@ public class RegionUtils {
 			ArrayList<Text> flags = new ArrayList<Text>();
 			for (int i = 0; i < region.getFlags().size(); i++) {
 				RegionFlag flag = region.getFlags().get(i);
-				flags.add(Text.of(flag.getValue() ? TextColors.GREEN : TextColors.RED, flag.getName(),
-						i < region.getFlags().size() - 1 ? ", " : ""));
+				flags.add(Text.builder().append(Text.of(flag.getValue() ? TextColors.GREEN : TextColors.RED, flag.getName(),
+						i < region.getFlags().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag flag " + flag.getName() + " " + !flag.getValue())).build());
 			}
 			source.sendMessage(Text.of(flags.toArray()));
 			MessageUtils.sendMessage(source, RegionText.INTERACTS.getValue(), TextColors.YELLOW);
 			ArrayList<Text> interacts = new ArrayList<Text>();
 			for (int i = 0; i < region.getInteracts().size(); i++) {
 				RegionInteract interact = region.getInteracts().get(i);
-				interacts.add(Text.of(interact.isEnabled() ? TextColors.GREEN : TextColors.RED, interact.getBlock(),
-						i < region.getInteracts().size() - 1 ? ", " : ""));
+				interacts.add(Text.builder().append(Text.of(interact.isEnabled() ? TextColors.GREEN : TextColors.RED, interact.getBlock(),
+						i < region.getInteracts().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag interact " + interact.getBlock() + " " + !interact.isEnabled())).build());
 			}
 			source.sendMessage(Text.of(interacts.toArray()));
 			MessageUtils.sendMessage(source, RegionText.EXPLOSIONS_DAMAGE.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDamage = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
 				RegionExplosion explosion = region.getExplosions().get(i);
-				explosionsDamage.add(Text.of(explosion.getDamage() ? TextColors.GREEN : TextColors.RED,
-						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
+				explosionsDamage.add(Text.builder().append(Text.of(explosion.getDamage() ? TextColors.GREEN : TextColors.RED,
+						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag explosiondamage " + explosion.getExplosion() + " " + !explosion.getDamage())).build());
 			}
 			source.sendMessage(Text.of(explosionsDamage.toArray()));
 			MessageUtils.sendMessage(source, RegionText.EXPLOSIONS_DESTROY.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
 				RegionExplosion explosion = region.getExplosions().get(i);
-				explosionsDestroy.add(Text.of(explosion.getDestroy() ? TextColors.GREEN : TextColors.RED,
-						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
+				explosionsDestroy.add(Text.builder().append(Text.of(explosion.getDestroy() ? TextColors.GREEN : TextColors.RED,
+						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag explosiondestroy " + explosion.getExplosion() + " " + !explosion.getDestroy())).build());
 			}
 			source.sendMessage(Text.of(explosionsDestroy.toArray()));
 
@@ -885,8 +887,8 @@ public class RegionUtils {
 			ArrayList<Text> vehiclesPlace = new ArrayList<Text>();
 			for (int i = 0; i < region.getVehicles().size(); i++) {
 				RegionVehicle vehicle = region.getVehicles().get(i);
-				vehiclesPlace.add(Text.of(vehicle.getPlace() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
-						i < region.getVehicles().size() - 1 ? ", " : ""));
+				vehiclesPlace.add(Text.builder().append(Text.of(vehicle.getPlace() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
+						i < region.getVehicles().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag vehicleplace " + vehicle.getName() + " " + !vehicle.getPlace())).build());
 			}
 			source.sendMessage(Text.of(vehiclesPlace.toArray()));
 
@@ -894,8 +896,8 @@ public class RegionUtils {
 			ArrayList<Text> vehiclesDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getVehicles().size(); i++) {
 				RegionVehicle vehicle = region.getVehicles().get(i);
-				vehiclesDestroy.add(Text.of(vehicle.getDestroy() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
-						i < region.getVehicles().size() - 1 ? ", " : ""));
+				vehiclesDestroy.add(Text.builder().append(Text.of(vehicle.getDestroy() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
+						i < region.getVehicles().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag vehicledestroy " + vehicle.getName() + " " + !vehicle.getDestroy())).build());
 			}
 			source.sendMessage(Text.of(vehiclesDestroy.toArray()));
 
@@ -904,8 +906,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsSpawn = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsSpawn.add(Text.of(mob.getSpawn() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsSpawn.add(Text.builder().append(Text.of(mob.getSpawn() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobspawn " + mob.getMob() + " " + !mob.getSpawn())).build());
 				}
 				source.sendMessage(Text.of(mobsSpawn.toArray()));
 
@@ -913,8 +915,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsPve = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsPve.add(Text.of(mob.getPve() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsPve.add(Text.builder().append(Text.of(mob.getPve() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobpve " + mob.getMob() + " " + !mob.getPve())).build());
 				}
 				source.sendMessage(Text.of(mobsPve.toArray()));
 
@@ -922,8 +924,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsDamage = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsDamage.add(Text.of(mob.getDamage() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsDamage.add(Text.builder().append(Text.of(mob.getDamage() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobdamage " + mob.getMob() + " " + !mob.getDamage())).build());
 				}
 				source.sendMessage(Text.of(mobsDamage.toArray()));
 
@@ -931,8 +933,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsDrop = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsDrop.add(Text.of(mob.getDrop() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsDrop.add(Text.builder().append(Text.of(mob.getDrop() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobdrop " + mob.getMob() + " " + !mob.getDrop())).build());
 				}
 				source.sendMessage(Text.of(mobsDrop.toArray()));
 
@@ -940,8 +942,8 @@ public class RegionUtils {
                 ArrayList<Text> mobsInteract = new ArrayList<Text>();
                 for (int i = 0; i < region.getMobs().size(); i++) {
                     RegionMob mob = region.getMobs().get(i);
-                    mobsInteract.add(Text.of(mob.getInteract() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-                            i < region.getMobs().size() - 1 ? ", " : ""));
+                    mobsInteract.add(Text.builder().append(Text.of(mob.getInteract() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+                            i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobinteract " + mob.getMob() + " " + !mob.getInteract())).build());
                 }
                 source.sendMessage(Text.of(mobsInteract.toArray()));
 			}
