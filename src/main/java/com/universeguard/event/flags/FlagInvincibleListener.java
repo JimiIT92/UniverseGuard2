@@ -38,7 +38,6 @@ public class FlagInvincibleListener {
 
 	@Listener
 	public void onPvp(InteractItemEvent event, @First Player player) {
-
 		if(event.getContext().containsKey(EventContextKeys.ENTITY_HIT)) {
 			if(handleEvent(event, player.getLocation(), player))
 				event.setCancelled(true);
