@@ -2,8 +2,10 @@ package com.universeguard.command.argument;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -81,6 +83,7 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 					flags.add("all");
 					flags.add("allhostile");
 					flags.add("allpassive");
+					break;
 			default: break;
 			}
 		}

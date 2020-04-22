@@ -7,6 +7,7 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.utils.*;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Creature;
@@ -24,10 +25,8 @@ import org.spongepowered.api.event.filter.cause.Root;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
-import com.universeguard.utils.RegionUtils;
+
+import java.util.stream.Collectors;
 
 /**
  * Handler for the mobspawn flag

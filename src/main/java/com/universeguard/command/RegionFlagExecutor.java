@@ -7,6 +7,7 @@
  */
 package com.universeguard.command;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -37,7 +38,7 @@ public class RegionFlagExecutor implements CommandExecutor {
 		if (RegionUtils.hasPendingRegion(src)) {
 			if (args.hasAny("subflag") && args.hasAny("flag") && args.hasAny("value")) {
 				Region region = RegionUtils.getPendingRegion(src);
-				boolean value = Boolean.valueOf(args.<String>getOne("value").get());
+				boolean value = Boolean.parseBoolean(args.<String>getOne("value").get());
 				String name = args.<String>getOne("flag").get();
 				String subflag = args.<String>getOne("subflag").get();
 				if (!subflag.equalsIgnoreCase("flag")) {
