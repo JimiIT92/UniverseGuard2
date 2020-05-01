@@ -9,9 +9,12 @@ package com.universeguard.region;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.universeguard.region.components.*;
 import com.universeguard.region.enums.*;
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
@@ -420,6 +423,11 @@ public class Region {
 	 * @return true if the command is enabled or not set, false otherwise
 	 */
 	public boolean isCommandEnabled(String command) {
+		LogUtils.log(command);
+		LogUtils.log(this.COMMANDS.stream().map(RegionCommand::getCommand).collect(Collectors.joining()));
+		if(this.COMMANDS.stream().anyMatch(s -> command.toLowerCase().startsWith(s.getCommand().toLowerCase()))) {
+			return false;
+		}
 		RegionCommand regionCommand = getRegionCommand(command);
 		return regionCommand == null ? true : regionCommand.isEnabled();
 	}

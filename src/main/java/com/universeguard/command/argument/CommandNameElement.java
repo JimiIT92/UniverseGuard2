@@ -17,7 +17,7 @@ public class CommandNameElement extends PatternMatchingCommandElement{
 
 	@Override
 	protected Iterable<String> getChoices(CommandSource source) {
-		return Sponge.getCommandManager().getPrimaryAliases();
+		return Sponge.getCommandManager().getAliases();
 	}
 
 	@Override

@@ -350,7 +350,7 @@ public class UniverseGuard {
 		
 		CommandSpec regionCommand = CommandSpec.builder().description(Text.of("Allow or disallow a command in a region"))
 				.executor(new RegionCommandExecutor())
-				.arguments(new BooleanElement(Text.of("value")), new CommandNameElement(Text.of("command")))
+				.arguments(new BooleanElement(Text.of("value")), GenericArguments.remainingJoinedStrings(Text.of("command")))
 				.permission(RegionPermission.ALL.getValue())
 				.build();
 		

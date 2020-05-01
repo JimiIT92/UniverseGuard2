@@ -7,6 +7,7 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.command.SendCommandEvent;
@@ -28,7 +29,7 @@ public class FlagCommandListener {
 
 	@Listener
 	public void onCommand(SendCommandEvent event, @First Player player) {
-		this.handleEvent(event, event.getCommand(), player);
+		this.handleEvent(event, event.getCommand() + (!event.getArguments().isEmpty() ? " " + event.getArguments() : ""), player);
 	}
 	
 	private void handleEvent(SendCommandEvent event, String command, Player player) {
