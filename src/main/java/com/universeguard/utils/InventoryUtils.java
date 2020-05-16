@@ -7,6 +7,7 @@
  */
 package com.universeguard.utils;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.universeguard.UniverseGuard;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -76,15 +77,18 @@ public class InventoryUtils {
 				.query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class))
 				.offer(itemStack).getType().equals(InventoryTransactionResult.Type.SUCCESS);
 		if(!result) {
-			World world = player.getLocation().getExtent();
-			Entity itemStackEntity = world.createEntity(EntityTypes.ITEM, player.getPosition());
-			itemStackEntity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-			world.spawnEntity(itemStackEntity);
+			dropItem(player.getWorld(), player.getPosition().add(0F, 0.25F, 0F), itemStack);
 		}
 		else {
 			return false;
 		}
 		return true;
+	}
+
+	public static void dropItem(World world, Vector3d location, ItemStack itemStack) {
+		Entity itemStackEntity = world.createEntity(EntityTypes.ITEM, location);
+		itemStackEntity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+		world.spawnEntity(itemStackEntity);
 	}
 
     public static boolean addItemsToInventory(Player player, ItemType itemType, int quantity) {
