@@ -81,7 +81,13 @@ public class Region {
      * The list of items that can't be used inside the Region
      */
     private ArrayList<String> DISALLOWED_ITEMS;
-
+	/**
+	 * The list of blocks that can't be used inside the Region
+	 */
+	private ArrayList<String> DISALLOWED_BLOCKS;
+	/**
+	 * If this Region is a Template
+	 */
     private boolean TEMPLATE;
 	
 	/**
@@ -115,6 +121,7 @@ public class Region {
 		this.COMMANDS = new ArrayList<RegionCommand>();
 		this.EXCLUDED_BLOCKS = new RegionExcludedBlocks();
 		this.DISALLOWED_ITEMS = new ArrayList<String>();
+		this.DISALLOWED_BLOCKS = new ArrayList<String>();
 		this.TEMPLATE = template;
 		this.initFlags();
 	}
@@ -423,13 +430,11 @@ public class Region {
 	 * @return true if the command is enabled or not set, false otherwise
 	 */
 	public boolean isCommandEnabled(String command) {
-		LogUtils.log(command);
-		LogUtils.log(this.COMMANDS.stream().map(RegionCommand::getCommand).collect(Collectors.joining()));
 		if(this.COMMANDS.stream().anyMatch(s -> command.toLowerCase().startsWith(s.getCommand().toLowerCase()))) {
 			return false;
 		}
 		RegionCommand regionCommand = getRegionCommand(command);
-		return regionCommand == null ? true : regionCommand.isEnabled();
+		return regionCommand == null || regionCommand.isEnabled();
 	}
 	
 	/**
@@ -899,6 +904,26 @@ public class Region {
 	        this.DISALLOWED_ITEMS.remove(item.getId());
         }
     }
+
+	public void setDisallowedBlocks(ArrayList<String> blocks){
+		this.DISALLOWED_BLOCKS = blocks;
+	}
+
+	public ArrayList<String> getDisallowedBlocks(){
+		return  this.DISALLOWED_BLOCKS;
+	}
+
+	public void disallowBlock(BlockType block){
+		if(!this.DISALLOWED_BLOCKS.contains(block.getId())){
+			this.DISALLOWED_BLOCKS.add(block.getId());
+		}
+	}
+
+	public void allowBlock(BlockType block){
+		if(this.DISALLOWED_BLOCKS.contains(block.getId())){
+			this.DISALLOWED_BLOCKS.remove(block.getId());
+		}
+	}
 
     public void setTemplate(boolean template) {
 	    this.TEMPLATE = template;

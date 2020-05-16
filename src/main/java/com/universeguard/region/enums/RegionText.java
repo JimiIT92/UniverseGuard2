@@ -79,6 +79,8 @@ public enum RegionText {
 	REGION_COMMAND_DISABLED("Command disabled"),
     REGION_ITEM_ENABLED("Item enabled"),
     REGION_ITEM_DISABLED("Item disabled"),
+	REGION_BLOCK_ENABLED("Block enabled"),
+	REGION_BLOCK_DISABLED("Block disabled"),
 	REGION_COMMAND_NOT_FOUND("Command not found!"),
 	EDITING_GLOBAL("WARNING! You are editing a global region. Edit it may affect protection in you world!"),
 	PLAYER_IN_REGION("This player is already a member of a region"),

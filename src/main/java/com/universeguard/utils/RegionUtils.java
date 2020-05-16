@@ -7,18 +7,14 @@
  */
 package com.universeguard.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.Map.Entry;
-
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.universeguard.UniverseGuard;
+import com.universeguard.region.GlobalRegion;
+import com.universeguard.region.LocalRegion;
+import com.universeguard.region.Region;
 import com.universeguard.region.components.*;
+import com.universeguard.region.enums.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -30,30 +26,15 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.universeguard.UniverseGuard;
-import com.universeguard.region.GlobalRegion;
-import com.universeguard.region.LocalRegion;
-import com.universeguard.region.Region;
-import com.universeguard.region.enums.EnumRegionExplosion;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.region.enums.RegionEventType;
-import com.universeguard.region.enums.RegionPermission;
-import com.universeguard.region.enums.RegionRole;
-import com.universeguard.region.enums.RegionText;
-import com.universeguard.region.enums.RegionType;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 

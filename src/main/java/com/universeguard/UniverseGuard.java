@@ -7,19 +7,21 @@
  */
 package com.universeguard;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.universeguard.command.*;
 import com.universeguard.command.argument.*;
+import com.universeguard.event.EventListener;
 import com.universeguard.event.EventPlayerJoin;
+import com.universeguard.event.EventRegionSelect;
 import com.universeguard.event.FlagEffectListener;
 import com.universeguard.event.flags.*;
+import com.universeguard.region.GlobalRegion;
+import com.universeguard.region.Region;
 import com.universeguard.region.enums.*;
+import com.universeguard.utils.*;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
@@ -40,22 +42,12 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.World;
 
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.universeguard.event.EventListener;
-import com.universeguard.event.EventRegionSelect;
-import com.universeguard.region.GlobalRegion;
-import com.universeguard.region.Region;
-import com.universeguard.utils.CommandUtils;
-import com.universeguard.utils.EventUtils;
-import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.LogUtils;
-import com.universeguard.utils.PermissionUtils;
-import com.universeguard.utils.RegionUtils;
-import com.universeguard.utils.TranslationUtils;
-
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -321,6 +313,7 @@ public class UniverseGuard {
         CommandSpec regionRemoveFarewell = CommandUtils.buildCommandSpec("Removes the farewell message from a Region", new RegionRemoveFarewellExecutor(), RegionPermission.ALL.getValue());
         CommandSpec regionRemoveGreeting = CommandUtils.buildCommandSpec("Removes the greeting message from a Region", new RegionRemoveGreetingExecutor(), RegionPermission.ALL.getValue());
         CommandSpec regionItemUse = CommandUtils.buildCommandSpec("Sets if you can or can't use an item inside a Region", new RegionItemUseExecutor(), RegionPermission.ALL.getValue(), new BooleanElement(Text.of("value")), GenericArguments.catalogedElement(Text.of("item"), ItemType.class));
+		CommandSpec regionBlockUse = CommandUtils.buildCommandSpec("Sets if you can or can't use a block inside a Region", new RegionBlockUseExecutor(), RegionPermission.ALL.getValue(), new BooleanElement(Text.of("value")), GenericArguments.catalogedElement(Text.of("block"), BlockType.class));
 
 		CommandSpec regionFlagInfo = CommandSpec.builder().description(Text.of("Get informations about a flag in a region"))
 				.executor(new RegionFlagInfoExecutor())
@@ -408,6 +401,7 @@ public class UniverseGuard {
                 .child(regionItemUse, "itemuse")
 				.child(regionGlobalFor, "globalfor")
 				.child(regionDiscard, "discard")
+				.child(regionBlockUse, "blockuse")
 				.build();
 		Sponge.getCommandManager().register(this, region, Lists.newArrayList("region", "rg"));
 	}
@@ -467,6 +461,7 @@ public class UniverseGuard {
         EventUtils.registerEvent(new FlagFishingPoleListener());
         EventUtils.registerEvent(new FlagItemUseListener());
         EventUtils.registerEvent(new EventPlayerJoin());
+		EventUtils.registerEvent(new FlagBlockUseListener());
 		
 		Task.builder()
 			.execute(new FlagHungerListener())
@@ -493,6 +488,6 @@ public class UniverseGuard {
                     .submit(UniverseGuard.INSTANCE);
         }
 
-		//EventUtils.registerEvent(new EventListener());
+		EventUtils.registerEvent(new EventListener());
 	}
 }

@@ -7,11 +7,10 @@
  */
 package com.universeguard.utils;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-import jdk.nashorn.internal.runtime.options.Option;
+import com.universeguard.UniverseGuard;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.enchantment.Enchantment;
@@ -20,13 +19,16 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.World;
 
-import com.universeguard.UniverseGuard;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * 
@@ -70,7 +72,19 @@ public class InventoryUtils {
 	 * @param itemStack The ItemStack
 	 */
 	public static boolean addItemStackToInventory(Player player, ItemStack itemStack) {
-		return player.getInventory().offer(itemStack).getType().equals(InventoryTransactionResult.Type.SUCCESS);
+		boolean result = player.getInventory()
+				.query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class))
+				.offer(itemStack).getType().equals(InventoryTransactionResult.Type.SUCCESS);
+		if(!result) {
+			World world = player.getLocation().getExtent();
+			Entity itemStackEntity = world.createEntity(EntityTypes.ITEM, player.getPosition());
+			itemStackEntity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+			world.spawnEntity(itemStackEntity);
+		}
+		else {
+			return false;
+		}
+		return true;
 	}
 
     public static boolean addItemsToInventory(Player player, ItemType itemType, int quantity) {

@@ -8,3 +8,11 @@ version = '2.23'
 dependencies {
     compile 'org.spongepowered:spongeapi:7.1.0'
 }
+
+task copyJarToBin(type:Copy) {
+    outputs.upToDateWhen { false }
+    from jar
+    into 'D:/UG/UniverseGuardOld/UG2/Test Server/mods'
+}
+
+build.finalizedBy(copyJarToBin)

@@ -7,49 +7,35 @@
  */
 package com.universeguard.event.flags;
 
-import com.google.gson.Gson;
 import com.universeguard.region.Region;
+import com.universeguard.region.enums.EnumRegionFlag;
+import com.universeguard.region.enums.RegionEventType;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.*;
-import jdk.nashorn.internal.ir.Block;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.explosive.Explosive;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.cause.EventContextKey;
 import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
-import org.spongepowered.api.event.item.inventory.InteractItemEvent;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.world.*;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionEventType;
-
-import javax.swing.text.html.Option;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Handler for the destroy flag
@@ -93,11 +79,18 @@ public class FlagDestroyListener {
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event, @First Player player) {
 		if(event.getContext().containsKey(EventContextKeys.PLAYER_BREAK)) {
+			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
 				Region region = RegionUtils.getRegion(location);
+
 				if(region != null && FlagUtils.isExcludedFromDestroy(region, block.getType()) && !PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
-					if(region.getFlag(EnumRegionFlag.DESTROY)) {
+					if(item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
+						event.setCancelled(true);
+						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+					}
+					else if(region.getFlag(EnumRegionFlag.DESTROY)) {
 						event.setCancelled(true);
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 					}
