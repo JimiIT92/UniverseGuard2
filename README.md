@@ -22,6 +22,7 @@ Since is an open source project anyone can help the development. So if you have 
 or how to fix some bugs feel free to write it on the Official Sponge page or in the Issues tab.
 The updated code can be found at the following repository
 https://github.com/JimiIT92/UniverseGuardAPI7
+
 Or if you just want to show some support to the project, I've created a paypal link recently, so you can pay me a coffee if you want to :)
 https://www.paypal.me/JimiIT92
 
