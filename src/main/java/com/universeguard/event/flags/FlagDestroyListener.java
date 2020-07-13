@@ -80,14 +80,14 @@ public class FlagDestroyListener {
 	}
 
 	@Listener
-	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event, @First Player player) {
+	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event) {
 		if(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK)) {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
 				Region region = RegionUtils.getRegion(location);
-
-				if(region != null && FlagUtils.isExcludedFromDestroy(region, block.getType()) && !PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
+				Player player = event.getCause().first(Player.class).orElse(null);
+				if(region != null && FlagUtils.isExcludedFromDestroy(region, block.getType()) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
 					if(item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
 						event.setCancelled(true);
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
@@ -104,13 +104,14 @@ public class FlagDestroyListener {
 	}
 
 	@Listener
-	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event, @First Player player) {
+	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
 			BlockType type = block.getState().getType();
 			if (block.getLocation().isPresent()) {
+				Player player = event.getCause().first(Player.class).orElse(null);
                 Region region = RegionUtils.getRegion(block.getLocation().get());
-                if(region != null && FlagUtils.isExcludedFromDestroy(region, type) && !PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
+                if(region != null && FlagUtils.isExcludedFromDestroy(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
                     if(region.getFlag(EnumRegionFlag.DESTROY)) {
                         event.setCancelled(true);
                         MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());

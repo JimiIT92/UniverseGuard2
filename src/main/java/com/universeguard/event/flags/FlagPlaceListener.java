@@ -78,13 +78,14 @@ public class FlagPlaceListener {
 	}
 
 	@Listener
-	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @First Player player) {
+	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
 			BlockType type = block.getState().getType();
 			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE)) {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
-				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && !PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
+			    Player player = event.getCause().first(Player.class).orElse(null);
+				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
 				    if(region.getFlag(EnumRegionFlag.PLACE)) {
                         event.setCancelled(true);
                         MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
