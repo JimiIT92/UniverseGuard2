@@ -1531,9 +1531,18 @@ public class RegionUtils {
 	}
 
 	public static ArrayList<Region> getPlayerRegions(UUID player) {
+		ArrayList<Region> playerRegions = new ArrayList<Region>();
+		for(Region region : UniverseGuard.ALL_REGIONS) {
+			if(isMemberByUUID(region, player))
+				playerRegions.add(region);
+		}
+		return playerRegions;
+	}
+
+	public static ArrayList<Region> getPlayerRegions(Player player) {
 	    ArrayList<Region> playerRegions = new ArrayList<Region>();
 	    for(Region region : UniverseGuard.ALL_REGIONS) {
-	        if(isMemberByUUID(region, player))
+	        if(isMemberByUUID(region, player.getUniqueId()) || isMember(region, player))
 	            playerRegions.add(region);
         }
 	    return playerRegions;

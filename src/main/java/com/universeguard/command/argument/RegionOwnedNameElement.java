@@ -3,6 +3,7 @@ package com.universeguard.command.argument;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.RegionPermission;
+import com.universeguard.utils.LogUtils;
 import com.universeguard.utils.PermissionUtils;
 import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.command.CommandSource;
@@ -31,15 +32,18 @@ public class RegionOwnedNameElement extends PatternMatchingCommandElement{
 	        if(PermissionUtils.hasPermission(player, RegionPermission.REGION)) {
 	        	return new RegionNameElement(getKey()).getChoices(source);
 			} else {
-				for (Region region : RegionUtils.getPlayerRegions(player.getUniqueId())) {
+				for (Region region : RegionUtils.getPlayerRegions(player)) {
 					if(region.isLocal()) {
 						LocalRegion localRegion = (LocalRegion)region;
-						if(localRegion.getOwner().getUUID().equals(player.getUniqueId()))
+						if(localRegion.getOwner().getUUID().equals(player.getUniqueId())
+						|| localRegion.getOwner().getUsername().equalsIgnoreCase(player.getName()))
 							regions.add(localRegion.getName());
 					}
 				}
 			}
         }
+
+		LogUtils.log(String.join(",", regions));
 
 		return regions;
 	}

@@ -1,6 +1,5 @@
 package com.universeguard.command.argument;
 
-import com.universeguard.UniverseGuard;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
 import com.universeguard.utils.RegionUtils;
@@ -27,7 +26,7 @@ public class RegionToSellNameElement extends PatternMatchingCommandElement{
         ArrayList<String> regions = new ArrayList<>();
 	    if(source instanceof Player) {
 	        Player player = (Player)source;
-            for (Region region : RegionUtils.getPlayerRegions(player.getUniqueId())) {
+            for (Region region : RegionUtils.getPlayerRegions(player)) {
                 if(region.isLocal()) {
                     LocalRegion localRegion = (LocalRegion)region;
 					regions.add(localRegion.getName());

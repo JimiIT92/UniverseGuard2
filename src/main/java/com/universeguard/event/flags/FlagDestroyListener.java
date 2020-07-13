@@ -12,7 +12,10 @@ import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.*;
+import com.universeguard.utils.FlagUtils;
+import com.universeguard.utils.MessageUtils;
+import com.universeguard.utils.PermissionUtils;
+import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -78,9 +81,8 @@ public class FlagDestroyListener {
 
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event, @First Player player) {
-		if(event.getContext().containsKey(EventContextKeys.PLAYER_BREAK)) {
+		if(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK)) {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
-
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
 				Region region = RegionUtils.getRegion(location);

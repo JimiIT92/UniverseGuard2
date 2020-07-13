@@ -7,8 +7,14 @@
  */
 package com.universeguard.event.flags;
 
-import com.universeguard.utils.*;
-import org.checkerframework.checker.units.qual.C;
+import com.universeguard.region.Region;
+import com.universeguard.region.enums.EnumRegionInteract;
+import com.universeguard.region.enums.RegionPermission;
+import com.universeguard.region.enums.RegionText;
+import com.universeguard.utils.FlagUtils;
+import com.universeguard.utils.MessageUtils;
+import com.universeguard.utils.PermissionUtils;
+import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
@@ -28,11 +34,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import com.universeguard.region.Region;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.RegionPermission;
-import com.universeguard.region.enums.RegionText;
 
 /**
  * Handler for the interact flag
@@ -59,10 +60,13 @@ public class FlagInteractListener {
 
 	@Listener
 	public void onCollideBlock(CollideBlockEvent event, @First Entity entity) {
-		if(entity instanceof Player) {
-			this.handleEvent(event, event.getTargetLocation(), EnumRegionInteract.PRESSURE_PLATE, (Player)entity);
-		} else {
-			this.handleEvent(event, event.getTargetLocation(), EnumRegionInteract.PRESSURE_PLATE);
+		EnumRegionInteract interact = FlagUtils.getInteract(event.getTargetBlock().getType());
+		if(interact != null && interact.equals(EnumRegionInteract.PRESSURE_PLATE)) {
+			if(entity instanceof Player) {
+				this.handleEvent(event, event.getTargetLocation(), EnumRegionInteract.PRESSURE_PLATE, (Player)entity);
+			} else {
+				this.handleEvent(event, event.getTargetLocation(), EnumRegionInteract.PRESSURE_PLATE);
+			}
 		}
 	}
 

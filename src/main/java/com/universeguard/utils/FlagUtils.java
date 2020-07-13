@@ -7,12 +7,10 @@
  */
 package com.universeguard.utils;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.universeguard.UniverseGuard;
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.*;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -24,9 +22,9 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.universeguard.UniverseGuard;
-
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FlagUtils {
 
@@ -219,7 +217,10 @@ public class FlagUtils {
 			return getInteract("trapdoor");
 		else if(block.equals(BlockTypes.STANDING_SIGN) || block.equals(BlockTypes.WALL_SIGN))
 			return getInteract("sign");
-		else if(block.equals(BlockTypes.WOODEN_PRESSURE_PLATE) || block.equals(BlockTypes.STONE_PRESSURE_PLATE) || block.getDefaultState().getKeys().contains(Keys.POWERED)) {
+		else if(block.equals(BlockTypes.WOODEN_PRESSURE_PLATE) || block.equals(BlockTypes.STONE_PRESSURE_PLATE)
+				|| block.equals(BlockTypes.LIGHT_WEIGHTED_PRESSURE_PLATE)
+				|| block.equals(BlockTypes.HEAVY_WEIGHTED_PRESSURE_PLATE)
+				|| block.getDefaultState().getKeys().contains(Keys.POWERED)) {
 			return getInteract("pressureplate");
 		}
 		else
@@ -347,7 +348,7 @@ public class FlagUtils {
 				|| type.equals(EntityTypes.CREEPER) || type.equals(EntityTypes.ENDER_CRYSTAL) ||
 				type.equals(EntityTypes.FIREBALL) || type.equals(EntityTypes.ENDER_DRAGON);
 	}
-	
+
 	/**
 	 * Check if a BlockType is a Crop
 	 * @param type The BlockType

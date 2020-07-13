@@ -59,7 +59,7 @@ public class UniverseGuard {
 	/**
 	 * Plugin Version
 	 */
-	static final String VERSION = "2.23";
+	static final String VERSION = "2.24";
     /**
      * Region Version Number
      */

@@ -10,12 +10,9 @@ package com.universeguard.command;
 import com.universeguard.UniverseGuard;
 import com.universeguard.region.LocalRegion;
 import com.universeguard.region.Region;
-import com.universeguard.region.components.RegionSell;
-import com.universeguard.region.components.RegionValue;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.InventoryUtils;
-import com.universeguard.utils.LogUtils;
 import com.universeguard.utils.MessageUtils;
 import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.command.CommandException;
@@ -24,9 +21,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 /**
  * 
@@ -44,7 +39,8 @@ public class RegionBuyExecutor implements CommandExecutor {
                 Region region = RegionUtils.load(args.<String>getOne("region").get());
                 if (UniverseGuard.PURCHASABLE_REGIONS && region != null) {
                     LocalRegion localRegion = (LocalRegion) region;
-                    if (!UniverseGuard.UNIQUE_REGIONS && RegionUtils.getPlayerRegions(player.getUniqueId()).size() < RegionUtils.getPlayerMaxRegions(player.getUniqueId())) {
+                    if (UniverseGuard.UNIQUE_REGIONS && RegionUtils.getPlayerRegions(player).size() == 0 ||
+                            (!UniverseGuard.UNIQUE_REGIONS && RegionUtils.getPlayerRegions(player).size() < RegionUtils.getPlayerMaxRegions(player.getUniqueId()))) {
                         ItemStack regionStack = ItemStack.of(localRegion.getValue().getItem(), localRegion.getValue().getQuantity());
                         if(player.getInventory().contains(regionStack) && InventoryUtils.removeFromInventory(player, regionStack)) {
                             RegionRole role = localRegion.getMembers().size() == 0 ? RegionRole.OWNER : RegionRole.MEMBER;
