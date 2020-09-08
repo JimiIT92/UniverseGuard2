@@ -225,7 +225,8 @@ public enum RegionText {
     TEXT_PURCHASE_MATERIAL_NOT_FOUND("Purchase material not found!"),
     TEXT_INVALID_BUY("You don't have enough material to buy this Region!"),
     TEXT_CANT_BUY("You can't buy this Region!"),
-    TEXT_WRONG_MAX_REGION_SIZE("Incorrect value set for max Region size. Will use: ");
+    TEXT_WRONG_MAX_REGION_SIZE("Incorrect value set for max Region size. Will use: "),
+	PLAYER_NOT_FOUND("Player not found");
 	
 	private String VALUE;
 	private RegionText(String value) {

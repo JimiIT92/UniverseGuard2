@@ -17,6 +17,6 @@ public enum RegionRole {
 	MEMBER;
 	
 	public String getName() {
-		return this.name().toString();
+		return this.name();
 	}
 }
