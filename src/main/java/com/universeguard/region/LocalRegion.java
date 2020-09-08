@@ -7,25 +7,20 @@
  */
 package com.universeguard.region;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
-
-import com.universeguard.UniverseGuard;
 import com.universeguard.region.components.RegionEffect;
-import com.universeguard.region.components.RegionValue;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.effect.potion.PotionEffectType;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.world.World;
-
 import com.universeguard.region.components.RegionLocation;
 import com.universeguard.region.components.RegionMember;
+import com.universeguard.region.components.RegionValue;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionType;
 import com.universeguard.utils.RegionUtils;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.World;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Local Region Class
@@ -207,7 +202,7 @@ public class LocalRegion extends Region {
 	 * @return Region Owner
 	 */
 	public RegionMember getOwner() {
-		return this.MEMBERS.stream().filter(member -> member.getRole().equals(RegionRole.OWNER)).findFirst().get();
+		return this.MEMBERS.stream().filter(member -> member.getRole().equals(RegionRole.OWNER)).findFirst().orElse(null);
 	}
 
 	/**
