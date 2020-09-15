@@ -7,8 +7,10 @@
  */
 package com.universeguard.event.flags;
 
-import java.util.Optional;
-
+import com.universeguard.region.enums.EnumRegionFlag;
+import com.universeguard.region.enums.RegionEventType;
+import com.universeguard.utils.InventoryUtils;
+import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -27,10 +29,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionEventType;
-import com.universeguard.utils.InventoryUtils;
-import com.universeguard.utils.RegionUtils;
+import java.util.Optional;
 
 /**
  * Handler for the itemdrop flag
@@ -39,6 +38,15 @@ import com.universeguard.utils.RegionUtils;
  *
  */
 public class FlagItemDropListener {
+
+	@Listener
+	public void onItemDrop(DropItemEvent.Pre event, @First Entity entity) {
+		if (entity instanceof Player) {
+			Player player = (Player) entity;
+			this.handleEvent(event, player.getLocation(), player);
+		} else
+			this.handleEvent(event, entity.getLocation(), null);
+	}
 
 	@Listener
 	public void onItemDrop(DropItemEvent.Dispense event, @First Entity entity) {
@@ -68,17 +76,7 @@ public class FlagItemDropListener {
 
 	@Listener
 	public void onItemDropFromInventory(SpawnEntityEvent event, @First Player player, @Root SpawnType cause) {
-		if (cause.equals(SpawnTypes.PLACEMENT) && !event.getEntities().isEmpty()) {
-			Entity entity = event.getEntities().get(0);
-			EntityType type = entity.getType();
-			if (type.equals(EntityTypes.ITEM))
-				this.handleEvent(event, player.getLocation(), player);
-		}
-	}
-
-	@Listener
-	public void onItemDrop(SpawnEntityEvent event, @First Player player, @Root SpawnType cause) {
-		if (cause.equals(SpawnTypes.DROPPED_ITEM) && !event.getEntities().isEmpty()) {
+		if ((cause.equals(SpawnTypes.DROPPED_ITEM) || cause.equals(SpawnTypes.PLACEMENT)) && !event.getEntities().isEmpty()) {
 			Entity entity = event.getEntities().get(0);
 			EntityType type = entity.getType();
 			if (type.equals(EntityTypes.ITEM))

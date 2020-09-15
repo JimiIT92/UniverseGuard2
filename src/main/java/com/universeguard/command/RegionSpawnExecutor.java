@@ -40,9 +40,10 @@ public class RegionSpawnExecutor implements CommandExecutor {
 				if (region != null && !region.getFlag(EnumRegionFlag.HIDE_REGION)) {
 					if(region.isLocal()) {
 						Region current = RegionUtils.getRegion(player.getLocation());
-						if(current != null && current.getFlag(EnumRegionFlag.EXIT) && region.getFlag(EnumRegionFlag.CAN_SPAWN) && region.getFlag(EnumRegionFlag.ENTER))
+						if(current != null && (PermissionUtils.hasPermission(player, RegionPermission.REGION) ||
+								current.getFlag(EnumRegionFlag.EXIT) && region.getFlag(EnumRegionFlag.CAN_SPAWN) && region.getFlag(EnumRegionFlag.ENTER)))
 							player.setLocation(((LocalRegion)region).getSpawnLocation().getLocation());
-						else if(!PermissionUtils.hasPermission(player, RegionPermission.REGION))
+						else
 							MessageUtils.sendErrorMessage(player, RegionText.REGION_NO_SPAWN.getValue());
 					}
 					else
