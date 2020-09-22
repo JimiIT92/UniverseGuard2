@@ -19,7 +19,9 @@ import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -85,9 +87,17 @@ public class FlagDestroyListener {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
+				if(block.getType() == BlockTypes.PISTON
+						|| block.getType() == BlockTypes.PISTON_EXTENSION
+						|| block.getType() == BlockTypes.PISTON_HEAD
+						|| block.getType() == BlockTypes.STICKY_PISTON ||
+				block.get(Keys.EXTENDED).isPresent()) {
+					return;
+				}
 				Region region = RegionUtils.getRegion(location);
 				Player player = event.getCause().first(Player.class).orElse(null);
-				if(region != null && FlagUtils.isExcludedFromDestroy(region, block.getType()) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
+				if(region != null && FlagUtils.isExcludedFromDestroy(region, block.getType())
+						&& (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
 					if(item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
 						event.setCancelled(true);
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
@@ -108,10 +118,18 @@ public class FlagDestroyListener {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
 			BlockType type = block.getState().getType();
+			if(type == BlockTypes.PISTON
+					|| type == BlockTypes.PISTON_EXTENSION
+					|| type == BlockTypes.PISTON_HEAD
+					|| type == BlockTypes.STICKY_PISTON ||
+					block.get(Keys.EXTENDED).isPresent()) {
+				return;
+			}
 			if (block.getLocation().isPresent()) {
 				Player player = event.getCause().first(Player.class).orElse(null);
                 Region region = RegionUtils.getRegion(block.getLocation().get());
-                if(region != null && FlagUtils.isExcludedFromDestroy(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
+                if(region != null && FlagUtils.isExcludedFromDestroy(region, type)
+						&& (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
                     if(region.getFlag(EnumRegionFlag.DESTROY)) {
                         event.setCancelled(true);
                         MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
