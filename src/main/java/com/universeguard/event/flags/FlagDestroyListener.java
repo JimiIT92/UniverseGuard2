@@ -12,10 +12,7 @@ import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
-import com.universeguard.utils.RegionUtils;
+import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -86,8 +83,10 @@ public class FlagDestroyListener {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
-				if(block.getType() == BlockTypes.PISTON_EXTENSION
-						|| block.getType() == BlockTypes.PISTON_HEAD) {
+				if(event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
+					event.getContext().containsKey(EventContextKeys.PISTON_RETRACT) ||
+					block.getType() == BlockTypes.PISTON_EXTENSION ||
+					block.getType() == BlockTypes.PISTON_HEAD) {
 					return;
 				}
 				Region region = RegionUtils.getRegion(location);
@@ -114,8 +113,10 @@ public class FlagDestroyListener {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
 			BlockType type = block.getState().getType();
-			if(type == BlockTypes.PISTON_EXTENSION
-					|| type == BlockTypes.PISTON_HEAD) {
+			if(event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
+					event.getContext().containsKey(EventContextKeys.PISTON_RETRACT) ||
+					type == BlockTypes.PISTON_EXTENSION ||
+					type == BlockTypes.PISTON_HEAD) {
 				return;
 			}
 			if (block.getLocation().isPresent()) {

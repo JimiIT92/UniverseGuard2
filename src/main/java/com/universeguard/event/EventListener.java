@@ -7,6 +7,7 @@
  */
 package com.universeguard.event;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -14,19 +15,16 @@ import org.spongepowered.api.event.block.CollideBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.block.TickBlockEvent;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
-import org.spongepowered.api.event.entity.*;
-import org.spongepowered.api.event.entity.ai.AITaskEvent;
-import org.spongepowered.api.event.entity.ai.SetAITargetEvent;
-import org.spongepowered.api.event.entity.living.humanoid.AnimateHandEvent;
+import org.spongepowered.api.event.entity.CollideEntityEvent;
+import org.spongepowered.api.event.entity.ConstructEntityEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.TargetEntityEvent;
 import org.spongepowered.api.event.network.ChannelRegistrationEvent;
-import org.spongepowered.api.event.statistic.ChangeStatisticEvent;
 import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.event.world.SaveWorldEvent;
 import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
 import org.spongepowered.api.event.world.chunk.UnloadChunkEvent;
 import org.spongepowered.api.text.format.TextColors;
-
-import com.universeguard.utils.LogUtils;
 
 /**
  * Debug class, used to log events
@@ -43,7 +41,8 @@ public class EventListener {
 				&& !(event instanceof SpawnEntityEvent.ChunkLoad) && !(event instanceof ChangeBlockEvent.Modify)
 				&& !(event instanceof ChangeBlockEvent.Place) && !(event instanceof SpawnEntityEvent.Spawner)
 				&& !(event instanceof TickBlockEvent) && !(event instanceof TargetEntityEvent)
-				&& !(event instanceof NotifyNeighborBlockEvent) && !(event instanceof ChangeDataHolderEvent.ValueChange))
+				&& !(event instanceof NotifyNeighborBlockEvent) && !(event instanceof ChangeDataHolderEvent.ValueChange)
+				&& !(event.getClass().getSimpleName().startsWith("PlaySoundEvent")))
 			LogUtils.print(TextColors.GREEN, event.getClass().getSimpleName(), "event listener");
 	}
 }
