@@ -27,6 +27,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -79,7 +80,9 @@ public class FlagDestroyListener {
 
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event) {
-		if(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK)) {
+		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
+				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
+				(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK))) {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
@@ -119,7 +122,11 @@ public class FlagDestroyListener {
 					type == BlockTypes.PISTON_HEAD) {
 				return;
 			}
-			if (block.getLocation().isPresent()) {
+
+			if (block.getLocation().isPresent() &&
+					event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
+					event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
+					(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK))) {
 				Player player = event.getCause().first(Player.class).orElse(null);
                 Region region = RegionUtils.getRegion(block.getLocation().get());
                 if(region != null && FlagUtils.isExcludedFromDestroy(region, type)
