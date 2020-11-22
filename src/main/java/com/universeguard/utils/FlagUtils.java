@@ -17,12 +17,14 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -392,11 +394,16 @@ public class FlagUtils {
 			    .collect(Collectors.toList());
 	}
 
+	public static boolean isFluid(BlockType type) {
+		Optional<MatterProperty> matter = type.getDefaultState().getProperty(MatterProperty.class);
+		return matter.isPresent() && Objects.equals(matter.get().getValue(), MatterProperty.Matter.LIQUID);
+	}
+
 	public static boolean isExcludedFromPlace(Region region, BlockType type) {
-	    return region.getExcludedBlocks().getPlace().contains(type.getId());
+	    return isFluid(type) || region.getExcludedBlocks().getPlace().contains(type.getId());
     }
 
     public static boolean isExcludedFromDestroy(Region region, BlockType type) {
-        return region.getExcludedBlocks().getDestroy().contains(type.getId());
+        return isFluid(type) || region.getExcludedBlocks().getDestroy().contains(type.getId());
     }
 }
