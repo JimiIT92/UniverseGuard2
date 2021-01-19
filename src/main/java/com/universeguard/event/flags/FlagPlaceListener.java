@@ -82,7 +82,7 @@ public class FlagPlaceListener {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
 			BlockType type = block.getState().getType();
-			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE)) {
+			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE) && !FlagUtils.isFluid(type)) {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
 			    Player player = event.getCause().first(Player.class).orElse(null);
 				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
