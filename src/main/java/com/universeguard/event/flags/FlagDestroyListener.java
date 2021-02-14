@@ -18,6 +18,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -63,7 +64,13 @@ public class FlagDestroyListener {
 			BlockState block = player.getWorld().getBlock(event.getInteractionPoint().get().toInt());
 			Optional<MatterProperty> matter = block.getProperty(MatterProperty.class);
 			if(matter.isPresent() && Objects.equals(matter.get().getValue(), MatterProperty.Matter.LIQUID)) {
-				this.handleEvent(event, player.getLocation(), player);
+				if(block.getType() == BlockTypes.WATER || block.getType() == BlockTypes.FLOWING_WATER) {
+					RegionUtils.handleEvent(event, EnumRegionFlag.WATER_FLOW, player.getLocation(), player, RegionEventType.LOCAL);
+				} else if(block.getType() == BlockTypes.LAVA || block.getType() == BlockTypes.FLOWING_LAVA) {
+					RegionUtils.handleEvent(event, EnumRegionFlag.LAVA_FLOW, player.getLocation(), player, RegionEventType.LOCAL);
+				} else {
+					RegionUtils.handleEvent(event, EnumRegionFlag.OTHER_LIQUIDS_FLOW, player.getLocation(), player, RegionEventType.LOCAL);
+				}
 			}
 		}
 	}
@@ -84,6 +91,11 @@ public class FlagDestroyListener {
 				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
 				(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK))) {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+			Player player = event.getCause().first(Player.class).orElse(null);
+			if(player != null && (!item.isPresent() || item.get().getType() == ItemTypes.AIR)) {
+				item = player.get(Keys.REPRESENTED_ITEM);
+			}
+			Optional<ItemStackSnapshot> finalItem = item;
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
 				if(event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
@@ -93,14 +105,13 @@ public class FlagDestroyListener {
 					return;
 				}
 				Region region = RegionUtils.getRegion(location);
-				Player player = event.getCause().first(Player.class).orElse(null);
 				if(region != null && FlagUtils.isExcludedFromDestroy(region, block.getType())
 						&& (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
-					if(item.isPresent() && region.getDisallowedItems().contains(item.get().getType().getId())){
+					if(finalItem.isPresent() && region.getDisallowedItems().contains(finalItem.get().getType().getId())){
 						event.setCancelled(true);
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 					}
-					else if(region.getFlag(EnumRegionFlag.DESTROY)) {
+					else if(region.getFlag(EnumRegionFlag.DESTROY) && (finalItem.isPresent() && (finalItem.get().getType() != ItemTypes.BUCKET || !FlagUtils.isFluid(block.getType())))) {
 						event.setCancelled(true);
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 					}
