@@ -18,5 +18,9 @@ public enum EnumDirection {
 	RIGHT,
 	LEFT,
 	FRONT,
-	BACK
+	BACK,
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST
 }

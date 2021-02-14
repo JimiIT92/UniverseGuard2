@@ -85,10 +85,10 @@ public class EventRegionSelect {
 							MessageUtils.sendHotbarMessage(player,
 									RegionText.SECOND_POINT_SET.getValue() + " " + location.toString());
 						}
-						RegionUtils.setPendingRegion(player, region);
 						RegionUtils.setRegionScoreboard(player, region);
+						RegionUtils.setPendingRegion(player, region);
 					}
-					else
+					else 
 						MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_ITEM.getValue());
 				}
 			}

@@ -32,22 +32,18 @@ public class RegionCommandExecutor implements CommandExecutor {
 		if(RegionUtils.hasPendingRegion(src)) {
 			if(args.hasAny("command") && args.hasAny("value")) {
 				String command = args.<String>getOne("command").get();
-				if(CommandUtils.isValid(command)) {
-					boolean value = Boolean.valueOf(args.<String>getOne("value").get());
-					Region region = RegionUtils.getPendingRegion(src);
-					if(value) {
-						region.enableCommand(command);
-						MessageUtils.sendSuccessMessage(src, RegionText.REGION_COMMAND_ENABLED.getValue() + ": " + command);
-					}
-					else {
-						region.disableCommand(command);
-						MessageUtils.sendSuccessMessage(src, RegionText.REGION_COMMAND_DISABLED.getValue() + ": " + command);
-					}
-					
-					RegionUtils.updatePendingRegion(src, region);	
+				boolean value = Boolean.valueOf(args.<String>getOne("value").get());
+				Region region = RegionUtils.getPendingRegion(src);
+				if(value) {
+					region.enableCommand(command);
+					MessageUtils.sendSuccessMessage(src, RegionText.REGION_COMMAND_ENABLED.getValue() + ": " + command);
 				}
-				else
-					MessageUtils.sendErrorMessage(src, RegionText.REGION_COMMAND_NOT_FOUND.getValue());
+				else {
+					region.disableCommand(command);
+					MessageUtils.sendSuccessMessage(src, RegionText.REGION_COMMAND_DISABLED.getValue() + ": " + command);
+				}
+
+				RegionUtils.updatePendingRegion(src, region);
 			}
 			else {
 				MessageUtils.sendErrorMessage(src, getCommandUsage());

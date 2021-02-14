@@ -23,8 +23,8 @@ public class GlobalRegion extends Region {
 	 * Global Region Constructor
 	 * @param name The Region name
 	 */
-	public GlobalRegion(String name) {
-		super(RegionType.GLOBAL, name);
+	public GlobalRegion(String name, boolean template) {
+		super(RegionType.GLOBAL, name, template);
 	}
 	
 	/**

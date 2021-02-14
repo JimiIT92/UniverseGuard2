@@ -9,6 +9,7 @@ package com.universeguard.command;
 
 import java.util.UUID;
 
+import com.universeguard.region.enums.RegionPermission;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -52,19 +53,26 @@ public class RegionRemoveExecutor implements CommandExecutor {
 					if (region.isLocal()) {
 						localRegion = (LocalRegion) region;
 						if (RegionUtils.isMemberByUUID(localRegion, member)) {
-							localRegion.removeMemberByUUID(member);
-							if (RegionUtils.save(localRegion)) {
-								MessageUtils.sendSuccessMessage(src,RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + username);
-								if(RegionUtils.isOnline(member)) {
-									Player onlinePlayer = RegionUtils.getPlayer(member);
-									if(onlinePlayer != null)
-										MessageUtils.sendMessage(onlinePlayer,
-												RegionText.REMOVED_FROM_REGION.getValue() + ": " + region.getName(),
-												TextColors.GOLD);
-								}
-							} else
-								MessageUtils.sendErrorMessage(src,
-										RegionText.REGION_REMOVE_MEMBER_EXCEPTION.getValue());
+							if(src.hasPermission(RegionPermission.REGION.getValue()) || (src instanceof Player && localRegion.getOwner().getUUID().equals(((Player)src).getUniqueId()))) {
+								localRegion.removeMemberByUUID(member);
+								if(localRegion.getMembers().size() == 0)
+									localRegion.setSold(false);
+								if (RegionUtils.save(localRegion)) {
+									MessageUtils.sendSuccessMessage(src,RegionText.PLAYER_REMOVED_FROM_REGION.getValue() + ": " + username);
+									if(RegionUtils.isOnline(member)) {
+										Player onlinePlayer = RegionUtils.getPlayer(member);
+										if(onlinePlayer != null)
+											MessageUtils.sendMessage(onlinePlayer,
+													RegionText.REMOVED_FROM_REGION.getValue() + ": " + region.getName(),
+													TextColors.GOLD);
+									}
+								} else
+									MessageUtils.sendErrorMessage(src,
+											RegionText.REGION_REMOVE_MEMBER_EXCEPTION.getValue());
+							} else {
+								MessageUtils.sendErrorMessage(src, RegionText.NO_PERMISSION_COMMAND.getValue());
+							}
+
 						} else
 							MessageUtils.sendErrorMessage(src, RegionText.PLAYER_NO_REGION.getValue());
 					} else

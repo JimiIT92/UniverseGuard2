@@ -7,19 +7,14 @@
  */
 package com.universeguard.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import com.universeguard.UniverseGuard;
+import com.universeguard.region.GlobalRegion;
+import com.universeguard.region.LocalRegion;
+import com.universeguard.region.Region;
+import com.universeguard.region.components.*;
+import com.universeguard.region.enums.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -31,36 +26,15 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.universeguard.UniverseGuard;
-import com.universeguard.region.GlobalRegion;
-import com.universeguard.region.LocalRegion;
-import com.universeguard.region.Region;
-import com.universeguard.region.components.RegionCommand;
-import com.universeguard.region.components.RegionExplosion;
-import com.universeguard.region.components.RegionFlag;
-import com.universeguard.region.components.RegionInteract;
-import com.universeguard.region.components.RegionLocation;
-import com.universeguard.region.components.RegionMember;
-import com.universeguard.region.components.RegionMob;
-import com.universeguard.region.components.RegionVehicle;
-import com.universeguard.region.enums.EnumRegionExplosion;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.region.enums.RegionEventType;
-import com.universeguard.region.enums.RegionPermission;
-import com.universeguard.region.enums.RegionRole;
-import com.universeguard.region.enums.RegionText;
-import com.universeguard.region.enums.RegionType;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 
@@ -73,7 +47,7 @@ public class RegionUtils {
 
 	// Pending Regions
 	private static HashMap<CommandSource, Region> PENDINGS = new HashMap<CommandSource, Region>();
-
+	private static HashMap<UUID, RegionSell> SELLING_REGIONS = new HashMap<>();
 	/**
 	 * Save a Region to a JSON file
 	 * 
@@ -108,7 +82,7 @@ public class RegionUtils {
 			return true;
 		} catch (IOException e) {
 			LogUtils.log(e);
-			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_EXCEPTION.getValue());
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_EXCEPTION.getValue(), "rg utils");
 			return false;
 		} finally {
 			if (fileWriter != null) {
@@ -116,7 +90,7 @@ public class RegionUtils {
 					fileWriter.close();
 				} catch (IOException e) {
 					LogUtils.log(e);
-					LogUtils.print(RegionText.REGION_WRITER_CLOSE_EXCEPTION.getValue());
+					LogUtils.print(RegionText.REGION_WRITER_CLOSE_EXCEPTION.getValue(), "rg utils");
 				}
 			}
 		}
@@ -130,7 +104,7 @@ public class RegionUtils {
 	 * @return true if the Region has been saved correctly, false otherwise
 	 */
 	public static LocalRegion copy(LocalRegion region, String newRegionName) {
-		LocalRegion newRegion = new LocalRegion(newRegionName, region.getFirstPoint(), region.getSecondPoint());
+		LocalRegion newRegion = new LocalRegion(newRegionName, region.getFirstPoint(), region.getSecondPoint(), region.getTemplate());
 		newRegion.setPriority(region.getPriority());
 		newRegion.setTeleportLocation(region.getTeleportLocation());
 		newRegion.setSpawnLocation(region.getSpawnLocation());
@@ -156,7 +130,10 @@ public class RegionUtils {
 	 * @return true if the Region has been removed correctly, false otherwise
 	 */
 	public static boolean remove(Region region) {
-		File directory = region.isLocal() ? getRegionFolder() : getGlobalRegionFolder();
+	    if(region.isLocal()) {
+            ((LocalRegion)region).getMembers().clear();
+        }
+	    File directory = region.isLocal() ? getRegionFolder() : getGlobalRegionFolder();
 		if (!directory.exists())
 			return false;
 		File file = getFile(region);
@@ -188,6 +165,31 @@ public class RegionUtils {
 		return false;
 	}
 
+	public static void loadSellingRegions() {
+		Gson gson = new Gson();
+		BufferedReader bufferedReader = null;
+		try {
+			File file = new File(getConfigFolder() + "/" + "selling_regions.json");
+			if(file.exists()) {
+				bufferedReader = new BufferedReader(new FileReader(file));
+				Type type = new TypeToken<Map<UUID, RegionSell>>(){}.getType();
+				SELLING_REGIONS = gson.fromJson(bufferedReader, type);
+			}
+		} catch (FileNotFoundException e) {
+			LogUtils.log(e);
+			LogUtils.print(TextColors.RED, RegionText.REGION_SELLING_LOAD_EXCEPTION.getValue(), "rg utils");
+		} finally {
+			if (bufferedReader != null) {
+				try {
+					bufferedReader.close();
+				} catch (IOException e) {
+					LogUtils.log(e);
+					LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
+				}
+			}
+		}
+	}
+
 	/**
 	 * Save a Regions index file
 	 */
@@ -208,15 +210,86 @@ public class RegionUtils {
 			fileWriter.write(gson.toJson(regions));
 		} catch (IOException e) {
 			LogUtils.log(e);
-			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue());
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue(), "rg utils");
 		} finally {
 			if (fileWriter != null) {
 				try {
 					fileWriter.close();
 				} catch (IOException e) {
 					LogUtils.log(e);
-					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue());
+					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue(), "rg utils");
 				}
+			}
+		}
+	}
+
+	/**
+	 * Save the Selling Regions file
+	 */
+	public static void saveSellingRegions() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+		FileWriter fileWriter = null;
+		try {
+			File directory = new File(getConfigFolder());
+			if (!directory.exists())
+				directory.mkdirs();
+			File file = new File(getConfigFolder() + "/" + "selling_regions.json");
+			if (!file.exists())
+				file.createNewFile();
+			fileWriter = new FileWriter(file);
+			fileWriter.write(gson.toJson(SELLING_REGIONS));
+		} catch (IOException e) {
+			LogUtils.log(e);
+			LogUtils.print(TextColors.RED, RegionText.REGION_SAVE_INDEX_EXCEPTION.getValue(), "rg utils");
+		} finally {
+			if (fileWriter != null) {
+				try {
+					fileWriter.close();
+				} catch (IOException e) {
+					LogUtils.log(e);
+					LogUtils.print(RegionText.REGION_WRITER_INDEX_CLOSE_EXCEPTION.getValue(), "rg utils");
+				}
+			}
+		}
+	}
+
+	public static void addSellingRegion(UUID owner, UUID regionId, RegionValue value) {
+		SELLING_REGIONS.putIfAbsent(regionId,new RegionSell(owner, regionId, value));
+		saveSellingRegions();
+	}
+
+	public static HashMap<UUID, RegionSell> getSellingRegions(UUID regionId) {
+		return SELLING_REGIONS;
+	}
+
+	public static RegionSell getSellingRegionForPlayer(UUID playerId) {
+		return SELLING_REGIONS.size() == 0 ? null : SELLING_REGIONS.values().stream().filter(sell -> sell.getOwner().equals(playerId) && sell.isBought()).findFirst().orElse(null);
+	}
+
+	public static void setRegionBought(UUID regionId) {
+		RegionSell sell = SELLING_REGIONS.get(regionId);
+		if(sell != null){
+			sell.setBought(true);
+			SELLING_REGIONS.put(regionId, sell);
+			Player owner = getPlayer(sell.getOwner());
+			if(owner != null && owner.isOnline()) {
+				MessageUtils.sendSuccessMessage(owner, RegionText.REGION_BOUGHT.getValue());
+				InventoryUtils.addItemsToInventory(owner, sell.getValue().getItem(), sell.getValue().getQuantity());
+				SELLING_REGIONS.remove(regionId);
+			}
+			saveSellingRegions();
+		}
+	}
+
+	public static void removeSellingRegion(UUID regionId) {
+		RegionSell region = SELLING_REGIONS.get(regionId);
+		if(region != null) {
+			Player owner = getPlayer(region.getOwner());
+			if(owner != null && owner.isOnline()) {
+				MessageUtils.sendSuccessMessage(owner, RegionText.REGION_BOUGHT.getValue());
+				InventoryUtils.addItemsToInventory(owner, region.getValue().getItem(), region.getValue().getQuantity());
+				SELLING_REGIONS.remove(regionId);
+				saveSellingRegions();
 			}
 		}
 	}
@@ -239,7 +312,7 @@ public class RegionUtils {
 	/**
 	 * Get a Region from ID
 	 * 
-	 * @param name
+	 * @param id
 	 *            The ID of the region
 	 * @return The Region with that name if exists, null otherwise
 	 */
@@ -261,7 +334,7 @@ public class RegionUtils {
 		boolean removeOld = false;
 		if (region.isLocal()) {
 			LocalRegion newRegion = new LocalRegion(region.getName(), ((LocalRegion) region).getFirstPoint(),
-					((LocalRegion) region).getSecondPoint());
+					((LocalRegion) region).getSecondPoint(), region.getTemplate());
 			newRegion.setMembers(((LocalRegion) region).getMembers());
 			newRegion.setPriority(((LocalRegion) region).getPriority());
 			if (((LocalRegion) region).getSpawnLocation() != null)
@@ -279,7 +352,7 @@ public class RegionUtils {
 			newRegion.updateFlags();
 			removeOld = save(newRegion);
 		} else {
-			GlobalRegion newRegion = new GlobalRegion(region.getName());
+			GlobalRegion newRegion = new GlobalRegion(region.getName(), region.getTemplate());
 			newRegion.setFlags(region.getFlags());
 			newRegion.setGamemode(region.getGameMode());
 			newRegion.setCommands(region.getCommands());
@@ -356,7 +429,7 @@ public class RegionUtils {
 					if (type.equals(RegionType.LOCAL))
 						region = new LocalRegion(element.getKey());
 					else
-						region = new GlobalRegion(element.getKey());
+						region = new GlobalRegion(element.getKey(), false);
 
 					JsonObject flagObject = jObj.getAsJsonObject("flags");
 					for (EnumRegionFlag flag : EnumRegionFlag.values()) {
@@ -449,14 +522,14 @@ public class RegionUtils {
 
 			} catch (FileNotFoundException e) {
 				LogUtils.log(e);
-				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue());
+				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue(), "rg utils");
 			} finally {
 				if (bufferedReader != null) {
 					try {
 						bufferedReader.close();
 					} catch (IOException e) {
 						LogUtils.log(e);
-						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue());
+						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
 					}
 				}
 			}
@@ -490,19 +563,66 @@ public class RegionUtils {
 				}
 			} catch (FileNotFoundException e) {
 				LogUtils.log(e);
-				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue());
+				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue(), "rg utils");
 			} finally {
 				if (bufferedReader != null) {
 					try {
 						bufferedReader.close();
 					} catch (IOException e) {
 						LogUtils.log(e);
-						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue());
+						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
 					}
 				}
 			}
 		}
 		return regions;
+	}
+
+	public static Region reloadRegion(UUID id, RegionType type) {
+		Region loadedRegion = load(id);
+		Region region = null;
+		if(loadedRegion != null) {
+			File file = getFile(loadedRegion);
+			Gson gson = new Gson();
+			BufferedReader bufferedReader = null;
+			try {
+				assert loadedRegion != null;
+				bufferedReader = new BufferedReader(new FileReader(file));
+				if (type == RegionType.LOCAL) {
+					region = gson.fromJson(bufferedReader, LocalRegion.class);
+				} else {
+					region = gson.fromJson(bufferedReader, GlobalRegion.class);
+				}
+			} catch (FileNotFoundException e) {
+				LogUtils.log(e);
+				LogUtils.print(TextColors.RED, RegionText.REGION_LOAD_EXCEPTION.getValue(), "rg utils");
+			} finally {
+				if (bufferedReader != null) {
+					try {
+						bufferedReader.close();
+					} catch (IOException e) {
+						LogUtils.log(e);
+						LogUtils.print(TextColors.RED, RegionText.REGION_READER_CLOSE_EXCEPTION.getValue(), "rg utils");
+					}
+				}
+			}
+		}
+
+		if(region != null) {
+			Region cachedRegion = null;
+			for (Region cached : UniverseGuard.ALL_REGIONS) {
+				if (cached.getId() != null && cached.getId().compareTo(region.getId()) == 0) {
+					cachedRegion = cached;
+					break;
+				}
+			}
+			if (cachedRegion != null) {
+				UniverseGuard.ALL_REGIONS.remove(cachedRegion);
+			}
+			UniverseGuard.ALL_REGIONS.add(region);
+		}
+
+		return region;
 	}
 
 	/**
@@ -617,13 +737,7 @@ public class RegionUtils {
 	 *            The player
 	 */
 	public static void printRegionsList(Player player) {
-		StringBuilder regions = new StringBuilder();
-		for (Region region : UniverseGuard.ALL_REGIONS) {
-			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
-				regions.append(region.getName() + ", ");
-		}
-		MessageUtils.sendMessage(player, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
-		MessageUtils.sendMessage(player, regions.substring(0, regions.length() - 2), TextColors.YELLOW);
+		printRegionsList((CommandSource)player);
 	}
 	
 	/**
@@ -635,7 +749,7 @@ public class RegionUtils {
 	public static void printRegionsList(CommandSource source) {
 		StringBuilder regions = new StringBuilder();
 		for (Region region : UniverseGuard.ALL_REGIONS) {
-			if (!region.getFlag(EnumRegionFlag.HIDE_REGION))
+			if (!region.getFlag(EnumRegionFlag.HIDE_REGION) && !region.getTemplate())
 				regions.append(region.getName() + ", ");
 		}
 		MessageUtils.sendMessage(source, RegionText.REGION_LIST.getValue(), TextColors.GOLD);
@@ -678,6 +792,11 @@ public class RegionUtils {
 				MessageUtils.sendMessage(source,
 						RegionText.GREETING_MESSAGE.getValue() + ": " + localRegion.getGreetingMessage(),
 						TextColors.GREEN);
+			if(localRegion.getValue() != null) {
+                MessageUtils.sendMessage(source,
+                        RegionText.REGION_VALUE.getValue() + ": " + localRegion.getValue().getItem() + " (" + localRegion.getValue().getQuantity() + ")",
+                        TextColors.GREEN);
+            }
 			if (!localRegion.getFlag(EnumRegionFlag.HIDE_LOCATIONS)) {
 				MessageUtils.sendMessage(source,
 						RegionText.FROM.getValue() + ": " + localRegion.getFirstPoint().toString(), TextColors.AQUA);
@@ -702,38 +821,46 @@ public class RegionUtils {
 				}
 				source.sendMessage(Text.of(members.toArray()));
 			}
+
+            MessageUtils.sendMessage(source, RegionText.EFFECTS.getValue(), TextColors.YELLOW);
+            ArrayList<Text> effects = new ArrayList<Text>();
+            for (int i = 0; i < localRegion.getEffects().size(); i++) {
+                RegionEffect effect = ((LocalRegion) region).getEffects().get(i);
+                effects.add(Text.of(TextColors.GREEN, effect.getEffect().getTranslation().get(), " ", effect.getLevel() + 1, String.valueOf(i < localRegion.getEffects().size() - 1 ? ", " : "")));
+            }
+            source.sendMessage(Text.of(effects.toArray()));
 		}
 		if (!region.getFlag(EnumRegionFlag.HIDE_FLAGS)) {
 			MessageUtils.sendMessage(source, RegionText.FLAGS.getValue(), TextColors.YELLOW);
 			ArrayList<Text> flags = new ArrayList<Text>();
 			for (int i = 0; i < region.getFlags().size(); i++) {
 				RegionFlag flag = region.getFlags().get(i);
-				flags.add(Text.of(flag.getValue() ? TextColors.GREEN : TextColors.RED, flag.getName(),
-						i < region.getFlags().size() - 1 ? ", " : ""));
+				flags.add(Text.builder().append(Text.of(flag.getValue() ? TextColors.GREEN : TextColors.RED, flag.getName(),
+						i < region.getFlags().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag flag " + flag.getName() + " " + !flag.getValue())).build());
 			}
 			source.sendMessage(Text.of(flags.toArray()));
 			MessageUtils.sendMessage(source, RegionText.INTERACTS.getValue(), TextColors.YELLOW);
 			ArrayList<Text> interacts = new ArrayList<Text>();
 			for (int i = 0; i < region.getInteracts().size(); i++) {
 				RegionInteract interact = region.getInteracts().get(i);
-				interacts.add(Text.of(interact.isEnabled() ? TextColors.GREEN : TextColors.RED, interact.getBlock(),
-						i < region.getInteracts().size() - 1 ? ", " : ""));
+				interacts.add(Text.builder().append(Text.of(interact.isEnabled() ? TextColors.GREEN : TextColors.RED, interact.getBlock(),
+						i < region.getInteracts().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag interact " + interact.getBlock() + " " + !interact.isEnabled())).build());
 			}
 			source.sendMessage(Text.of(interacts.toArray()));
 			MessageUtils.sendMessage(source, RegionText.EXPLOSIONS_DAMAGE.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDamage = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
 				RegionExplosion explosion = region.getExplosions().get(i);
-				explosionsDamage.add(Text.of(explosion.getDamage() ? TextColors.GREEN : TextColors.RED,
-						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
+				explosionsDamage.add(Text.builder().append(Text.of(explosion.getDamage() ? TextColors.GREEN : TextColors.RED,
+						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag explosiondamage " + explosion.getExplosion() + " " + !explosion.getDamage())).build());
 			}
 			source.sendMessage(Text.of(explosionsDamage.toArray()));
 			MessageUtils.sendMessage(source, RegionText.EXPLOSIONS_DESTROY.getValue(), TextColors.YELLOW);
 			ArrayList<Text> explosionsDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getExplosions().size(); i++) {
 				RegionExplosion explosion = region.getExplosions().get(i);
-				explosionsDestroy.add(Text.of(explosion.getDestroy() ? TextColors.GREEN : TextColors.RED,
-						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : ""));
+				explosionsDestroy.add(Text.builder().append(Text.of(explosion.getDestroy() ? TextColors.GREEN : TextColors.RED,
+						explosion.getExplosion(), i < region.getExplosions().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag explosiondestroy " + explosion.getExplosion() + " " + !explosion.getDestroy())).build());
 			}
 			source.sendMessage(Text.of(explosionsDestroy.toArray()));
 
@@ -741,8 +868,8 @@ public class RegionUtils {
 			ArrayList<Text> vehiclesPlace = new ArrayList<Text>();
 			for (int i = 0; i < region.getVehicles().size(); i++) {
 				RegionVehicle vehicle = region.getVehicles().get(i);
-				vehiclesPlace.add(Text.of(vehicle.getPlace() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
-						i < region.getVehicles().size() - 1 ? ", " : ""));
+				vehiclesPlace.add(Text.builder().append(Text.of(vehicle.getPlace() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
+						i < region.getVehicles().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag vehicleplace " + vehicle.getName() + " " + !vehicle.getPlace())).build());
 			}
 			source.sendMessage(Text.of(vehiclesPlace.toArray()));
 
@@ -750,8 +877,8 @@ public class RegionUtils {
 			ArrayList<Text> vehiclesDestroy = new ArrayList<Text>();
 			for (int i = 0; i < region.getVehicles().size(); i++) {
 				RegionVehicle vehicle = region.getVehicles().get(i);
-				vehiclesDestroy.add(Text.of(vehicle.getDestroy() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
-						i < region.getVehicles().size() - 1 ? ", " : ""));
+				vehiclesDestroy.add(Text.builder().append(Text.of(vehicle.getDestroy() ? TextColors.GREEN : TextColors.RED, vehicle.getName(),
+						i < region.getVehicles().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag vehicledestroy " + vehicle.getName() + " " + !vehicle.getDestroy())).build());
 			}
 			source.sendMessage(Text.of(vehiclesDestroy.toArray()));
 
@@ -760,8 +887,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsSpawn = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsSpawn.add(Text.of(mob.getSpawn() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsSpawn.add(Text.builder().append(Text.of(mob.getSpawn() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobspawn " + mob.getMob() + " " + !mob.getSpawn())).build());
 				}
 				source.sendMessage(Text.of(mobsSpawn.toArray()));
 
@@ -769,8 +896,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsPve = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsPve.add(Text.of(mob.getPve() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsPve.add(Text.builder().append(Text.of(mob.getPve() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobpve " + mob.getMob() + " " + !mob.getPve())).build());
 				}
 				source.sendMessage(Text.of(mobsPve.toArray()));
 
@@ -778,8 +905,8 @@ public class RegionUtils {
 				ArrayList<Text> mobsDamage = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsDamage.add(Text.of(mob.getDamage() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsDamage.add(Text.builder().append(Text.of(mob.getDamage() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobdamage " + mob.getMob() + " " + !mob.getDamage())).build());
 				}
 				source.sendMessage(Text.of(mobsDamage.toArray()));
 
@@ -787,19 +914,19 @@ public class RegionUtils {
 				ArrayList<Text> mobsDrop = new ArrayList<Text>();
 				for (int i = 0; i < region.getMobs().size(); i++) {
 					RegionMob mob = region.getMobs().get(i);
-					mobsDrop.add(Text.of(mob.getDrop() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
-							i < region.getMobs().size() - 1 ? ", " : ""));
+					mobsDrop.add(Text.builder().append(Text.of(mob.getDrop() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+							i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobdrop " + mob.getMob() + " " + !mob.getDrop())).build());
 				}
 				source.sendMessage(Text.of(mobsDrop.toArray()));
 
-				MessageUtils.sendMessage(source, RegionText.COMMANDS.getValue(), TextColors.YELLOW);
-				ArrayList<Text> commands = new ArrayList<Text>();
-				for (int i = 0; i < region.getCommands().size(); i++) {
-					RegionCommand command = region.getCommands().get(i);
-					commands.add(Text.of(command.isEnabled() ? TextColors.GREEN : TextColors.RED, command.getCommand(),
-							i < region.getCommands().size() - 1 ? ", " : ""));
-				}
-				source.sendMessage(Text.of(commands.toArray()));
+                MessageUtils.sendMessage(source, RegionText.MOBS_INTERACT.getValue(), TextColors.YELLOW);
+                ArrayList<Text> mobsInteract = new ArrayList<Text>();
+                for (int i = 0; i < region.getMobs().size(); i++) {
+                    RegionMob mob = region.getMobs().get(i);
+                    mobsInteract.add(Text.builder().append(Text.of(mob.getInteract() ? TextColors.GREEN : TextColors.RED, mob.getMob(),
+                            i < region.getMobs().size() - 1 ? ", " : "")).onClick(TextActions.runCommand("/rg flag mobinteract " + mob.getMob() + " " + !mob.getInteract())).build());
+                }
+                source.sendMessage(Text.of(mobsInteract.toArray()));
 			}
 
 		}
@@ -981,7 +1108,7 @@ public class RegionUtils {
 	/**
 	 * Shows the command help text for a CommandSource
 	 * 
-	 * @param player
+	 * @param source
 	 *            The source
 	 * @param command
 	 *            The command
@@ -1030,6 +1157,8 @@ public class RegionUtils {
 	 * @return true if that location is in that Region, false otherwise
 	 */
 	public static boolean isInRegion(LocalRegion region, Location<World> location) {
+	    if(region.getTemplate())
+	        return false;
 		Location<World> pos1 = region.getFirstPoint().getLocation();
 		Location<World> pos2 = region.getSecondPoint().getLocation();
 		if (pos1 != null && pos2 != null) {
@@ -1060,7 +1189,7 @@ public class RegionUtils {
 	 */
 	public static Region getRegion(Location<World> location) {
 		LocalRegion localRegion = getLocalRegion(location);
-		return localRegion != null ? localRegion : getGlobalRegion(location);
+		return localRegion != null ? localRegion.getTemplate() ? null : localRegion : getGlobalRegion(location);
 	}
 
 	/**
@@ -1118,7 +1247,8 @@ public class RegionUtils {
 	 * @return The GlobalRegion at the given location
 	 */
 	public static GlobalRegion getGlobalRegion(Location<World> location) {
-		return (GlobalRegion) load(location.getExtent().getName());
+	    GlobalRegion global = (GlobalRegion) load(location.getExtent().getName());
+		return global != null ? global.getTemplate() ? null : global : null;
 	}
 
 	/**
@@ -1151,8 +1281,6 @@ public class RegionUtils {
 	 *            The flag
 	 * @param region
 	 *            The Region
-	 * @param location
-	 *            The location
 	 * @param player
 	 *            The player
 	 * @param type
@@ -1162,7 +1290,7 @@ public class RegionUtils {
 	private static boolean handleEvent(Cancellable event, EnumRegionFlag flag, Region region, Player player,
 			RegionEventType type) {
 		if (region != null) {
-			boolean cancel = flag.equals(EnumRegionFlag.INVINCIBLE) ? region.getFlag(flag) : !region.getFlag(flag);
+			boolean cancel = flag.equals(EnumRegionFlag.INVINCIBLE) == region.getFlag(flag);
 			if (player != null) {
 				if (type.equals(RegionEventType.LOCAL)) {
 					if (region.isLocal())
@@ -1250,10 +1378,25 @@ public class RegionUtils {
 		case 5:
 			printHelpFor(source, "farewell", RegionText.REGION_HELP_FAREWELL);
 			printHelpFor(source, "greeting", RegionText.REGION_HELP_GREETING);
+            printHelpFor(source, "effectadd [effect] [amplifier]", RegionText.REGION_HELP_EFFECT_ADD);
+            printHelpFor(source, "effectremove [effect]", RegionText.REGION_HELP_EFFECT_REMOVE);
+			printHelpFor(source, "setvalue [region] [item] [quantity]", RegionText.REGION_HELP_SET_VALUE);
+			break;
+        case 6:
+            printHelpFor(source, "removevalue [region]", RegionText.REGION_HELP_REMOVE_VALUE);
+            printHelpFor(source, "buy [region]", RegionText.REGION_HELP_BUY);
+            printHelpFor(source, "sell [region]", RegionText.REGION_HELP_SELL);
+            printHelpFor(source, "excludeblock [block] [type]", RegionText.REGION_HELP_EXCLUDE_BLOCK);
+            printHelpFor(source, "includeblock [block] [type]", RegionText.REGION_HELP_INCLUDE_BLOCK);
+            break;
+        case 7:
+            printHelpFor(source, "tempplate [value]", RegionText.REGION_HELP_TEMPLATE);
             printHelpFor(source, "removefarewell", RegionText.REGION_HELP_REMOVEFAREWELL);
             printHelpFor(source, "removegreeting", RegionText.REGION_HELP_REMOVEGREETING);
-			printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
-			break;
+            printHelpFor(source, "itemuse", RegionText.REGION_HELP_ITEMUSE);
+			printHelpFor(source, "globalfor", RegionText.REGION_HELP_GLOBAL_FOR);
+            printHelpFor(source, "help (flag) (page)", RegionText.REGION_HELP_HELP);
+            break;
 		}
 	}
 
@@ -1326,6 +1469,7 @@ public class RegionUtils {
 			printFlagHelpFor(source, "mobspawn", RegionText.REGION_FLAG_HELP_MOB_SPAWN);
 			printFlagHelpFor(source, "mobdamage", RegionText.REGION_FLAG_HELP_MOB_DAMAGE);
 			printFlagHelpFor(source, "mobpve", RegionText.REGION_FLAG_HELP_MOB_PVE);
+            printFlagHelpFor(source, "mobinteract", RegionText.REGION_FLAG_HELP_MOB_INTERACT);
 			break;
 		case 9:
 			printFlagHelpFor(source, EnumRegionFlag.ITEM_PICKUP, RegionText.REGION_FLAG_HELP_ITEM_PICKUP);
@@ -1338,7 +1482,13 @@ public class RegionUtils {
 			printFlagHelpFor(source, EnumRegionFlag.EXIT, RegionText.REGION_FLAG_HELP_EXIT);
 			printFlagHelpFor(source, EnumRegionFlag.ENTER, RegionText.REGION_FLAG_HELP_ENTER);
             printFlagHelpFor(source, EnumRegionFlag.TRAMPLE, RegionText.REGION_FLAG_HELP_TRAMPLE);
+            printFlagHelpFor(source, EnumRegionFlag.SHULKER_BOXES, RegionText.REGION_FLAG_HELP_SHULKER_BOXES);
+            printFlagHelpFor(source, EnumRegionFlag.PISTONS, RegionText.REGION_FLAG_HELP_PISTONS);
 			break;
+        case 11:
+            printFlagHelpFor(source, EnumRegionFlag.FROST_WALKER, RegionText.REGION_FLAG_HELP_FROST_WALKER);
+            printFlagHelpFor(source, EnumRegionFlag.FISHING_POLE, RegionText.REGION_FLAG_HELP_FISHING_POLE);
+            break;
 		}
 	}
 
@@ -1379,6 +1529,37 @@ public class RegionUtils {
         
         player.setScoreboard(scoreboard);
 	}
+
+	public static ArrayList<Region> getPlayerRegions(UUID player) {
+		ArrayList<Region> playerRegions = new ArrayList<Region>();
+		for(Region region : UniverseGuard.ALL_REGIONS) {
+			if(isMemberByUUID(region, player))
+				playerRegions.add(region);
+		}
+		return playerRegions;
+	}
+
+	public static ArrayList<Region> getPlayerRegions(Player player) {
+	    ArrayList<Region> playerRegions = new ArrayList<Region>();
+	    for(Region region : UniverseGuard.ALL_REGIONS) {
+	        if(isMemberByUUID(region, player.getUniqueId()) || isMember(region, player))
+	            playerRegions.add(region);
+        }
+	    return playerRegions;
+    }
+
+    public static int getPlayerMaxRegions(UUID uuid) {
+	    Player player = getPlayer(uuid);
+	    if(player != null) {
+	        if(player.hasPermission("*"))
+	            return UniverseGuard.MAX_PERMISSION_REGIONS.get("*");
+	        for(RegionPermission permission : RegionPermission.values()) {
+	            if(PermissionUtils.hasPermission(player, permission))
+	                return UniverseGuard.MAX_PERMISSION_REGIONS.get(permission.getName());
+            }
+        }
+	    return UniverseGuard.MAX_REGIONS;
+    }
 
 	/**
 	 * Get the JSON file of a Region
@@ -1428,6 +1609,10 @@ public class RegionUtils {
 	public static File getRegionFolder() {
 		return new File(getConfigFolder() + "/regions");
 	}
+
+    public static File getTemplateFolder() {
+        return new File(getConfigFolder() + "/templates");
+    }
 
 	/**
 	 * Get the Global Regions folder

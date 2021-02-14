@@ -16,7 +16,7 @@ import org.spongepowered.api.entity.living.animal.Animal;
 import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -33,9 +33,10 @@ import com.universeguard.utils.RegionUtils;
 public class FlagMobDropListener {
 	
 	@Listener
-	public void onMobDrop(SpawnEntityEvent event, @Root EntitySpawnCause cause) {
-		if(!(cause.getEntity() instanceof Player) && cause.getType().equals(SpawnTypes.DROPPED_ITEM) && !event.getEntities().isEmpty()) {
-			Entity entity = cause.getEntity();
+	public void onMobDrop(SpawnEntityEvent event, @Root Entity entity) {
+		if(!(entity instanceof Player) && 
+				event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
+				event.getContext().get(EventContextKeys.SPAWN_TYPE).get().equals(SpawnTypes.DROPPED_ITEM) && !event.getEntities().isEmpty()) {
 			EntityType type = entity.getType();
 			if(!type.equals(EntityTypes.ITEM) && !FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type) && entity instanceof Living)
 				this.handleEvent(event, entity);

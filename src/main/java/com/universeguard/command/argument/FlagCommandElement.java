@@ -1,8 +1,11 @@
 package com.universeguard.command.argument;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -71,11 +74,16 @@ public class FlagCommandElement extends PatternMatchingCommandElement{
 			case MOBPVE:
 			case MOBDAMAGE:
 			case MOBDROP:
-					flags.addAll(Sponge.getRegistry().getAllOf(EntityType.class).stream()
-						    .map(CatalogType::getId).collect(Collectors.toList()));
+            case MOBINTERACT:
+                    Collection<String> allMobs = Sponge.getRegistry().getAllOf(EntityType.class).stream().map(CatalogType::getId).collect(Collectors.toList());
+					flags.addAll(allMobs);
+                    for (String id : allMobs) {
+                        flags.add(id.substring(id.indexOf(":") + 1));
+                    }
 					flags.add("all");
 					flags.add("allhostile");
 					flags.add("allpassive");
+					break;
 			default: break;
 			}
 		}

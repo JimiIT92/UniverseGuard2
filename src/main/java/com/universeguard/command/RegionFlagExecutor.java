@@ -7,6 +7,7 @@
  */
 package com.universeguard.command;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -37,7 +38,7 @@ public class RegionFlagExecutor implements CommandExecutor {
 		if (RegionUtils.hasPendingRegion(src)) {
 			if (args.hasAny("subflag") && args.hasAny("flag") && args.hasAny("value")) {
 				Region region = RegionUtils.getPendingRegion(src);
-				boolean value = Boolean.valueOf(args.<String>getOne("value").get());
+				boolean value = Boolean.parseBoolean(args.<String>getOne("value").get());
 				String name = args.<String>getOne("flag").get();
 				String subflag = args.<String>getOne("subflag").get();
 				if (!subflag.equalsIgnoreCase("flag")) {
@@ -170,6 +171,23 @@ public class RegionFlagExecutor implements CommandExecutor {
 						} else
 							MessageUtils.sendErrorMessage(src, RegionText.REGION_MOB_NOT_FOUND.getValue());
 						break;
+                    case "mobinteract":
+                        if(name.equalsIgnoreCase("all")) {
+                            region.setMobInteract("all", value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        } else if(name.equalsIgnoreCase("allhostile")) {
+                            region.setMobInteract("allhostile", value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        } else if(name.equalsIgnoreCase("allpassive")) {
+                            region.setMobInteract("allpassive", value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        }
+                        else if (FlagUtils.getMobId(name) != null) {
+                            region.setMobInteract(FlagUtils.getMobId(name), value);
+                            MessageUtils.sendSuccessMessage(src, RegionText.REGION_FLAG_UPDATED.getValue());
+                        } else
+                            MessageUtils.sendErrorMessage(src, RegionText.REGION_MOB_NOT_FOUND.getValue());
+                        break;
 					default:
 						MessageUtils.sendErrorMessage(src, getCommandUsage());
 						break;

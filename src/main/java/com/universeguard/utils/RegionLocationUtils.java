@@ -7,6 +7,7 @@
  */
 package com.universeguard.utils;
 
+import com.universeguard.UniverseGuard;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -48,9 +49,28 @@ public class RegionLocationUtils {
 	 * @return The RegionLocation from player and location
 	 */
 	public static RegionLocation fromLocation(Player player, Location<World> location) {
-		return new RegionLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), getDimension(player), getWorld(player));
+        return create(location.getBlockX(), location.getBlockY(), location.getBlockZ(), getDimension(player), getWorld(player));
 	}
-	
+
+	public static RegionLocation fromCoordinates(Player player, int x, int y, int z) {
+	    return create(x, y, z, getDimension(player), getWorld(player));
+    }
+
+    public static RegionLocation create(int x, int y, int z, String dimension, String world) {
+	    return new RegionLocation(x, y, z, dimension, world);
+    }
+
+	public static boolean isMaxSize(LocalRegion region) {
+	    if(UniverseGuard.LIMIT_REGIONS_SIZE) {
+	        int distanceX = Math.abs(region.getFirstPoint().getX() - region.getSecondPoint().getX());
+            int distanceY = Math.abs(region.getFirstPoint().getY() - region.getSecondPoint().getY());
+            int distanceZ = Math.abs(region.getFirstPoint().getZ() - region.getSecondPoint().getZ());
+            int maxsize = UniverseGuard.MAX_REGION_SIZE;
+            return distanceX > maxsize || distanceY > maxsize || distanceZ > maxsize;
+        }
+	    return false;
+    }
+
 	/**
 	 * Reset the first or the second point of a Local Region based on the given direction
 	 * @param region The Region
@@ -76,24 +96,28 @@ public class RegionLocationUtils {
 				region.setSecondPoint(new RegionLocation(secondPoint.getX(), hasBlocks ? secondPoint.getY() - blocks : 0, secondPoint.getZ(), secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case LEFT:
+        case WEST:
 			if(firstPoint.getX() <= secondPoint.getX())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX() - blocks, firstPoint.getY(), firstPoint.getZ(), firstPoint.getDimension(), firstPoint.getWorld()));
 			else
 				region.setSecondPoint(new RegionLocation(secondPoint.getX() - blocks, secondPoint.getY(), secondPoint.getZ(), secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case RIGHT:
+        case EAST:
 			if(firstPoint.getX() >= secondPoint.getX())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX() + blocks, firstPoint.getY(), firstPoint.getZ(), firstPoint.getDimension(), firstPoint.getWorld()));
 			else
 				region.setSecondPoint(new RegionLocation(secondPoint.getX() + blocks, secondPoint.getY(), secondPoint.getZ(), secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case FRONT:
+        case SOUTH:
 			if(firstPoint.getZ() >= secondPoint.getZ())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ() + blocks, firstPoint.getDimension(), firstPoint.getWorld()));
 			else
 				region.setSecondPoint(new RegionLocation(secondPoint.getX(), secondPoint.getY(), secondPoint.getZ() + blocks, secondPoint.getDimension(), secondPoint.getWorld()));
 			break;
 		case BACK:
+        case NORTH:
 			if(firstPoint.getZ() <= secondPoint.getZ())
 				region.setFirstPoint(new RegionLocation(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ() - blocks, firstPoint.getDimension(), firstPoint.getWorld()));
 			else

@@ -9,22 +9,18 @@ package com.universeguard.region;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.universeguard.region.components.*;
+import com.universeguard.region.enums.*;
+import com.universeguard.utils.LogUtils;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 import com.universeguard.UniverseGuard;
-import com.universeguard.region.components.RegionCommand;
-import com.universeguard.region.components.RegionExplosion;
-import com.universeguard.region.components.RegionFlag;
-import com.universeguard.region.components.RegionInteract;
-import com.universeguard.region.components.RegionMob;
-import com.universeguard.region.components.RegionVehicle;
-import com.universeguard.region.enums.EnumRegionExplosion;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.region.enums.RegionType;
 import com.universeguard.utils.FlagUtils;
+import org.spongepowered.api.item.ItemType;
 
 /**
  * Region Class
@@ -77,13 +73,29 @@ public class Region {
 	 * Region Commands
 	 */
 	private ArrayList<RegionCommand> COMMANDS;
+    /**
+     * The list of blocks excluded from place and destroy flags
+     */
+    private RegionExcludedBlocks EXCLUDED_BLOCKS;
+    /**
+     * The list of items that can't be used inside the Region
+     */
+    private ArrayList<String> DISALLOWED_ITEMS;
+	/**
+	 * The list of blocks that can't be used inside the Region
+	 */
+	private ArrayList<String> DISALLOWED_BLOCKS;
+	/**
+	 * If this Region is a Template
+	 */
+    private boolean TEMPLATE;
 	
 	/**
 	 * Region Constructor
 	 * @param type The Region Type
 	 */
 	public Region(RegionType type) {
-		this(type, "");
+		this(type, "", false);
 	}
 	
 	/**
@@ -91,8 +103,8 @@ public class Region {
 	 * @param type The Region Type
 	 * @param name The Region name
 	 */
-	public Region(RegionType type, String name) {
-		this(type, name, GameModes.NOT_SET.getId());
+	public Region(RegionType type, String name, boolean template) {
+		this(type, name, GameModes.NOT_SET.getId(), template);
 	}
 	
 	/**
@@ -101,12 +113,16 @@ public class Region {
 	 * @param name The Region name
 	 * @param gamemode The Region GameMode
 	 */
-	public Region(RegionType type, String name, String gamemode) {
+	public Region(RegionType type, String name, String gamemode, boolean template) {
 		this.ID = UUID.randomUUID();
 		this.TYPE = type;
 		this.NAME = name;
 		this.GAMEMODE = gamemode;
 		this.COMMANDS = new ArrayList<RegionCommand>();
+		this.EXCLUDED_BLOCKS = new RegionExcludedBlocks();
+		this.DISALLOWED_ITEMS = new ArrayList<String>();
+		this.DISALLOWED_BLOCKS = new ArrayList<String>();
+		this.TEMPLATE = template;
 		this.initFlags();
 	}
 	
@@ -414,8 +430,11 @@ public class Region {
 	 * @return true if the command is enabled or not set, false otherwise
 	 */
 	public boolean isCommandEnabled(String command) {
+		if(this.COMMANDS.stream().anyMatch(s -> command.toLowerCase().startsWith(s.getCommand().toLowerCase()))) {
+			return false;
+		}
 		RegionCommand regionCommand = getRegionCommand(command);
-		return regionCommand == null ? true : regionCommand.isEnabled();
+		return regionCommand == null || regionCommand.isEnabled();
 	}
 	
 	/**
@@ -661,7 +680,39 @@ public class Region {
 		rm.setPve(value);
 		this.MOBS.add(rm);
 	}
-	
+
+
+    /**
+     * Get the interact value of a Mob in the Region
+     * @param mob The Mob
+     * @return The interact value of the Mob
+     */
+    public boolean getMobInteract(String mob) {
+        for(RegionMob m : this.MOBS) {
+            if(m.getMob().equalsIgnoreCase(mob))
+                return m.getInteract();
+        }
+        return true;
+    }
+
+    /**
+     * Set the interact value of a Mob for the Region
+     * @param mob The Mob
+     * @param value The value
+     */
+    public void setMobInteract(String mob, boolean value) {
+        RegionMob rm = null;
+        for(RegionMob m : this.MOBS) {
+            if(m.getMob().equalsIgnoreCase(mob)) {
+                m.setInteract(value);
+                return;
+            }
+        }
+        rm = new RegionMob(mob);
+        rm.setInteract(value);
+        this.MOBS.add(rm);
+    }
+
 	/**
 	 * Get the damage value of a Mob in the Region
 	 * @param mob The Mob
@@ -787,7 +838,7 @@ public class Region {
 	public void setMobs(ArrayList<RegionMob> mobs) {
 		this.MOBS = mobs;
 	}
-	
+
 	/**
 	 * Set the Region Version
 	 * @param version The Region Version
@@ -795,7 +846,93 @@ public class Region {
 	public void setVersion(float version) {
 		this.VERSION = version;
 	}
-	
+
+	public void setExcludedBlocks(RegionExcludedBlocks blocks) {
+	    this.EXCLUDED_BLOCKS = blocks;
+    }
+
+    public RegionExcludedBlocks getExcludedBlocks() {
+        return this.EXCLUDED_BLOCKS;
+    }
+
+	public void excludeBlock(BlockType block, EnumRegionBlock type) {
+	    switch(type) {
+            case PLACE:
+                this.EXCLUDED_BLOCKS.addPlace(block);
+                break;
+            case DESTROY:
+                this.EXCLUDED_BLOCKS.addDestroy(block);
+                break;
+            case BOTH:
+                this.EXCLUDED_BLOCKS.addPlace(block);
+                this.EXCLUDED_BLOCKS.addDestroy(block);
+                break;
+        }
+    }
+
+    public void includeBlock(BlockType block, EnumRegionBlock type) {
+        switch(type) {
+            case PLACE:
+                this.EXCLUDED_BLOCKS.removePlace(block);
+                break;
+            case DESTROY:
+                this.EXCLUDED_BLOCKS.removeDestroy(block);
+                break;
+            case BOTH:
+                this.EXCLUDED_BLOCKS.removePlace(block);
+                this.EXCLUDED_BLOCKS.removeDestroy(block);
+                break;
+        }
+    }
+
+    public void setDisallowedItems(ArrayList<String> items){
+	    this.DISALLOWED_ITEMS = items;
+    }
+
+    public ArrayList<String> getDisallowedItems(){
+	    return  this.DISALLOWED_ITEMS;
+    }
+
+    public void disallowItem(ItemType item){
+	    if(!this.DISALLOWED_ITEMS.contains(item.getId())){
+	        this.DISALLOWED_ITEMS.add(item.getId());
+        }
+    }
+
+    public void allowItem(ItemType item){
+	    if(this.DISALLOWED_ITEMS.contains(item.getId())){
+	        this.DISALLOWED_ITEMS.remove(item.getId());
+        }
+    }
+
+	public void setDisallowedBlocks(ArrayList<String> blocks){
+		this.DISALLOWED_BLOCKS = blocks;
+	}
+
+	public ArrayList<String> getDisallowedBlocks(){
+		return  this.DISALLOWED_BLOCKS;
+	}
+
+	public void disallowBlock(BlockType block){
+		if(!this.DISALLOWED_BLOCKS.contains(block.getId())){
+			this.DISALLOWED_BLOCKS.add(block.getId());
+		}
+	}
+
+	public void allowBlock(BlockType block){
+		if(this.DISALLOWED_BLOCKS.contains(block.getId())){
+			this.DISALLOWED_BLOCKS.remove(block.getId());
+		}
+	}
+
+    public void setTemplate(boolean template) {
+	    this.TEMPLATE = template;
+    }
+
+    public boolean getTemplate() {
+	    return  this.TEMPLATE;
+    }
+
 	/**
 	 * Get the Region Version
 	 * @return The Region Version

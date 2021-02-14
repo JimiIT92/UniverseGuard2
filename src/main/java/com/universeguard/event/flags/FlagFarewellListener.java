@@ -44,10 +44,10 @@ public class FlagFarewellListener {
 	{
 		Location<World> from = event.getFromTransform().getLocation();
 		Region regionFrom = RegionUtils.getRegion(from);
-		if(regionFrom.isLocal()) {
+		if(regionFrom != null && regionFrom.isLocal()) {
 			Location<World> to = event.getToTransform().getLocation();
 			Region regionTo = RegionUtils.getRegion(to);
-			if(regionFrom != null && regionTo != null && regionFrom != regionTo && regionFrom.getFlag(EnumRegionFlag.EXIT) &&
+			if(regionTo != null && regionFrom != regionTo && regionFrom.getFlag(EnumRegionFlag.EXIT) &&
 					!((LocalRegion)regionFrom).getFarewellMessage().isEmpty()) {
 				MessageUtils.sendHotbarErrorMessage(player, ((LocalRegion)regionFrom).getFarewellMessage());
 			}

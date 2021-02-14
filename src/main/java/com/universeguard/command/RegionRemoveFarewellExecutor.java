@@ -26,9 +26,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
  */
 public class RegionRemoveFarewellExecutor implements CommandExecutor {
 
-    @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        if(RegionUtils.hasPendingRegion(src)) {
+	@Override
+	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+		if(RegionUtils.hasPendingRegion(src)) {
             Region region = RegionUtils.getPendingRegion(src);
             if(region != null) {
                 if(region.isLocal()) {
@@ -43,15 +43,15 @@ public class RegionRemoveFarewellExecutor implements CommandExecutor {
                     MessageUtils.sendErrorMessage(src, RegionText.REGION_LOCAL_ONLY.getValue());
             } else
                 MessageUtils.sendErrorMessage(src, RegionText.REGION_NOT_FOUND.getValue());
-
-        } else
-            MessageUtils.sendErrorMessage(src, RegionText.NO_PENDING_REGION.getValue());
-
-        return CommandResult.empty();
-    }
-
-    private String getCommandUsage() {
-        return "/rg removefarewell";
-    }
+			
+		} else
+			MessageUtils.sendErrorMessage(src, RegionText.NO_PENDING_REGION.getValue());
+		
+		return CommandResult.empty();
+	}
+	
+	private String getCommandUsage() {
+		return "/rg removefarewell";
+	}
 
 }

@@ -7,33 +7,37 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.region.Region;
+import com.universeguard.region.enums.EnumRegionFlag;
+import com.universeguard.region.enums.RegionEventType;
+import com.universeguard.region.enums.RegionPermission;
+import com.universeguard.region.enums.RegionText;
+import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.ExperienceOrb;
-import org.spongepowered.api.entity.Item;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.RegionEventType;
-import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.InventoryUtils;
-import com.universeguard.utils.RegionUtils;
+import java.util.Optional;
 
 /**
  * Handler for the place flag
@@ -66,14 +70,34 @@ public class FlagPlaceListener {
 				}
 		}
 	}
-	
+
 	@Listener
-	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event, @Root Player player) {
+	public void onBucketUse(InteractItemEvent.Secondary event, @First Player player) {
+		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
+		if(item.isPresent() && (item.get().getType().equals(ItemTypes.WATER_BUCKET) || item.get().getType().equals(ItemTypes.LAVA_BUCKET))){
+			this.handleEvent(event, player.getLocation(), player);
+		}
+	}
+
+	@Listener
+	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getFinal();
-			if (block.getLocation().isPresent() && !block.getState().getType().equals(BlockTypes.FIRE)) {
-				Location<World> location = block.getLocation().get();
-				this.handleEvent(event, location, player);
+			BlockType type = block.getState().getType();
+			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE) && !FlagUtils.isFluid(type)
+			&& !(FlagPistonsListener.isPistonExtension(type) || (block.get(Keys.EXTENDED).isPresent()
+			&& block.get(Keys.EXTENDED).get())
+			|| event.getCause().root() instanceof Piston)) {
+			    Region region = RegionUtils.getRegion(block.getLocation().get());
+			    Player player = event.getCause().first(Player.class).orElse(null);
+				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
+				    if(region.getFlag(EnumRegionFlag.PLACE)) {
+                        event.setCancelled(true);
+                        MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+                    }
+                } else {
+                    this.handleEvent(event, block.getLocation().get(), player);
+                }
 			}
 		}
 	}

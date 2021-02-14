@@ -11,11 +11,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -42,13 +43,16 @@ public class FlagTrampleListener {
     }
 
     @Listener
-    public void onLeafDrop(SpawnEntityEvent event, @Root BlockSpawnCause cause) {
-        BlockType type = cause.getBlockSnapshot().getState().getType();
-        if(cause.getType().equals(SpawnTypes.DROPPED_ITEM) && FlagUtils.isCrop(type))
-            this.handleEvent(event, cause.getBlockSnapshot().getLocation().get(), null);
+    public void onFieldsDrop(SpawnEntityEvent event, @First LocatableBlock block) {
+        if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE)) {
+            SpawnType spawn = event.getContext().get(EventContextKeys.SPAWN_TYPE).get();
+            BlockType type = block.getBlockState().getType();
+            if(spawn.equals(SpawnTypes.DROPPED_ITEM) && FlagUtils.isCrop(type))
+                this.handleEvent(event, block.getLocation(), null);
+        }
     }
-
-    private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
-        return RegionUtils.handleEvent(event, EnumRegionFlag.TRAMPLE, location, player, RegionEventType.GLOBAL);
-    }
+	
+	private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
+		return RegionUtils.handleEvent(event, EnumRegionFlag.TRAMPLE, location, player, RegionEventType.GLOBAL);
+	}
 }

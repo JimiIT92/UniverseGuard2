@@ -10,11 +10,10 @@ package com.universeguard.event.flags;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Root;
 
 import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionVehicle;
@@ -31,8 +30,8 @@ import com.universeguard.utils.RegionUtils;
 public class FlagVehiclePlaceListener {
 
 	@Listener
-	public void onInteract(SpawnEntityEvent event, @Root EntitySpawnCause cause, @First Player player) {
-		if(cause.getType().equals(SpawnTypes.PLACEMENT) && !event.getEntities().isEmpty()) {
+	public void onInteract(SpawnEntityEvent event, @First Player player) {
+		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) && event.getContext().get(EventContextKeys.SPAWN_TYPE).get().equals(SpawnTypes.PLACEMENT) && !event.getEntities().isEmpty()) {
 			EntityType type = event.getEntities().get(0).getType();
 			if(FlagUtils.isVehicle(type)) {
 				EnumRegionVehicle vehicle = FlagUtils.getVehicle(type);

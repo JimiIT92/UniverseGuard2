@@ -7,6 +7,7 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
@@ -19,6 +20,10 @@ import org.spongepowered.api.world.World;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
 import com.universeguard.utils.RegionUtils;
+
+import java.util.Objects;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Handler for the chests flag

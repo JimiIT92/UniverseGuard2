@@ -121,6 +121,8 @@ public class MessageUtils {
 	 * @param color The color
 	 */
 	public static void sendHotbarMessage(Player player, String message, TextColor color) {
-		player.sendMessage(ChatTypes.ACTION_BAR, Text.of(color, message));
+		if(player != null) {
+			player.sendMessage(ChatTypes.ACTION_BAR, Text.of(color, message));
+		}
 	}
 }

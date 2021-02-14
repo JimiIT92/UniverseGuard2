@@ -7,18 +7,20 @@
  */
 package com.universeguard.region;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.World;
-
+import com.universeguard.region.components.RegionEffect;
 import com.universeguard.region.components.RegionLocation;
 import com.universeguard.region.components.RegionMember;
+import com.universeguard.region.components.RegionValue;
 import com.universeguard.region.enums.RegionRole;
 import com.universeguard.region.enums.RegionType;
 import com.universeguard.utils.RegionUtils;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.World;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Local Region Class
@@ -59,12 +61,24 @@ public class LocalRegion extends Region {
 	 * Region Greeting message
 	 */
 	private String GREETING_MESSAGE;
+    /**
+     * The effects a player will get into this Region
+     */
+	private ArrayList<RegionEffect> EFFECTS;
+    /**
+     * If this Region has been sold
+     */
+	private boolean SOLD;
+    /**
+     * The value needed to buy this Region
+     */
+	private RegionValue VALUE;
 	/**
 	 * LocalRegion Constructor
 	 * @param name The Region name
 	 */
 	public LocalRegion(String name) {
-		this(name, null, null);
+		this(name, null, null, false);
 	}
 	
 	/**
@@ -73,8 +87,8 @@ public class LocalRegion extends Region {
 	 * @param firstPoint The first point
 	 * @param secondPoint The second point
 	 */
-	public LocalRegion(String name, RegionLocation firstPoint, RegionLocation secondPoint) {
-		super(RegionType.LOCAL, name);
+	public LocalRegion(String name, RegionLocation firstPoint, RegionLocation secondPoint, boolean template) {
+		super(RegionType.LOCAL, name, template);
 		this.FIRST_POINT= firstPoint;
 		this.SECOND_POINT = secondPoint;
 		this.PRIORITY = 0;
@@ -83,6 +97,8 @@ public class LocalRegion extends Region {
 		this.MEMBERS = new ArrayList<RegionMember>();
 		this.FAREWELL_MESSAGE = "";
 		this.GREETING_MESSAGE = "";
+		this.EFFECTS = new ArrayList<RegionEffect>();
+		this.SOLD = false;
 	}
 	
 	/**
@@ -180,7 +196,15 @@ public class LocalRegion extends Region {
 	public ArrayList<RegionMember> getMembers() {
 		return this.MEMBERS;
 	}
-	
+
+	/**
+	 * Get the Region Owner
+	 * @return Region Owner
+	 */
+	public RegionMember getOwner() {
+		return this.MEMBERS.stream().filter(member -> member.getRole().equals(RegionRole.OWNER)).findFirst().orElse(null);
+	}
+
 	/**
 	 * Add a Player with the specified Role to the Region
 	 * @param player The player
@@ -264,8 +288,58 @@ public class LocalRegion extends Region {
 	public String getGreetingMessage() {
 		return this.GREETING_MESSAGE;
 	}
-	
-	/**
+
+	public void setEffects(ArrayList<RegionEffect> effects) {
+	    this.EFFECTS = effects;
+    }
+
+    public ArrayList<RegionEffect> getEffects() {
+	    return this.EFFECTS;
+    }
+
+    public void addEffect(PotionEffectType potion, int level) {
+	    boolean found = false;
+	    for(RegionEffect effect : this.EFFECTS) {
+	        if(effect.getEffect().equals(potion)) {
+                effect.setLevel(level);
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+            this.EFFECTS.add(new RegionEffect(potion, level));
+    }
+
+    public void removeEffect(PotionEffectType potion) {
+        RegionEffect effectToRemove = null;
+	    for (RegionEffect effect : this.EFFECTS) {
+            if(effect.getEffect().equals(potion)) {
+                effectToRemove = effect;
+                break;
+            }
+        }
+        if(effectToRemove != null) {
+	        this.EFFECTS.remove(effectToRemove);
+        }
+    }
+
+    public void setSold(boolean sold) {
+	    this.SOLD = sold;
+    }
+
+    public boolean getSold() {
+        return this.SOLD;
+    }
+
+    public void setValue(RegionValue value) {
+	    this.VALUE = value;
+    }
+
+    public RegionValue getValue() {
+	    return this.VALUE;
+    }
+
+    /**
 	 * Get the World object for the Region
 	 * @return The Region World Object
 	 */

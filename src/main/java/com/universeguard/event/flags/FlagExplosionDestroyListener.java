@@ -9,6 +9,7 @@ package com.universeguard.event.flags;
 
 import java.util.Iterator;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityType;

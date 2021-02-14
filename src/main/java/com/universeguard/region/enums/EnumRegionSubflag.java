@@ -22,5 +22,6 @@ public enum EnumRegionSubflag {
 	MOBSPAWN,
 	MOBDAMAGE,
 	MOBPVE,
-	MOBDROP;
+	MOBDROP,
+    MOBINTERACT;
 }

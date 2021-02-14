@@ -1,16 +1,18 @@
-apply plugin: 'java'
-
-repositories {
-    mavenCentral()
-    maven {
-        name = 'sponge'
-        url = 'https://repo.spongepowered.org/maven'
-    }
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
 }
 
 group = 'com.universeguard'
-version = '2.14'
+version = '2.34'
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:6.0.0'
+    compile 'org.spongepowered:spongeapi:7.1.0'
 }
+
+task copyJarToBin(type:Copy) {
+    outputs.upToDateWhen { false }
+    from jar
+    into 'D:/UG/UniverseGuardOld/UG2/Test Server/mods'
+}
+
+build.finalizedBy(copyJarToBin)

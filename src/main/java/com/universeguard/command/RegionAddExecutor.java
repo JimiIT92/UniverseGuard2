@@ -7,8 +7,14 @@
  */
 package com.universeguard.command;
 
-import java.util.UUID;
-
+import com.universeguard.UniverseGuard;
+import com.universeguard.region.LocalRegion;
+import com.universeguard.region.Region;
+import com.universeguard.region.enums.RegionPermission;
+import com.universeguard.region.enums.RegionRole;
+import com.universeguard.region.enums.RegionText;
+import com.universeguard.utils.MessageUtils;
+import com.universeguard.utils.RegionUtils;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -17,13 +23,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.universeguard.UniverseGuard;
-import com.universeguard.region.LocalRegion;
-import com.universeguard.region.Region;
-import com.universeguard.region.enums.RegionRole;
-import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.RegionUtils;
+import java.util.UUID;
 
 /**
  * 
@@ -39,7 +39,7 @@ public class RegionAddExecutor implements CommandExecutor {
 			String username = args.<String>getOne("name").get();
 			UUID member = RegionUtils.getPlayerUUID(username);
 			RegionRole role = args.<RegionRole>getOne("role").get();
-			if(role != null && member != null) {
+			if(member != null) {
 				if (!RegionUtils.hasRegionByUUID(member) || !UniverseGuard.UNIQUE_REGIONS) {
 					Region region = null;
 					LocalRegion localRegion = null;
@@ -55,16 +55,24 @@ public class RegionAddExecutor implements CommandExecutor {
 						if(region.isLocal()) {
 							localRegion = (LocalRegion) region;
 							if(!RegionUtils.isMemberByUUID(localRegion, member)) {
-								localRegion.addMemberByUUIDAndUsername(member, username, role);
-								if(RegionUtils.save(localRegion)) {
-									MessageUtils.sendSuccessMessage(src, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + username);
-									if(RegionUtils.isOnline(member)) {
-										Player onlinePlayer = RegionUtils.getPlayer(member);
-										if(onlinePlayer != null)
-											MessageUtils.sendMessage(onlinePlayer, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);	
-									}
-								} else
-									MessageUtils.sendErrorMessage(src, RegionText.REGION_ADD_MEMBER_EXCEPTION.getValue());
+							    if(!UniverseGuard.UNIQUE_REGIONS && UniverseGuard.LIMIT_PLAYER_REGIONS && RegionUtils.getPlayerRegions(member).size() >= RegionUtils.getPlayerMaxRegions(member)) {
+							        MessageUtils.sendErrorMessage(src, RegionText.PLAYERS_MAX_REGIONS.getValue());
+							        return CommandResult.empty();
+                                }
+							    if(src.hasPermission(RegionPermission.REGION.getValue()) || (localRegion.getOwner() != null && src instanceof Player && localRegion.getOwner().getUUID().equals(((Player)src).getUniqueId()))) {
+									localRegion.addMemberByUUIDAndUsername(member, username, role);
+									if(RegionUtils.save(localRegion)) {
+										MessageUtils.sendSuccessMessage(src, RegionText.PLAYER_ADDED_TO_REGION.getValue() + ": " + username);
+										if(RegionUtils.isOnline(member)) {
+											Player onlinePlayer = RegionUtils.getPlayer(member);
+											if(onlinePlayer != null)
+												MessageUtils.sendMessage(onlinePlayer, RegionText.ADDED_TO_REGION.getValue() + ": " + region.getName(), TextColors.GOLD);
+										}
+									} else
+										MessageUtils.sendErrorMessage(src, RegionText.REGION_ADD_MEMBER_EXCEPTION.getValue());
+								} else {
+							    	MessageUtils.sendErrorMessage(src, RegionText.NO_PERMISSION_COMMAND.getValue());
+								}
 							}
 							else
 								MessageUtils.sendErrorMessage(src, RegionText.PLAYER_IN_REGION.getValue());
@@ -75,7 +83,7 @@ public class RegionAddExecutor implements CommandExecutor {
 				} else
 					MessageUtils.sendErrorMessage(src, RegionText.PLAYER_IN_REGION.getValue());
 			} else
-				MessageUtils.sendErrorMessage(src, RegionText.ROLE_NOT_FOUND.getValue());
+				MessageUtils.sendErrorMessage(src, RegionText.PLAYER_NOT_FOUND.getValue());
 			
 		} else {
 			MessageUtils.sendErrorMessage(src, getCommandUsage());

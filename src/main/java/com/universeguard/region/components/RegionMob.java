@@ -18,6 +18,7 @@ public class RegionMob {
 	private boolean PVE;
 	private boolean DAMAGE;
 	private boolean DROP;
+	private boolean INTERACT;
 	
 	public RegionMob(String name) {
 		this.MOB = name.toLowerCase();
@@ -25,6 +26,7 @@ public class RegionMob {
 		this.PVE = true;
 		this.DAMAGE = true;
 		this.DROP = true;
+		this.INTERACT = true;
 	}
 
 	public String getMob() {
@@ -66,4 +68,12 @@ public class RegionMob {
 	public boolean getDrop() {
 		return this.DROP;
 	}
+
+    public void setInteract(boolean interact) {
+        this.INTERACT = interact;
+    }
+
+    public boolean getInteract() {
+        return this.INTERACT;
+    }
 }

@@ -14,10 +14,7 @@ package com.universeguard.region.enums;
  */
 public enum RegionPermission {
 	ALL("universeguard.all", "Grant all permissions to use Universe Guard"),
-	REGION("universeguard.region", "Grant the ability to bypass region restrictions"),
-	CREATE("universeguard.create", "Grant the ability to create regions"),
-	EDIT("universeguard.edit", "Grant the ability to a player to edit it's own regions"),
-	DELETE("universeguard.delete", "Grant the ability to a player to delete it's own regions");
+	REGION("universeguard.region", "Grant the ability to bypass region restrictions");
 	
 	private String VALUE;
 	private String COMMENT;

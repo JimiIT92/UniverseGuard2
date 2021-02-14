@@ -25,6 +25,7 @@ public enum EnumRegionInteract {
 	DOOR("door", true),
 	FENCE_GATE("fencegate", true),
 	TRAPDOOR("trapdoor", true),
+	PRESSURE_PLATE("pressureplate", true),
 	SIGN("sign", true);
 	
 	private String NAME;

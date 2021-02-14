@@ -7,28 +7,26 @@
  */
 package com.universeguard.utils;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.universeguard.UniverseGuard;
+import com.universeguard.region.Region;
+import com.universeguard.region.enums.*;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.universeguard.UniverseGuard;
-import com.universeguard.region.enums.EnumRegionExplosion;
-import com.universeguard.region.enums.EnumRegionFlag;
-import com.universeguard.region.enums.EnumRegionInteract;
-import com.universeguard.region.enums.EnumRegionVehicle;
-import com.universeguard.region.enums.RegionText;
-
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FlagUtils {
 
@@ -65,12 +63,32 @@ public class FlagUtils {
 			configNode.getNode("timers", "hunger").setValue(UniverseGuard.HUNGER_TIMER).setComment("The update frequency (in seconds) of the hunger flag timer");
 		if(configNode.getNode("timers", "gamemode").isVirtual())
 			configNode.getNode("timers", "gamemode").setValue(UniverseGuard.GAMEMODE_TIMER).setComment("The update frequency (in seconds) of the gamemode flag timer");
-		if(configNode.getNode("timers", "enter_flag").isVirtual())
-			configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
+        if(configNode.getNode("timers", "enter_flag").isVirtual())
+            configNode.getNode("timers", "enter_flag").setValue(UniverseGuard.ENTER_FLAG_TIMER).setComment("The update frequency (in milliseconds) of the enter flag timer");
+        if(configNode.getNode("timers", "use_effects").isVirtual())
+            configNode.getNode("timers", "use_effects").setValue(UniverseGuard.USE_EFFECTS).setComment("If Regions can have potion effects");
+        if(configNode.getNode("timers", "effect").isVirtual())
+            configNode.getNode("timers", "effect").setValue(UniverseGuard.EFFECT_TIMER).setComment("The update frequency (in milliseconds) of the effect timer");
 		if(configNode.getNode("players", "unique_regions").isVirtual())
 			configNode.getNode("players", "unique_regions").setValue(UniverseGuard.UNIQUE_REGIONS).setComment("Sets if players can be in more Regions");
 		if(configNode.getNode("selector", "item").isVirtual())
 			configNode.getNode("selector", "item").setValue(UniverseGuard.SELECTOR_ITEM.getId());
+        if(configNode.getNode("regions", "limit_regions_size").isVirtual())
+            configNode.getNode("regions", "limit_regions_size").setValue(UniverseGuard.LIMIT_REGIONS_SIZE).setComment("Sets if Regions must have a max size");
+        if(configNode.getNode("regions", "max_region_size").isVirtual())
+            configNode.getNode("regions", "max_region_size").setValue(UniverseGuard.MAX_REGION_SIZE).setComment("The max size a Region can be. This represents the distance between the first and the second point.");
+        if(configNode.getNode("players", "limit_player_regions").isVirtual())
+            configNode.getNode("players", "limit_player_regions").setValue(UniverseGuard.LIMIT_PLAYER_REGIONS).setComment("Sets if players can be in a max amount of Regions");
+        if(configNode.getNode("players", "max_regions").isVirtual())
+            configNode.getNode("players", "max_regions").setValue(UniverseGuard.MAX_REGIONS).setComment("The max number of Regions a player ca be member or owner");
+        for(RegionPermission permission : RegionPermission.values()) {
+            if(configNode.getNode("max_regions", permission.getName()).isVirtual())
+                configNode.getNode("max_regions", permission.getName()).setValue(UniverseGuard.MAX_REGIONS);
+        }
+        if(configNode.getNode("max_regions", "*").isVirtual())
+            configNode.getNode("max_regions", "*").setValue(UniverseGuard.MAX_REGIONS);
+        if(configNode.getNode("regions", "purchasable_regions").isVirtual())
+            configNode.getNode("regions", "purchasable_regions").setValue(UniverseGuard.PURCHASABLE_REGIONS).setComment("Sets if Regions can be purchased");
 	}
 	
 	/**
@@ -95,14 +113,49 @@ public class FlagUtils {
 		UniverseGuard.HUNGER_TIMER = configNode.getNode("timers", "hunger").getInt();
 		UniverseGuard.GAMEMODE_TIMER = configNode.getNode("timers", "gamemode").getInt();
 		UniverseGuard.ENTER_FLAG_TIMER = configNode.getNode("timers", "enter_flag").getInt();
+        UniverseGuard.USE_EFFECTS = configNode.getNode("timers", "use_effects").getBoolean();
+        UniverseGuard.EFFECT_TIMER = configNode.getNode("timers", "effect").getInt();
 		UniverseGuard.UNIQUE_REGIONS = configNode.getNode("players", "unique_regions").getBoolean();
-		if(!configNode.getNode("selector", "item").isVirtual()) {
+        UniverseGuard.PURCHASABLE_REGIONS = configNode.getNode("regions", "purchasable_regions").getBoolean();
+		UniverseGuard.LIMIT_REGIONS_SIZE = configNode.getNode("regions", "limit_regions_size").getBoolean();
+        UniverseGuard.LIMIT_PLAYER_REGIONS = configNode.getNode("players", "limit_player_regions").getBoolean();
+        if(!configNode.getNode("regions", "max_region_size").isVirtual()) {
+            int maxRegionSize = configNode.getNode("regions", "max_region_size").getInt();
+            if(maxRegionSize > 0)
+                UniverseGuard.MAX_REGION_SIZE = maxRegionSize;
+            else
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGION_SIZE.getValue() + String.valueOf(UniverseGuard.MAX_REGION_SIZE), "flag utils");
+        }
+        if(!configNode.getNode("players", "max_regions").isVirtual()) {
+            int maxRegions = configNode.getNode("players", "max_regions").getInt();
+            if(maxRegions > 0)
+                UniverseGuard.MAX_REGIONS = maxRegions;
+            else
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS), "flag utils");
+        }
+        for(RegionPermission permission : RegionPermission.values()) {
+            if(!configNode.getNode("max_regions", permission.getName()).isVirtual()) {
+                int maxRegions = configNode.getNode("max_regions", permission.getName()).getInt();
+                if(maxRegions > 0)
+                    UniverseGuard.MAX_PERMISSION_REGIONS.put(permission.getName(), maxRegions);
+                else
+                    LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS), "flag utils");
+            }
+        }
+        if(!configNode.getNode("max_regions", "*").isVirtual()) {
+            int maxRegions = configNode.getNode("max_regions", "*").getInt();
+            if(maxRegions > 0)
+                UniverseGuard.MAX_PERMISSION_REGIONS.put("*", maxRegions);
+            else
+                LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_MAX_REGIONS.getValue() + String.valueOf(UniverseGuard.MAX_REGIONS), "flag utils");
+        }
+        if(!configNode.getNode("selector", "item").isVirtual()) {
 			String id = configNode.getNode("selector", "item").getString();
 			Optional<ItemType> type = game.getRegistry().getType(ItemType.class, id);
 			if(type.isPresent())
 				UniverseGuard.SELECTOR_ITEM = type.get();
 			else
-				LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_SELECTOR_ITEM.getValue() + UniverseGuard.SELECTOR_ITEM.getId());
+				LogUtils.print(TextColors.RED, RegionText.TEXT_WRONG_SELECTOR_ITEM.getValue() + UniverseGuard.SELECTOR_ITEM.getId(), "flag utils");
 		}
 	}
 	
@@ -134,10 +187,11 @@ public class FlagUtils {
 	
 	/**
 	 * Get a interact from block
-	 * @param name The block of the interact
+	 * @param block The block of the interact
 	 * @return The interact with the given block if exists, null othewrise
 	 */
 	public static EnumRegionInteract getInteract(BlockType block) {
+
 		if(block.equals(BlockTypes.CRAFTING_TABLE))
 			return getInteract("craftingtable");
 		else if(block.equals(BlockTypes.ANVIL))
@@ -148,28 +202,36 @@ public class FlagUtils {
 			return getInteract("hopper");
 		else if(block.equals(BlockTypes.LEVER))
 			return getInteract("lever");
-		else if(block.equals(BlockTypes.STONE_BUTTON) || block.equals(BlockTypes.WOODEN_BUTTON))
+		else if(block.equals(BlockTypes.STONE_BUTTON) || block.equals(BlockTypes.WOODEN_BUTTON) ||
+				(block.getDefaultState().getKeys().contains(Keys.POWERED) && block.getDefaultState().getKeys().contains(Keys.DIRECTION)))
 			return getInteract("button");
 		else if(block.equals(BlockTypes.FURNACE))
 			return getInteract("furnace");
 		else if(block.equals(BlockTypes.WOODEN_DOOR) || block.equals(BlockTypes.BIRCH_DOOR) || block.equals(BlockTypes.SPRUCE_DOOR) ||
 				block.equals(BlockTypes.JUNGLE_DOOR) || block.equals(BlockTypes.ACACIA_DOOR) || block.equals(BlockTypes.DARK_OAK_DOOR) ||
-				block.equals(BlockTypes.IRON_DOOR))
+				block.equals(BlockTypes.IRON_DOOR) || block.getDefaultState().getKeys().contains(Keys.HINGE_POSITION))
 			return getInteract("door");
 		else if(block.equals(BlockTypes.FENCE_GATE) || block.equals(BlockTypes.BIRCH_FENCE_GATE) || block.equals(BlockTypes.SPRUCE_FENCE_GATE) ||
-				block.equals(BlockTypes.JUNGLE_FENCE_GATE) || block.equals(BlockTypes.ACACIA_FENCE_GATE) || block.equals(BlockTypes.DARK_OAK_FENCE_GATE))
+				block.equals(BlockTypes.JUNGLE_FENCE_GATE) || block.equals(BlockTypes.ACACIA_FENCE_GATE) || block.equals(BlockTypes.DARK_OAK_FENCE_GATE)
+				|| block.getDefaultState().getKeys().contains(Keys.IN_WALL))
 			return getInteract("fencegate");
-		else if(block.equals(BlockTypes.TRAPDOOR) || block.equals(BlockTypes.IRON_TRAPDOOR))
+		else if(block.equals(BlockTypes.TRAPDOOR) || block.equals(BlockTypes.IRON_TRAPDOOR) || block.getDefaultState().getKeys().contains(Keys.OPEN))
 			return getInteract("trapdoor");
 		else if(block.equals(BlockTypes.STANDING_SIGN) || block.equals(BlockTypes.WALL_SIGN))
 			return getInteract("sign");
+		else if(block.equals(BlockTypes.WOODEN_PRESSURE_PLATE) || block.equals(BlockTypes.STONE_PRESSURE_PLATE)
+				|| block.equals(BlockTypes.LIGHT_WEIGHTED_PRESSURE_PLATE)
+				|| block.equals(BlockTypes.HEAVY_WEIGHTED_PRESSURE_PLATE)
+				|| block.getDefaultState().getKeys().contains(Keys.POWERED)) {
+			return getInteract("pressureplate");
+		}
 		else
 			return null;
 	}
 	
 	/**
 	 * Get a vehicle from entity
-	 * @param name The entity of the vehicle
+	 * @param entity The entity of the vehicle
 	 * @return The vehicle with the given entity if exists, null othewrise
 	 */
 	public static EnumRegionVehicle getVehicle(EntityType entity) {
@@ -186,7 +248,7 @@ public class FlagUtils {
 	
 	/**
 	 * Get a interact from entity
-	 * @param name The entity of the interact
+	 * @param entity The entity of the interact
 	 * @return The interact with the given entity if exists, null othewrise
 	 */
 	public static EnumRegionInteract getInteract(EntityType entity) {
@@ -226,7 +288,7 @@ public class FlagUtils {
 	
 	/**
 	 * Get an explosion from entity
-	 * @param name The name of the explosion
+	 * @param type The name of the explosion
 	 * @return The explosion with the given name if exists, null othewrise
 	 */
 	public static EnumRegionExplosion getExplosion(EntityType type) {
@@ -288,7 +350,7 @@ public class FlagUtils {
 				|| type.equals(EntityTypes.CREEPER) || type.equals(EntityTypes.ENDER_CRYSTAL) ||
 				type.equals(EntityTypes.FIREBALL) || type.equals(EntityTypes.ENDER_DRAGON);
 	}
-	
+
 	/**
 	 * Check if a BlockType is a Crop
 	 * @param type The BlockType
@@ -316,7 +378,7 @@ public class FlagUtils {
 					return id;
 			}
 			else
-				if(id.substring(id.indexOf(":") + 1).equalsIgnoreCase(name))
+				if(id.substring(id.indexOf(":") + 1).equalsIgnoreCase(name.toLowerCase()))
 					return id;
 		}
 		return null;
@@ -324,7 +386,6 @@ public class FlagUtils {
 	
 	/**
 	 * Get the mob id from name
-	 * @param name The name of the mob
 	 * @return The mob id for a mob with that name if exists, null otherwise
 	 */
 	public static List<String> getAllMobIds() {
@@ -332,4 +393,17 @@ public class FlagUtils {
 			    .map(CatalogType::getId)
 			    .collect(Collectors.toList());
 	}
+
+	public static boolean isFluid(BlockType type) {
+		Optional<MatterProperty> matter = type.getDefaultState().getProperty(MatterProperty.class);
+		return matter.isPresent() && Objects.equals(matter.get().getValue(), MatterProperty.Matter.LIQUID);
+	}
+
+	public static boolean isExcludedFromPlace(Region region, BlockType type) {
+	    return isFluid(type) || region.getExcludedBlocks().getPlace().contains(type.getId());
+    }
+
+    public static boolean isExcludedFromDestroy(Region region, BlockType type) {
+        return isFluid(type) || region.getExcludedBlocks().getDestroy().contains(type.getId());
+    }
 }
