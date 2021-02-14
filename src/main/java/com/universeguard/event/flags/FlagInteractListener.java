@@ -8,19 +8,19 @@
 package com.universeguard.event.flags;
 
 import com.universeguard.region.Region;
+import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.EnumRegionInteract;
 import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
-import com.universeguard.utils.FlagUtils;
-import com.universeguard.utils.MessageUtils;
-import com.universeguard.utils.PermissionUtils;
-import com.universeguard.utils.RegionUtils;
+import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.animal.Horse;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.vehicle.minecart.Minecart;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.CollideBlockEvent;
@@ -95,9 +95,22 @@ public class FlagInteractListener {
 
 	@Listener
 	public void onInteractEntitySecondaryMainhand(InteractEntityEvent.Secondary.MainHand event, @First Player player) {
-		EntityType entity = event.getTargetEntity().getType();
-		EnumRegionInteract interact = FlagUtils.getInteract(entity);
-		this.handleEvent(event, event.getTargetEntity().getLocation(), interact, player);
+		Entity entity = event.getTargetEntity();
+		EntityType entityType = entity.getType();
+		EnumRegionInteract interact = FlagUtils.getInteract(entityType);
+		if(!this.handleEvent(event, event.getTargetEntity().getLocation(), interact, player)) {
+			Region playerRegion = RegionUtils.getRegion(player.getLocation());
+			Region entityRegion = RegionUtils.getRegion(entity.getLocation());
+			if(playerRegion != entityRegion) {
+				if(
+						(!playerRegion.getFlag(EnumRegionFlag.EXIT) && !RegionUtils.hasPermission(player, playerRegion)) ||
+								(!entityRegion.getFlag(EnumRegionFlag.ENTER) && !RegionUtils.hasPermission(player, entityRegion))
+				) {
+					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+					event.setCancelled(true);
+				}
+			}
+		}
 	}
 	
 	@Listener
@@ -107,10 +120,10 @@ public class FlagInteractListener {
 		this.handleEvent(event, event.getTargetEntity().getLocation(), interact, player);
 	}
 	
-	private void handleEvent(Cancellable event, Location<World> location, EnumRegionInteract interact, Player player) {
+	private boolean handleEvent(Cancellable event, Location<World> location, EnumRegionInteract interact, Player player) {
 		Region region = RegionUtils.getRegion(location);
+		boolean cancel = false;
 		if(region != null && interact != null) {
-			boolean cancel = false;
 			if(region.isLocal())
 				cancel = !region.getInteract(interact) && !RegionUtils.hasPermission(player, region);
 			else
@@ -121,6 +134,7 @@ public class FlagInteractListener {
 					MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 			}
 		}
+		return cancel;
 	}
 
 	private void handleEvent(Cancellable event, Location<World> location, EnumRegionInteract interact) {

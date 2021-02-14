@@ -7,7 +7,11 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.utils.LogUtils;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 
@@ -16,6 +20,7 @@ import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.utils.DirectionUtils;
 import com.universeguard.utils.RegionUtils;
+import org.spongepowered.api.world.World;
 
 /**
  * Handler for the enter flag
@@ -28,9 +33,10 @@ public class FlagEnterListener implements Runnable {
 	public void run() {
 		for(Player player : Sponge.getServer().getOnlinePlayers()) {
 			Region region = RegionUtils.getRegion(player.getLocation());
-			Direction direction = DirectionUtils.getPlayerDirection(player);
 			if(region != null && region.isLocal() && !RegionUtils.hasPermission(player, region) && !region.getFlag(EnumRegionFlag.ENTER)) {
-				player.setLocation(player.getLocation().sub(getOffset(direction)));
+				//Direction direction = DirectionUtils.getPlayerDirection(player);
+				player.setVelocity(player.getVelocity().mul(-2));
+				player.getVehicle().ifPresent(Entity::clearPassengers);
 			}
 		}
 	}
