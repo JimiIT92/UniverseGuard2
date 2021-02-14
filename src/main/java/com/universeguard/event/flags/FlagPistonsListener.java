@@ -1,5 +1,6 @@
 package com.universeguard.event.flags;
 
+import com.universeguard.region.Region;
 import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionEventType;
 import com.universeguard.utils.RegionUtils;
@@ -15,6 +16,10 @@ import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 public class FlagPistonsListener {
 
     @Listener
@@ -22,15 +27,33 @@ public class FlagPistonsListener {
         if(isPiston(block.getBlockState().getType()) ||
                 block.get(Keys.EXTENDED).isPresent()) {
             Player player = event.getCause().first(Player.class).orElse(null);
-            event.setCancelled(event.getLocations().stream().anyMatch(location -> this.handleEvent(event, location, player)));
+
+            List<Location<World>> locations = event.getLocations();
+            Location<World> eventLocation = locations.stream().findFirst().orElse(null);
+            boolean cantUsePistons = this.handleEvent(event, eventLocation, player);
+            List<Region> regions = locations.stream().map(RegionUtils::getRegion).distinct().collect(Collectors.toList());
+            if(regions.size() == 1) {
+                event.setCancelled(cantUsePistons);
+            } else {
+                Region eventRegion = RegionUtils.getRegion(eventLocation);
+                if(eventRegion != null) {
+                    boolean cantPushPistons = locations.stream().filter(l -> !Objects.equals(RegionUtils.getRegion(l), eventRegion)).anyMatch(l -> RegionUtils.handleEvent(event, EnumRegionFlag.PLACE, l, player, RegionEventType.LOCAL));
+                    boolean cantRetractPistons = locations.stream().filter(l -> !Objects.equals(RegionUtils.getRegion(l), eventRegion)).anyMatch(l -> RegionUtils.handleEvent(event, EnumRegionFlag.DESTROY, l, player, RegionEventType.LOCAL));
+                    event.setCancelled(cantUsePistons || cantPushPistons || cantRetractPistons);
+                }
+            }
         }
     }
 
-    private boolean isPiston(BlockType type) {
+    public static boolean isPiston(BlockType type) {
         return type.equals(BlockTypes.PISTON) ||
-                type.equals(BlockTypes.PISTON_EXTENSION)||
-                type.equals(BlockTypes.PISTON_HEAD) ||
+                isPistonExtension(type) ||
                 type.equals(BlockTypes.STICKY_PISTON);
+    }
+
+    public static boolean isPistonExtension(BlockType type) {
+        return type.equals(BlockTypes.PISTON_EXTENSION)||
+                type.equals(BlockTypes.PISTON_HEAD);
     }
 
     private boolean handleEvent(Cancellable event, Location<World> location, Player player) {
