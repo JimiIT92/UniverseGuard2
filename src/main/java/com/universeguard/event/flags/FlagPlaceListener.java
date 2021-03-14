@@ -14,6 +14,7 @@ import com.universeguard.region.enums.RegionPermission;
 import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.Piston;
@@ -82,11 +83,10 @@ public class FlagPlaceListener {
 	@Listener
 	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event) {
 		if (!event.getTransactions().isEmpty()) {
-			BlockSnapshot block = event.getTransactions().get(0).getFinal();
+			BlockSnapshot block = event.getTransactions().get(0).getDefault();
 			BlockType type = block.getState().getType();
 			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE) && !FlagUtils.isFluid(type)
-			&& !(FlagPistonsListener.isPistonExtension(type) || (block.get(Keys.EXTENDED).isPresent()
-			&& block.get(Keys.EXTENDED).get())
+			&& !(FlagPistonsListener.isPistonExtension(type)|| block.get(Keys.EXTENDED).isPresent()
 			|| event.getCause().root() instanceof Piston)) {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
 			    Player player = event.getCause().first(Player.class).orElse(null);

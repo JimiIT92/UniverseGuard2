@@ -15,6 +15,7 @@ import com.universeguard.region.enums.RegionText;
 import com.universeguard.utils.*;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -30,8 +31,13 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.CraftItemEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
+import org.spongepowered.api.item.inventory.property.SlotPos;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -41,14 +47,12 @@ import org.spongepowered.api.world.World;
  *
  */
 public class FlagInteractListener {
-	
+
 	@Listener
-	public void onItemCraft(ClickInventoryEvent event, @Root Player player, @Getter("getTargetInventory") Inventory inventory) {
-		if (inventory.getArchetype() == InventoryArchetypes.PLAYER) {
-			this.handleEvent(event, player.getLocation(), EnumRegionInteract.CRAFTING_TABLE, player);
-	    }
+	public void onItemCraft(CraftItemEvent event, @Root Player player) {
+		this.handleEvent(event, player.getLocation(), EnumRegionInteract.CRAFTING_TABLE, player);
 	}
-	
+
 	@Listener
 	public void onInteractBlockSecondaryMainhand(InteractBlockEvent.Secondary.MainHand event, @First Player player) {
 		BlockType block = event.getTargetBlock().getState().getType();

@@ -10,6 +10,7 @@ package com.universeguard.event.flags;
 import com.universeguard.utils.*;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.Creature;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.animal.Animal;
@@ -59,7 +60,7 @@ public class FlagMobSpawnListener {
 	private void handleEvent(SpawnEntityEvent event, Entity entity, Player player)
 	{
 		EntityType type = entity.getType();
-		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type) && entity instanceof Living)
+		if(!FlagUtils.isBlockEntity(type) && !FlagUtils.isVehicle(type) && !(entity instanceof ArmorStand) && entity instanceof Living)
 		{
 			String name = type.getId().toLowerCase();
 			Region region = RegionUtils.getRegion(entity.getLocation());
