@@ -17,6 +17,7 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.CommandBlock;
 import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.key.Keys;
@@ -91,12 +92,14 @@ public class FlagPlaceListener {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
 			    Player player = event.getCause().first(Player.class).orElse(null);
 				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
-				    if(region.getFlag(EnumRegionFlag.PLACE)) {
+					if(region.getFlag(EnumRegionFlag.PLACE)) {
                         event.setCancelled(true);
                         MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
                     }
                 } else {
-                    this.handleEvent(event, block.getLocation().get(), player);
+					if(event.getCause().first(CommandBlock.class).orElse(null) == null) {
+						this.handleEvent(event, block.getLocation().get(), player);
+					}
                 }
 			}
 		}
