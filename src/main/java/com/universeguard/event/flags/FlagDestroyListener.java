@@ -32,6 +32,7 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.world.Location;
@@ -56,8 +57,7 @@ public class FlagDestroyListener {
 		}
 	}
 
-
-	@Listener
+	/*@Listener
 	public void onBucketFill(InteractBlockEvent.Secondary event, @First Player player) {
 		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 		if(item.isPresent() && item.get().getType().equals(ItemTypes.BUCKET) && event.getInteractionPoint().isPresent()) {
@@ -73,7 +73,7 @@ public class FlagDestroyListener {
 				}
 			}
 		}
-	}
+	}*/
 
 	@Listener
 	public void onEntityCollide(CollideEntityEvent.Impact event, @First Player player) {
@@ -87,8 +87,10 @@ public class FlagDestroyListener {
 
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event) {
+		LogUtils.log(event.getContext().get(EventContextKeys.SPAWN_TYPE).get().getId());
 		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
 				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
+				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.PLACEMENT &&
 				(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK))) {
 			Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 			Player player = event.getCause().first(Player.class).orElse(null);

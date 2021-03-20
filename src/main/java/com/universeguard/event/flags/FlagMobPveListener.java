@@ -16,6 +16,7 @@ import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 
@@ -35,9 +36,10 @@ import com.universeguard.utils.RegionUtils;
 public class FlagMobPveListener {
 
 	@Listener
-	public void onMobPve(DamageEntityEvent event, @First EntityDamageSource source) {
-		if(!(event.getTargetEntity() instanceof Player) && source.getSource() instanceof Player) {
-			this.handleEvent(event, event.getTargetEntity(), (Player) source.getSource());
+	public void onMobPve(DamageEntityEvent event, @First IndirectEntityDamageSource source) {
+		Entity entity = source.getIndirectSource();
+		if(!(event.getTargetEntity() instanceof Player) && entity instanceof Player) {
+			this.handleEvent(event, event.getTargetEntity(), (Player) entity);
 		}
 	}
 	
