@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.spongepowered:configurate-core:3.7.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-core/3.7.1/2cb140a772956b742e16c302f77c1352733dd35a/configurate-core-3.7.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-core/3.7.1/ec03a7856b743130d8ab58a5a270825924decca1/configurate-core-3.7.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

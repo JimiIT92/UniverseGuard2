@@ -57,23 +57,24 @@ public class FlagDestroyListener {
 		}
 	}
 
-	/*@Listener
+	@Listener
 	public void onBucketFill(InteractBlockEvent.Secondary event, @First Player player) {
 		Optional<ItemStackSnapshot> item = event.getContext().get(EventContextKeys.USED_ITEM);
 		if(item.isPresent() && item.get().getType().equals(ItemTypes.BUCKET) && event.getInteractionPoint().isPresent()) {
 			BlockState block = player.getWorld().getBlock(event.getInteractionPoint().get().toInt());
 			Optional<MatterProperty> matter = block.getProperty(MatterProperty.class);
 			if(matter.isPresent() && Objects.equals(matter.get().getValue(), MatterProperty.Matter.LIQUID)) {
-				if(block.getType() == BlockTypes.WATER || block.getType() == BlockTypes.FLOWING_WATER) {
+				this.handleEvent(event, new Location<World>(player.getWorld(), event.getInteractionPoint().get()), player);
+				/*if(block.getType() == BlockTypes.WATER || block.getType() == BlockTypes.FLOWING_WATER) {
 					RegionUtils.handleEvent(event, EnumRegionFlag.WATER_FLOW, player.getLocation(), player, RegionEventType.LOCAL);
 				} else if(block.getType() == BlockTypes.LAVA || block.getType() == BlockTypes.FLOWING_LAVA) {
 					RegionUtils.handleEvent(event, EnumRegionFlag.LAVA_FLOW, player.getLocation(), player, RegionEventType.LOCAL);
 				} else {
 					RegionUtils.handleEvent(event, EnumRegionFlag.OTHER_LIQUIDS_FLOW, player.getLocation(), player, RegionEventType.LOCAL);
-				}
+				}*/
 			}
 		}
-	}*/
+	}
 
 	@Listener
 	public void onEntityCollide(CollideEntityEvent.Impact event, @First Player player) {
@@ -87,7 +88,6 @@ public class FlagDestroyListener {
 
 	@Listener
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event) {
-		LogUtils.log(event.getContext().get(EventContextKeys.SPAWN_TYPE).get().getId());
 		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
 				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
 				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.PLACEMENT &&
@@ -100,7 +100,8 @@ public class FlagDestroyListener {
 			Optional<ItemStackSnapshot> finalItem = item;
 			event.getLocations().forEach(location -> {
 				BlockState block = location.getBlock();
-				if(event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
+				if(FlagUtils.isFluid(block.getType()) ||
+					event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
 					event.getContext().containsKey(EventContextKeys.PISTON_RETRACT) ||
 					block.getType() == BlockTypes.PISTON_EXTENSION ||
 					block.getType() == BlockTypes.PISTON_HEAD) {
@@ -129,7 +130,7 @@ public class FlagDestroyListener {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
 			BlockType type = block.getState().getType();
-			if(event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
+			if(FlagUtils.isFluid(type) || event.getContext().containsKey(EventContextKeys.PISTON_EXTEND) ||
 					event.getContext().containsKey(EventContextKeys.PISTON_RETRACT) ||
 					type == BlockTypes.PISTON_EXTENSION ||
 					type == BlockTypes.PISTON_HEAD) {
@@ -139,6 +140,7 @@ public class FlagDestroyListener {
 			if (block.getLocation().isPresent() &&
 					event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
 					event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
+					event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.PLACEMENT &&
 					(event.getContext().containsKey(EventContextKeys.OWNER) || event.getContext().containsKey(EventContextKeys.PLAYER_BREAK))) {
 				Player player = event.getCause().first(Player.class).orElse(null);
                 Region region = RegionUtils.getRegion(block.getLocation().get());

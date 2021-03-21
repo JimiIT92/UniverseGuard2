@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.spongepowered:configurate-yaml:3.7.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-yaml/3.7.1/a0c3eec370aa9bdec3f450f842edcb03f6d42be2/configurate-yaml-3.7.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-yaml/3.7.1/190f59d18bd8dfc9680c698cbe0d667aae818ed/configurate-yaml-3.7.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
