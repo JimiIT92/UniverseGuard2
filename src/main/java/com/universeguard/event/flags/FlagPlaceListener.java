@@ -86,7 +86,7 @@ public class FlagPlaceListener {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getDefault();
 			BlockType type = block.getState().getType();
-			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE) && !FlagUtils.isFluid(type)
+			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE) /*&& !FlagUtils.isFluid(type)*/
 			&& !(FlagPistonsListener.isPistonExtension(type)|| block.get(Keys.EXTENDED).isPresent()
 			|| event.getCause().root() instanceof Piston)) {
 			    Region region = RegionUtils.getRegion(block.getLocation().get());
