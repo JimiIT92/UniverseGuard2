@@ -7,6 +7,7 @@
  */
 package com.universeguard.event.flags;
 
+import com.universeguard.utils.FlagUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -39,7 +40,7 @@ public class FlagLeafDecayListener {
 		if(!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
 			BlockType type = block.getState().getType();
-			if(type.equals(BlockTypes.LEAVES) || type.equals(BlockTypes.LEAVES2))
+			if(FlagUtils.isLeave(type))
 				this.handleEvent(event, block.getLocation().get(), null);
 		}
 	}
@@ -50,7 +51,7 @@ public class FlagLeafDecayListener {
 		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE)) {
 			SpawnType spawn = event.getContext().get(EventContextKeys.SPAWN_TYPE).get();
 			BlockType type = block.getBlockState().getType();
-			if(spawn.equals(SpawnTypes.DROPPED_ITEM) && (type.equals(BlockTypes.LEAVES) || type.equals(BlockTypes.LEAVES2)))
+			if(spawn.equals(SpawnTypes.DROPPED_ITEM) && (FlagUtils.isLeave(type)))
 				this.handleEvent(event, block.getLocation(), null);	
 		}
 	}

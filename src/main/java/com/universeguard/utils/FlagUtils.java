@@ -400,10 +400,16 @@ public class FlagUtils {
 	}
 
 	public static boolean isExcludedFromPlace(Region region, BlockType type) {
-	    return /*isFluid(type) ||*/ region.getExcludedBlocks().getPlace().contains(type.getId());
+	    return region.getExcludedBlocks().getPlace().contains(type.getId());
     }
 
     public static boolean isExcludedFromDestroy(Region region, BlockType type) {
-        return /*isFluid(type) || */ region.getExcludedBlocks().getDestroy().contains(type.getId());
+        return region.getExcludedBlocks().getDestroy().contains(type.getId());
     }
+
+    public static boolean isLeave(BlockType type) {
+		return type.equals(BlockTypes.LEAVES) ||
+				type.equals(BlockTypes.LEAVES2) ||
+				type.getDefaultState().get(Keys.DECAYABLE).isPresent();
+	}
 }
