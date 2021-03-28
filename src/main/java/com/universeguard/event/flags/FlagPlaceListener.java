@@ -28,14 +28,17 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.filter.IsCancelled;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -81,26 +84,70 @@ public class FlagPlaceListener {
 		}
 	}
 
-	@Listener
+	@Listener(order = Order.FIRST, beforeModifications = true)
+	@IsCancelled(Tristate.UNDEFINED)
 	public void onBlockPlacedByPlayer(ChangeBlockEvent.Place event) {
 		if (!event.getTransactions().isEmpty()) {
-			BlockSnapshot block = event.getTransactions().get(0).getDefault();
-			BlockType type = block.getState().getType();
-			if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE) /*&& !FlagUtils.isFluid(type)*/
-			&& !(FlagPistonsListener.isPistonExtension(type)|| block.get(Keys.EXTENDED).isPresent()
-			|| event.getCause().root() instanceof Piston)) {
-			    Region region = RegionUtils.getRegion(block.getLocation().get());
-			    Player player = event.getCause().first(Player.class).orElse(null);
-				if(region != null && FlagUtils.isExcludedFromPlace(region, type) && (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION))) {
-					if(region.getFlag(EnumRegionFlag.PLACE)) {
-                        event.setCancelled(true);
-                        MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
-                    }
-                } else {
-					if(event.getCause().first(CommandBlock.class).orElse(null) == null) {
-						this.handleEvent(event, block.getLocation().get(), player);
+			Player player = event.getCause().first(Player.class).orElse(null);
+			boolean isPistonCause = event.getCause().root() instanceof Piston;
+			boolean hasPermission = (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION));
+			event.getTransactions().forEach(t -> {
+				BlockSnapshot block = t.getDefault();
+				BlockType type = block.getState().getType();
+				if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE)
+						&& !(FlagPistonsListener.isPistonExtension(type)|| block.get(Keys.EXTENDED).isPresent()
+						|| isPistonCause)) {
+					Region region = RegionUtils.getRegion(block.getLocation().get());
+					if(region != null && FlagUtils.isExcludedFromPlace(region, type) && hasPermission) {
+						if(region.getFlag(EnumRegionFlag.PLACE)) {
+							t.setValid(false);
+						}
+					} else {
+						if(event.getCause().first(CommandBlock.class).orElse(null) == null) {
+							if(this.handleEvent(event, block.getLocation().get(), player)) {
+								t.setValid(false);
+							}
+						}
 					}
-                }
+				}
+			});
+			if(event.getTransactions().stream().anyMatch(t -> !t.isValid())) {
+				event.setCancelled(true);
+				MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
+			}
+		}
+	}
+
+	@Listener(order = Order.FIRST, beforeModifications = true)
+	@IsCancelled(Tristate.UNDEFINED)
+	public void onBlockPlacedByPlayer(ChangeBlockEvent.Grow event) {
+		if (!event.getTransactions().isEmpty()) {
+			Player player = event.getCause().first(Player.class).orElse(null);
+			boolean isPistonCause = event.getCause().root() instanceof Piston;
+			boolean hasPermission = (player == null || !PermissionUtils.hasPermission(player, RegionPermission.REGION));
+			event.getTransactions().forEach(t -> {
+				BlockSnapshot block = t.getDefault();
+				BlockType type = block.getState().getType();
+				if (block.getLocation().isPresent() && !type.equals(BlockTypes.FROSTED_ICE)
+						&& !(FlagPistonsListener.isPistonExtension(type)|| block.get(Keys.EXTENDED).isPresent()
+						|| isPistonCause)) {
+					Region region = RegionUtils.getRegion(block.getLocation().get());
+					if(region != null && FlagUtils.isExcludedFromPlace(region, type) && hasPermission) {
+						if(region.getFlag(EnumRegionFlag.PLACE)) {
+							t.setValid(false);
+						}
+					} else {
+						if(event.getCause().first(CommandBlock.class).orElse(null) == null) {
+							if(this.handleEvent(event, block.getLocation().get(), player)) {
+								t.setValid(false);
+							}
+						}
+					}
+				}
+			});
+			if(event.getTransactions().stream().anyMatch(t -> !t.isValid())) {
+				event.setCancelled(true);
+				MessageUtils.sendHotbarErrorMessage(player, RegionText.NO_PERMISSION_REGION.getValue());
 			}
 		}
 	}

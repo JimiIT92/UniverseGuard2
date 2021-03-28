@@ -25,6 +25,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -86,7 +87,7 @@ public class FlagDestroyListener {
 		}
 	}
 
-	@Listener
+	@Listener(order = Order.FIRST, beforeModifications = true)
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break.Pre event) {
 		if(event.getContext().containsKey(EventContextKeys.SPAWN_TYPE) &&
 				event.getContext().get(EventContextKeys.SPAWN_TYPE).get() != SpawnTypes.CUSTOM &&
@@ -125,7 +126,7 @@ public class FlagDestroyListener {
 		}
 	}
 
-	@Listener
+	@Listener(order = Order.FIRST, beforeModifications = true)
 	public void onBlockDestroyedByPlayer(ChangeBlockEvent.Break event) {
 		if (!event.getTransactions().isEmpty()) {
 			BlockSnapshot block = event.getTransactions().get(0).getOriginal();
