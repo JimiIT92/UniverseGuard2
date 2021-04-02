@@ -14,8 +14,10 @@ and so on. More informations about what you can set inside a Region can be found
 Universe Guard do not require any other plugin or mod to be installed on your server. 
 
 # Compatibility
-Universe Guard has been build with the version 6.0.0 of SpongeAPI and has been tested with Sponge for Minecraft 1.10.2. By the way, this
+Universe Guard has been build with the version 7.3.1 of SpongeAPI and has been tested with Sponge for Minecraft 1.10.2. By the way, this
 should also work with newest version of Sponge, but at the time I'm writing this document tests with other version are still in progess.
+Make sure you have the right Sponge version installed on your server, as any version prior to the one used by UniverseGuard won't make
+the plugin work
 
 # How to contribute
 Since is an open source project anyone can help the development. So if you have any idea on how to improve the plugin, 
