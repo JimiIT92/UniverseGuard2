@@ -23,8 +23,8 @@ the plugin work
 Since is an open source project anyone can help the development. So if you have any idea on how to improve the plugin, 
 or how to fix some bugs feel free to write it on the Official Sponge page or in the Issues tab.
 
-Or if you just want to show some support to the project, I've created a paypal link recently, so you can pay me a coffee if you want to :)
-https://www.paypal.me/JimiIT92
+Or if you just want to show some support to the project, I've created a Ko-Fi link recently, so you can pay me a beer if you want to :)
+[https://ko-fi.com/jimi_](https://ko-fi.com/jimi_)
 
 Of course I'm not asking you to pay to use the plugin, and will NEVER do that. If you payed to use this plugin than you got scammed!
 I hope you like this plugin and help me to make it grow. Peace! :) 
